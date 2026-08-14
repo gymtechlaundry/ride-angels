@@ -1,0 +1,25 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="calendar-day-page ra-page-shell ra-page-shell--flush-top">
+    <app-page-header
+      [title]="title()"
+      [subtitle]="subtitle()"
+      [showBack]="true"
+    />
+
+    <section class="feed ra-page-pad">
+      @for (ride of dayRides(); track ride.rideRequestId) {
+        <app-ride-card
+          [ride]="ride"
+          [hideDate]="true"
+          (open)="openRideCard($event)"
+        />
+      } @empty {
+        <p class="empty">No rides scheduled for this day.</p>
+      }
+    </section>
+  </div>
+</ion-content>

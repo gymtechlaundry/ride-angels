@@ -1,0 +1,437 @@
+<ion-header class="ion-no-border ra-chrome">
+  <div class="header-inner">
+    <app-page-header title="Profile" subtitle="Your Ride Angels account" />
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="profile-page ra-page-shell">
+    @if (user(); as u) {
+      <section class="profile-card ra-page-pad">
+        <div class="card" [class.editing]="editing()">
+          <div class="identity">
+            <app-profile-avatar
+              [src]="u.avatarUrl"
+              [name]="u.displayName"
+              [size]="editing() ? 72 : 64"
+              [alt]="u.displayName"
+            />
+
+            @if (editing()) {
+              @if (isNative) {
+                <button
+                  type="button"
+                  class="photo-btn ra-reset"
+                  [disabled]="profileBusy()"
+                  (click)="changePhoto()"
+                >
+                  Change photo
+                </button>
+              } @else {
+                <label class="photo-btn">
+                  Change photo
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    capture="environment"
+                    (change)="onAvatarSelected($event)"
+                    [disabled]="profileBusy()"
+                  />
+                </label>
+              }
+            } @else {
+              <div class="identity-copy">
+                <h2>{{ u.displayName }}</h2>
+                @if (u.email) {
+                  <p>{{ u.email }}</p>
+                }
+                @if (u.phone) {
+                  <p>{{ u.phone }}</p>
+                }
+              </div>
+            }
+          </div>
+
+          @if (editing()) {
+            <form class="edit-form" [formGroup]="editForm" (ngSubmit)="saveProfile()">
+              <label class="field">
+                <span class="label">First name</span>
+                <input formControlName="firstName" type="text" autocomplete="given-name" />
+              </label>
+              <label class="field">
+                <span class="label">Last name</span>
+                <input formControlName="lastName" type="text" autocomplete="family-name" />
+              </label>
+
+              <div class="field">
+                <span class="label">Default mode</span>
+                <p class="field-hint">Used each time you sign in.</p>
+                <div class="mode-options compact">
+                  <button
+                    type="button"
+                    class="mode-option ra-reset"
+                    [class.active]="editDefaultPersona() === 'rider'"
+                    (click)="editDefaultPersona.set('rider')"
+                  >
+                    <strong>Rider</strong>
+                    <span>Request and manage rides</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="mode-option ra-reset"
+                    [class.active]="editDefaultPersona() === 'angel'"
+                    (click)="editDefaultPersona.set('angel')"
+                  >
+                    <strong>Ride Angel</strong>
+                    <span>Claim and drive rides</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="field">
+                <span class="label">Phone number</span>
+                <div class="identity-row">
+                  <div>
+                    <p class="identity-value">
+                      {{ phoneMethod()?.value || 'Not added' }}
+                    </p>
+                    <p
+                      class="identity-status"
+                      [class.ok]="phoneMethod()?.status === 'verified'"
+                    >
+                      {{ methodStatusLabel(phoneMethod()?.status) }}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    class="text-action muted ra-reset"
+                    (click)="manageSignIn('phone')"
+                  >
+                    {{ phoneMethod()?.status === 'verified' ? 'Change' : 'Add' }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="field">
+                <span class="label">Email address</span>
+                <div class="identity-row">
+                  <div>
+                    <p class="identity-value">
+                      {{ emailMethod()?.value || 'Not added' }}
+                    </p>
+                    <p
+                      class="identity-status"
+                      [class.ok]="emailMethod()?.status === 'verified'"
+                    >
+                      {{ methodStatusLabel(emailMethod()?.status) }}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    class="text-action muted ra-reset"
+                    (click)="manageSignIn('email')"
+                  >
+                    {{ emailMethod()?.status === 'verified' ? 'Change' : 'Add' }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="edit-actions">
+                <app-primary-button
+                  label="Save"
+                  [disabled]="profileBusy()"
+                  (pressed)="saveProfile()"
+                />
+                <button
+                  type="button"
+                  class="cancel ra-reset"
+                  [disabled]="profileBusy()"
+                  (click)="cancelEdit()"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          } @else {
+            <button type="button" class="edit-link ra-reset" (click)="startEdit()">
+              Edit profile
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="settings-section ra-page-pad">
+      <div class="settings-card">
+        <div class="settings-head">
+          <div>
+            <p class="eyebrow">Calendar</p>
+            @if (calendarRows().length === 0) {
+              <p class="status">No calendars connected</p>
+              <p class="help">{{ calendarEmptyHelp() }}</p>
+            }
+          </div>
+          @if (showCalendarPicker() && canChangeCalendar()) {
+            <button
+              type="button"
+              class="text-action ra-reset"
+              [disabled]="calendarBusy()"
+              (click)="toggleCalendarPicker()"
+            >
+              Done
+            </button>
+          }
+        </div>
+
+        @if (calendarRows().length > 0) {
+          <div class="app-list">
+            @for (row of calendarRows(); track row.id) {
+              <div class="app-row">
+                <div class="app-row-head">
+                  <p class="app-name">
+                    {{ row.label }}
+                    @if (row.connected && row.selectedName) {
+                      <span class="title-meta">({{ row.selectedName }})</span>
+                    }
+                  </p>
+                  @if (
+                    row.connected &&
+                    row.supportsPicker &&
+                    canChangeCalendar() &&
+                    !showCalendarPicker()
+                  ) {
+                    <button
+                      type="button"
+                      class="text-action inline ra-reset"
+                      [disabled]="calendarBusy()"
+                      (click)="toggleCalendarPicker(row)"
+                    >
+                      Change
+                    </button>
+                  }
+                </div>
+
+                @if (row.connected) {
+                  @if (
+                    row.supportsPicker &&
+                    showCalendarPicker() &&
+                    canChangeCalendar()
+                  ) {
+                    <div class="calendar-list">
+                      <p class="list-label">Choose calendar</p>
+                      @for (cal of calendars(); track cal.id) {
+                        <button
+                          type="button"
+                          class="cal-option ra-reset"
+                          [class.active]="prefs()?.selectedCalendarId === cal.id"
+                          (click)="selectCalendar(cal)"
+                        >
+                          {{ cal.name }}
+                          @if (cal.isPrimary) {
+                            <span class="primary-tag">Primary</span>
+                          }
+                        </button>
+                      }
+                    </div>
+                  }
+
+                  <div class="link-row">
+                    <p class="status ok">Connected</p>
+                    <button
+                      type="button"
+                      class="text-action muted ra-reset"
+                      [disabled]="calendarBusy()"
+                      (click)="disconnectCalendar()"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                } @else if (row.canConnect) {
+                  <div class="link-row">
+                    <p class="status">Not connected</p>
+                    <button
+                      type="button"
+                      class="text-action ra-reset"
+                      [disabled]="calendarBusy()"
+                      (click)="connectProvider(row.id)"
+                    >
+                      {{ calendarConnectLabel(row.id) }}
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="settings-section ra-page-pad">
+      <div class="settings-card">
+        <div class="settings-head">
+          <div>
+            <p class="eyebrow">Connected apps</p>
+            @if (partnerLinkRows().length === 0) {
+              <p class="status">No connected apps</p>
+            }
+          </div>
+        </div>
+
+        @if (partnerLinkRows().length > 0) {
+          <div class="app-list">
+            @for (link of partnerLinkRows(); track link.partnerId) {
+              <div class="app-row">
+                <p class="app-name">{{ link.partnerName }}</p>
+                <div class="link-row">
+                  <p class="status ok">Linked</p>
+                  <button
+                    type="button"
+                    class="text-action muted ra-reset"
+                    [disabled]="appsBusy()"
+                    (click)="unlinkPartner(link.partnerId, link.partnerName)"
+                  >
+                    Unlink
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="settings-section ra-page-pad">
+      <div class="settings-card">
+        <div class="settings-head">
+          <div>
+            <p class="eyebrow">Notifications</p>
+          </div>
+        </div>
+
+        <div class="app-list">
+          <div class="app-row">
+            <p class="app-name">Push notifications</p>
+            @if (isNative) {
+              <div class="link-row">
+                <p
+                  class="status"
+                  [class.ok]="pushStatus() === 'on'"
+                  [class.warn]="pushStatus() === 'denied'"
+                >
+                  {{ pushStatusLabel() }}
+                </p>
+                @if (pushStatus() === 'on') {
+                  <button
+                    type="button"
+                    class="text-action muted ra-reset"
+                    [disabled]="pushBusy()"
+                    (click)="onPushToggle(false)"
+                  >
+                    Turn off
+                  </button>
+                } @else if (pushStatus() !== 'loading') {
+                  <button
+                    type="button"
+                    class="text-action muted ra-reset"
+                    [disabled]="pushBusy()"
+                    (click)="onPushToggle(true)"
+                  >
+                    Turn on
+                  </button>
+                }
+              </div>
+
+              @if (pushStatus() === 'on') {
+                <button
+                  type="button"
+                  class="choose-events ra-reset"
+                  (click)="openNotifications()"
+                >
+                  <div>
+                    <p class="help">Choose which events send a push.</p>
+                  </div>
+                  <span class="chevron" aria-hidden="true">›</span>
+                </button>
+              } @else if (pushStatus() === 'denied') {
+                <p class="help">
+                  Notifications are blocked for Ride Angels. Turn them on in
+                  system settings, then tap Turn on again.
+                </p>
+                <button
+                  type="button"
+                  class="text-action inline ra-reset"
+                  (click)="openNotificationSettings()"
+                >
+                  Open Settings
+                </button>
+              }
+            } @else {
+              <p class="status">Available in the iOS or Android app</p>
+            }
+          </div>
+
+          <div class="app-row">
+            <p class="app-name">In-app notifications</p>
+            <div class="link-row">
+              <p class="status" [class.ok]="inAppChannelEnabled()">
+                {{ inAppChannelEnabled() ? 'On' : 'Off' }}
+              </p>
+              @if (inAppChannelEnabled()) {
+                <button
+                  type="button"
+                  class="text-action muted ra-reset"
+                  [disabled]="channelBusy()"
+                  (click)="onInAppToggle(false)"
+                >
+                  Turn off
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="text-action muted ra-reset"
+                  [disabled]="channelBusy()"
+                  (click)="onInAppToggle(true)"
+                >
+                  Turn on
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="app-row">
+            <p class="app-name">SMS notifications</p>
+            <div class="link-row">
+              <p class="status">Coming soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="actions ra-page-pad">
+      <div class="action-buttons">
+        <app-primary-button
+          label="Feedback & ideas"
+          variant="soft"
+          (pressed)="openDiscussion()"
+        />
+
+        <app-primary-button
+          label="Account & Security"
+          variant="soft"
+          (pressed)="openSecurity()"
+        />
+      </div>
+
+      <div class="account-links">
+        <button type="button" class="reset ra-reset" (click)="signOut()">
+          Sign out
+        </button>
+      </div>
+    </section>
+  </div>
+</ion-content>

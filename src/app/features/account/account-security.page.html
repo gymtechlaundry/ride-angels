@@ -1,0 +1,171 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="security-page ra-page-shell ra-page-shell--flush-top">
+    <app-page-header
+      title="Account & security"
+      subtitle="Sign-in methods and account controls for this profile."
+      [showBack]="true"
+    />
+
+    @if (showRecoveryPrompt()) {
+      <section class="recovery ra-page-pad">
+        <div class="help-card">
+          <h2>{{ recoveryTitle() }}</h2>
+          <p>{{ recoveryBody() }}</p>
+          @if (recoveryChannel(); as channel) {
+            <app-primary-button
+              [label]="recoveryActionLabel()"
+              (pressed)="startRecoveryAdd()"
+            />
+          }
+          <button type="button" class="skip ra-reset" (click)="skipForNow()">
+            Skip for now
+          </button>
+        </div>
+      </section>
+    }
+
+    <section class="page-section ra-page-pad">
+      <header class="section-head">
+        <h2>Security</h2>
+        <p>
+          Sign-in methods for this account. Adding one never creates a second
+          profile.
+        </p>
+      </header>
+
+      <div class="methods-card">
+        <div class="method-list">
+          @for (method of methods(); track method.channel) {
+            <div class="method-row">
+              <div class="method-copy">
+                <p class="method-name">
+                  {{ method.channel === 'phone' ? 'Phone number' : 'Email address' }}
+                </p>
+                <p class="method-value" [class.is-empty]="!method.value">
+                  {{ method.value || '\u00A0' }}
+                </p>
+              </div>
+
+              <div class="link-row">
+                <p class="status" [class.ok]="method.status === 'verified'">
+                  {{ statusLabel(method.status) }}
+                  @if (method.isPrimary && method.status === 'verified') {
+                    · Primary
+                  }
+                </p>
+                @if (adding() !== method.channel) {
+                  <button
+                    type="button"
+                    class="text-action muted ra-reset"
+                    (click)="startAdd(method.channel)"
+                  >
+                    {{
+                      method.status === 'not_added'
+                        ? 'Add'
+                        : 'Change'
+                    }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (adding(); as channel) {
+        <div class="add-panel">
+          <h3>{{ panelTitle(channel) }}</h3>
+          <p class="hint">
+            @if (channel === 'email') {
+              Enter the email you want to use for sign-in. We’ll send a code to confirm it belongs to you — same account, no new profile.
+            } @else {
+              Enter the phone number you want to use for sign-in. We’ll text a code to confirm it — same account, no new profile.
+            }
+          </p>
+
+          <div class="field">
+            <label [attr.for]="channel">{{ channel === 'email' ? 'Email' : 'Phone' }}</label>
+            <input
+              [id]="channel"
+              [type]="channel === 'email' ? 'email' : 'tel'"
+              [placeholder]="channel === 'email' ? 'you@example.com' : '(912) 555-1234'"
+              [ngModel]="value()"
+              (ngModelChange)="value.set($event)"
+            />
+          </div>
+
+          @if (error()) {
+            <p class="error">{{ error() }}</p>
+          }
+
+          <div class="row">
+            <app-primary-button
+              [label]="busy() ? 'Sending…' : 'Send verification code'"
+              [disabled]="busy()"
+              (pressed)="submitAdd()"
+            />
+            <button type="button" class="cancel ra-reset" (click)="cancelAdd()">Cancel</button>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="page-section ra-page-pad">
+      <header class="section-head">
+        <h2>Devices</h2>
+        <p>
+          You can stay signed in on more than one device — for example your
+          phone and iPad. Sign out on Profile only ends the session on this
+          device.
+        </p>
+      </header>
+
+      <div class="sessions-card">
+        <div class="sessions-copy">
+          <h3>Sign out all devices</h3>
+          <p>
+            Use this if you lost a phone or think someone else may have access.
+            You’ll need to sign in again everywhere.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="sessions-action ra-reset"
+          [disabled]="signingOutEverywhere()"
+          (click)="signOutEverywhere()"
+        >
+          {{ signingOutEverywhere() ? 'Signing out…' : 'Sign out all devices' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="page-section page-section--account ra-page-pad">
+      <header class="section-head">
+        <h2>Account</h2>
+        <p>Controls that affect your Ride Angels profile itself.</p>
+      </header>
+
+      <div class="danger-card">
+        <div class="danger-copy">
+          <h3>Account deletion</h3>
+          <p>
+            Permanently remove your Ride Angels profile, appointments, trusted
+            circle, and photos. This cannot be undone.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="delete-link ra-reset"
+          [disabled]="deleting()"
+          (click)="deleteAccount()"
+        >
+          {{ deleting() ? 'Deleting…' : 'Delete permanently' }}
+        </button>
+      </div>
+    </section>
+  </div>
+</ion-content>

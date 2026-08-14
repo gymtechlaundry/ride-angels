@@ -1,0 +1,14 @@
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-page-section-gap);
+  padding-top: var(--ra-page-section-y);
+  padding-bottom: var(--ra-page-section-y);
+}
+
+.empty {
+  margin: 0;
+  font-size: var(--ra-card-body-size);
+  line-height: 1.4;
+  color: var(--ra-text-muted);
+}

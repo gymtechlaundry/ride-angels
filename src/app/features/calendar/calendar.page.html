@@ -1,0 +1,121 @@
+<ion-header class="ion-no-border ra-chrome">
+  <div class="header-inner">
+    <app-page-header [title]="title()" [subtitle]="subtitle()" />
+    <div class="view-toggle ra-page-pad" role="tablist" aria-label="Schedule view">
+      <button
+        type="button"
+        class="seg ra-reset"
+        role="tab"
+        [class.active]="viewMode() === 'calendar'"
+        [attr.aria-selected]="viewMode() === 'calendar'"
+        (click)="setViewMode('calendar')"
+      >
+        Calendar
+      </button>
+      <button
+        type="button"
+        class="seg ra-reset"
+        role="tab"
+        [class.active]="viewMode() === 'list'"
+        [attr.aria-selected]="viewMode() === 'list'"
+        (click)="setViewMode('list')"
+      >
+        {{ persona() === 'angel' ? 'Open requests' : 'List' }}
+      </button>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="calendar-page ra-page-shell">
+    @if (viewMode() === 'calendar') {
+      <section class="cal-section ra-page-pad">
+        <app-calendar-month
+          [selected]="selectedDate()"
+          [dayEvents]="dayEvents()"
+          (dateSelected)="onSelectDate($event)"
+        />
+        <div class="legend" aria-label="Calendar color key">
+          <span class="legend-item">
+            <span class="swatch unclaimed" aria-hidden="true"></span>
+            Unclaimed
+          </span>
+          <span class="legend-item">
+            <span class="swatch needs-confirm" aria-hidden="true"></span>
+            Needs confirm
+          </span>
+          <span class="legend-item">
+            <span class="swatch claimed" aria-hidden="true"></span>
+            Claimed
+          </span>
+        </div>
+      </section>
+    } @else if (persona() === 'angel') {
+      <div class="filters ra-page-pad" role="tablist" aria-label="Filter open requests">
+        <button
+          type="button"
+          class="seg ra-reset"
+          role="tab"
+          [class.active]="boardFilter() === 'all'"
+          [attr.aria-selected]="boardFilter() === 'all'"
+          (click)="setBoardFilter('all')"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          class="seg ra-reset"
+          role="tab"
+          [class.active]="boardFilter() === 'private'"
+          [attr.aria-selected]="boardFilter() === 'private'"
+          (click)="setBoardFilter('private')"
+        >
+          Trusted
+        </button>
+        <button
+          type="button"
+          class="seg ra-reset"
+          role="tab"
+          [class.active]="boardFilter() === 'public'"
+          [attr.aria-selected]="boardFilter() === 'public'"
+          (click)="setBoardFilter('public')"
+        >
+          Community
+        </button>
+      </div>
+
+      <section class="feed ra-page-pad">
+        @for (item of openRequests(); track item.rideRequestId) {
+          <app-claim-board-card
+            [item]="item"
+            (open)="openRide($event.appointmentId)"
+          />
+        } @empty {
+          <p class="empty">
+            No open
+            {{
+              boardFilter() === 'private'
+                ? 'trusted'
+                : boardFilter() === 'public'
+                  ? 'community'
+                  : ''
+            }}
+            requests right now. Confirmed trips stay under Upcoming drives on Home.
+          </p>
+        }
+      </section>
+    } @else {
+      <section class="feed ra-page-pad">
+        @for (ride of riderListRides(); track ride.appointmentId) {
+          <app-ride-card [ride]="ride" (open)="openRideCard($event)" />
+        } @empty {
+          <p class="empty">No rides scheduled yet.</p>
+        }
+      </section>
+    }
+  </div>
+</ion-content>
