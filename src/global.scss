@@ -1,37 +1,213 @@
 /*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
+ * Ride Angels global styles
  */
 
-/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+// Light-only product — do not follow system dark mode
+// (Figma source of truth is a light theme)
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+html,
+body {
+  height: 100%;
+  background: var(--ra-bg);
+  color: var(--ra-ink);
+  font-family: var(--ra-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+ion-content {
+  --background: var(--ra-bg);
+}
+
+ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  --min-height: 0;
+}
+
+/* Fixed tab chrome — stays put while content scrolls / refreshes */
+ion-header.ra-chrome {
+  box-shadow: none;
+
+  &::after {
+    display: none;
+  }
+
+  .header-inner {
+    background: var(--ra-bg);
+  }
+}
+
+.ra-page,
+.ra-page-shell {
+  min-height: 100%;
+  background: var(--ra-bg);
+  padding-top: var(--ra-page-content-top);
+  padding-bottom: calc(var(--ra-page-content-bottom) + var(--ra-safe-bottom));
+}
+
+/* Stack screens with app-page-header inside ion-content */
+.ra-page-shell--flush-top {
+  padding-top: 0;
+}
+
+.ra-page-pad {
+  padding-left: var(--ra-page-padding);
+  padding-right: var(--ra-page-padding);
+}
+
+/* Standard vertical rhythm for list/feed sections under the header */
+.ra-page-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-page-section-gap);
+  padding-top: var(--ra-page-section-y);
+  padding-bottom: var(--ra-page-section-y);
+}
+
+.ra-display {
+  font-family: var(--ra-font-display);
+  color: var(--ra-ink);
+  letter-spacing: -0.01em;
+}
+
+.ra-section-title {
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ra-ink);
+  margin: 0;
+}
+
+.ra-subtitle {
+  font-family: var(--ra-font-body);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--ra-text-secondary);
+  margin: 0;
+}
+
+.ra-card {
+  background: var(--ra-surface);
+  border: 1px solid var(--ra-border);
+  border-radius: var(--ra-card-radius);
+  box-shadow: var(--ra-shadow-card);
+  padding: var(--ra-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-card-gap);
+}
+
+/* Shared card content patterns */
+.ra-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ra-card-gap);
+}
+
+.ra-card-person {
+  display: flex;
+  align-items: center;
+  gap: var(--ra-card-gap);
+}
+
+.ra-card-title {
+  margin: 0;
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  font-size: var(--ra-card-title-size);
+  color: var(--ra-ink);
+}
+
+.ra-card-name {
+  margin: 0;
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  font-size: var(--ra-card-name-size);
+  color: var(--ra-ink);
+}
+
+.ra-card-meta {
+  margin: var(--ra-card-stack-tight) 0 0;
+  font-size: var(--ra-card-meta-size);
+  color: var(--ra-text-secondary);
+}
+
+.ra-card-body {
+  margin: 0;
+  font-size: var(--ra-card-body-size);
+  line-height: 1.4;
+  color: var(--ra-text-secondary);
+}
+
+.ra-card-eyebrow {
+  margin: 0;
+  font-size: var(--ra-card-eyebrow-size);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ra-text-muted);
+}
+
+.ra-card-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ra-card-meta-gap);
+  font-size: var(--ra-card-body-size);
+  color: var(--ra-text-secondary);
+}
+
+.ra-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--ra-border);
+  padding-top: var(--ra-card-footer-pad);
+  font-size: var(--ra-card-meta-size);
+  color: var(--ra-text-secondary);
+}
+
+.ra-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ra-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+button.ra-reset,
+.ra-reset {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}

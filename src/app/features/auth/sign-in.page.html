@@ -1,0 +1,51 @@
+<ion-content [fullscreen]="true" class="auth-content">
+  <div class="auth-page">
+    <header class="hero">
+      <app-brand-logo variant="splash" maxWidth="240px" />
+      <h1>Welcome back</h1>
+      <p>Sign in to coordinate rides with your trusted circle.</p>
+    </header>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="field">
+        <span class="label">Email</span>
+        <div class="input-wrap">
+          <input formControlName="email" type="email" autocomplete="username" inputmode="email" />
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="label">Password</span>
+        <div class="input-wrap">
+          <input formControlName="password" type="password" autocomplete="current-password" />
+        </div>
+      </label>
+
+      @if (error()) {
+        <p class="error" role="alert">{{ error() }}</p>
+      }
+
+      <app-primary-button
+        [label]="submitting() ? 'Signing in…' : 'Sign In'"
+        [disabled]="submitting()"
+        (pressed)="submit()"
+      />
+    </form>
+
+    <p class="switch">
+      New here?
+      <a routerLink="/auth/sign-up">Create an account</a>
+    </p>
+
+    <section class="demo">
+      <p class="demo-title">Demo accounts</p>
+      <button type="button" class="demo-chip ra-reset" (click)="fillDemo('eleanor@rideangels.app')">
+        Rider · eleanor@rideangels.app
+      </button>
+      <button type="button" class="demo-chip ra-reset" (click)="fillDemo('sarah@rideangels.app')">
+        Angel · sarah@rideangels.app
+      </button>
+      <p class="demo-pass">Password: {{ demoPassword }}</p>
+    </section>
+  </div>
+</ion-content>

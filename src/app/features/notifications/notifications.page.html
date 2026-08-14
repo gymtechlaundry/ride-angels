@@ -1,0 +1,46 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="notifications-page ra-page-shell ra-page-shell--flush-top">
+    <app-page-header title="Notifications" subtitle="Updates from your ride circle" [showBack]="true">
+      <div headerEnd class="header-actions">
+        @if (unread() > 0) {
+          <button type="button" class="mark-all ra-reset" (click)="markAllRead()">
+            Mark all read
+          </button>
+        }
+        @if (readCount() > 0) {
+          <button type="button" class="mark-all ra-reset" (click)="clearRead()">
+            Clear read
+          </button>
+        }
+      </div>
+    </app-page-header>
+
+    <section class="list ra-page-pad">
+      @for (item of items(); track item.id) {
+        <div class="notif-row" [class.unread]="!item.read">
+          <button type="button" class="notif ra-reset" (click)="open(item)">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="copy">
+              <strong>{{ item.title }}</strong>
+              <span class="body">{{ item.body }}</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            class="dismiss ra-reset"
+            (click)="dismiss(item, $event)"
+            [attr.aria-label]="'Remove ' + item.title"
+          >
+            Remove
+          </button>
+        </div>
+      } @empty {
+        <p class="empty">You're all caught up.</p>
+      }
+    </section>
+  </div>
+</ion-content>

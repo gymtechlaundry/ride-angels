@@ -1,0 +1,158 @@
+<ion-header class="ion-no-border ra-chrome">
+  <div class="header-inner">
+    <header class="welcome ra-page-pad">
+      <div class="welcome-text">
+        <h1>Hi {{ user()?.firstName || 'there' }},</h1>
+        <p>
+          @if (persona() === 'angel') {
+            Your upcoming drives.
+          } @else {
+            Your loved ones are here for you.
+          }
+        </p>
+      </div>
+      <div class="welcome-actions">
+        <button
+          type="button"
+          class="bell ra-reset"
+          (click)="openNotifications()"
+          aria-label="Notifications"
+        >
+          <span class="ra-icon-box" style="width:20px;height:20px">
+            <img class="ra-icon" src="assets/icons/bell.svg" alt="" />
+          </span>
+          @if (unread() > 0) {
+            <span class="badge">{{ unread() > 9 ? '9+' : unread() }}</span>
+          }
+        </button>
+        <button
+          type="button"
+          class="ra-reset"
+          (click)="openProfile()"
+          aria-label="Profile"
+        >
+          <app-profile-avatar
+            [src]="user()?.avatarUrl"
+            [name]="user()?.displayName || 'User'"
+            [size]="48"
+            [alt]="user()?.displayName || 'Profile'"
+          />
+        </button>
+      </div>
+    </header>
+
+    @if (persona() === 'rider') {
+      <section class="banner-wrap ra-page-pad">
+        <button type="button" class="banner ra-reset" (click)="addAppointment()">
+          <span class="banner-icon">
+            <app-brand-logo variant="mark" maxWidth="44px" alt="" />
+          </span>
+          <span class="banner-copy">
+            <span class="banner-title">Add an appointment</span>
+            <span class="banner-desc">
+              Your trusted Ride Angels will be notified when you need a lift.
+            </span>
+          </span>
+          <span class="banner-cta" aria-hidden="true">
+            <span class="ra-icon-box" style="width:18px;height:18px">
+              <img class="ra-icon" src="assets/icons/plus.svg" alt="" />
+            </span>
+          </span>
+        </button>
+      </section>
+    }
+
+    <div class="list-title-bar ra-page-pad">
+      <h2 class="ra-section-title">
+        {{ persona() === 'angel' ? 'Upcoming drives' : 'Your scheduled rides' }}
+      </h2>
+      <p class="today-indicator" [attr.aria-label]="'Today, ' + todayLabel().weekday + ' ' + todayLabel().monthDay">
+        <span class="today-weekday">{{ todayLabel().weekday }}</span>
+        <span class="today-date">{{ todayLabel().monthDay }}</span>
+      </p>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="home-content">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="home-page ra-page-shell">
+    @if (persona() === 'rider') {
+      @if (pendingOffers().length) {
+        <section class="alert-strip ra-page-pad">
+          <button type="button" class="strip ra-reset" (click)="openOffers()">
+            <strong>{{ pendingOffers().length }} ride offer{{ pendingOffers().length === 1 ? '' : 's' }} waiting</strong>
+            <span>Review Accept / Decline on the appointment</span>
+          </button>
+          <div class="offer-chips">
+            @for (item of pendingOffers(); track item.offer.id) {
+              <button type="button" class="chip ra-reset" (click)="openOffer(item)">
+                {{ item.angel.displayName }} · {{ item.appointmentTitle }}
+              </button>
+            }
+          </div>
+        </section>
+      }
+
+      <section class="list-section ra-page-pad">
+        <div class="ride-list">
+          @for (group of rideDayGroups(); track group.dateKey) {
+            <div class="day-group">
+              <header class="day-head">
+                <h3 class="day-title">{{ group.title }}</h3>
+                <p class="day-subtitle">{{ group.subtitle }}</p>
+              </header>
+              <div class="day-rides">
+                @for (ride of group.rides; track ride.appointmentId) {
+                  <app-ride-card
+                    [ride]="ride"
+                    [hideDate]="true"
+                    (open)="openRide($event)"
+                  />
+                }
+              </div>
+            </div>
+          } @empty {
+            <p class="empty">No rides scheduled yet. Add an appointment above to get started.</p>
+          }
+        </div>
+      </section>
+    } @else {
+      @if (pendingInvites().length) {
+        <section class="alert-strip ra-page-pad">
+          <button type="button" class="strip ra-reset" (click)="openInvites()">
+            <strong>{{ pendingInvites().length }} invite{{ pendingInvites().length === 1 ? '' : 's' }} waiting</strong>
+            <span>Accept to join a rider’s trusted circle</span>
+          </button>
+        </section>
+      }
+
+      <section class="list-section ra-page-pad">
+        <div class="ride-list">
+          @for (group of driveDayGroups(); track group.dateKey) {
+            <div class="day-group">
+              <header class="day-head">
+                <h3 class="day-title">{{ group.title }}</h3>
+                <p class="day-subtitle">{{ group.subtitle }}</p>
+              </header>
+              <div class="day-rides">
+                @for (ride of group.rides; track ride.rideRequestId) {
+                  <app-ride-card
+                    [ride]="ride"
+                    [hideDate]="true"
+                    (open)="openRide($event)"
+                  />
+                }
+              </div>
+            </div>
+          } @empty {
+            <p class="empty">No drives scheduled yet.</p>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</ion-content>

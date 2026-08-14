@@ -1,2 +1,108 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// Ride Angels design tokens
+// Brand palette: src/assets/branding/guide/colors.json (approved brand kit)
+// Layout/UI patterns: Figma screens (preserved)
+
+:root {
+  // Official brand palette
+  --ra-primary: #6c47ff;
+  --ra-primary-dark: #5636cc;
+  --ra-primary-deep: #1e1b4b;
+  --ra-secondary: #a78bfa;
+  --ra-primary-soft: #efeaff;
+  --ra-accent: #ffc83d;
+  --ra-accent-text: #b8860b;
+
+  // Neutrals / text
+  --ra-ink: #1e1b4b;
+  --ra-text-secondary: #4f4a85;
+  --ra-text-muted: #8d8aa2;
+  --ra-border: #e4e6f0;
+  --ra-bg: #f5f6fa;
+  --ra-surface: #ffffff;
+
+  // Status
+  --ra-success-bg: #ecfdf5;
+  --ra-success-text: #047857;
+  --ra-warning-bg: #fffbeb;
+  --ra-warning-text: #d97706;
+
+  // Banner
+  --ra-banner-desc: #efeaff;
+
+  // Spacing
+  --ra-space-2: 2px;
+  --ra-space-4: 4px;
+  --ra-space-6: 6px;
+  --ra-space-8: 8px;
+  --ra-space-10: 10px;
+  --ra-space-12: 12px;
+  --ra-space-14: 14px;
+  --ra-space-16: 16px;
+  --ra-space-18: 18px;
+  --ra-space-20: 20px;
+  --ra-space-24: 24px;
+
+  // Radii
+  --ra-radius-8: 8px;
+  --ra-radius-12: 12px;
+  --ra-radius-16: 16px;
+  --ra-radius-18: 18px;
+  --ra-radius-20: 20px;
+  --ra-radius-24: 24px;
+  --ra-radius-pill: 999px;
+
+  // Shadows
+  --ra-shadow-card: 0 1px 2px rgba(30, 27, 75, 0.02), 0 4px 12px rgba(108, 71, 255, 0.06);
+  --ra-shadow-fab: 0 2px 4px rgba(0, 0, 0, 0.05), 0 8px 16px rgba(255, 200, 61, 0.28);
+  --ra-shadow-nav: 0 -4px 8px rgba(30, 27, 75, 0.04);
+  --ra-shadow-claim: 0 2px 3px rgba(30, 27, 75, 0.08), 0 10px 12px rgba(30, 27, 75, 0.15);
+
+  // Typography — Poppins for brand moments; Figma UI fonts preserved for product screens
+  --ra-font-brand: 'Poppins', sans-serif;
+  --ra-font-display: 'Outfit', sans-serif;
+  --ra-font-body: 'DM Sans', sans-serif;
+
+  // Brand asset paths
+  --ra-logo-horizontal-light: url('/assets/branding/logos/ride-angels-horizontal-light-approved.png');
+  --ra-logo-horizontal-dark: url('/assets/branding/logos/ride-angels-horizontal-dark-approved.png');
+  --ra-logo-vertical: url('/assets/branding/logos/ride-angels-vertical-approved.png');
+  --ra-logo-mark: url('/assets/branding/logos/ride-angels-mark-approved.png');
+
+  // Layout
+  --ra-page-padding: 24px;
+  --ra-page-content-top: 8px;
+  --ra-page-content-bottom: 24px;
+  --ra-page-section-y: 12px;
+  --ra-page-section-gap: 12px;
+  --ra-card-padding: 16px;
+  --ra-card-gap: 12px;
+  --ra-card-radius: var(--ra-radius-16);
+  /* Shared internals for like cards */
+  --ra-card-title-size: 16px;
+  --ra-card-name-size: 15px;
+  --ra-card-meta-size: 12px;
+  --ra-card-body-size: 13px;
+  --ra-card-eyebrow-size: 11px;
+  --ra-card-meta-gap: 6px;
+  --ra-card-stack-tight: 2px;
+  --ra-card-footer-pad: 8px;
+  --ra-card-avatar-size: 40px;
+  --ra-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ra-safe-top: env(safe-area-inset-top, 0px);
+
+  // Ionic overrides
+  --ion-font-family: var(--ra-font-body);
+  --ion-background-color: var(--ra-bg);
+  --ion-text-color: var(--ra-ink);
+  --ion-color-primary: #6c47ff;
+  --ion-color-primary-rgb: 108, 71, 255;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #5636cc;
+  --ion-color-primary-tint: #7a5fff;
+  --ion-toolbar-background: transparent;
+  --ion-tab-bar-background: var(--ra-surface);
+  --ion-tab-bar-border-color: var(--ra-border);
+  --ion-tab-bar-color: var(--ra-text-muted);
+  --ion-tab-bar-color-selected: var(--ra-primary);
+}

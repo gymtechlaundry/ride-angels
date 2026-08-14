@@ -1,0 +1,144 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="add-page ra-page-shell ra-page-shell--flush-top">
+    <app-page-header
+      [title]="editingId() ? 'Edit appointment' : 'Add appointment'"
+      [subtitle]="
+        editingId()
+          ? 'Update trip details for your Ride Angels'
+          : 'Set your destination and trip details'
+      "
+      [showBack]="true"
+    />
+
+    <form class="form ra-page-pad" [formGroup]="form" (ngSubmit)="save()">
+      <label class="field">
+        <span class="label">Appointment Title</span>
+        <div class="input-wrap">
+          <span class="ra-icon-box" style="width:16px;height:16px">
+            <img class="ra-icon" src="assets/icons/calendar.svg" alt="" />
+          </span>
+          <input
+            formControlName="title"
+            type="text"
+            placeholder="e.g. Doctor visit"
+            autocomplete="off"
+          />
+        </div>
+      </label>
+
+      <app-date-time-field
+        label="Date & Time"
+        mode="date-time"
+        iconSrc="assets/icons/clock.svg"
+        placeholder="Choose date and time"
+        [date]="form.controls.date.value"
+        [time]="form.controls.time.value"
+        [min]="minDate"
+        (dateChange)="onAppointmentDateChange($event)"
+        (timeChange)="onAppointmentTimeChange($event)"
+      />
+
+      <label class="field">
+        <span class="label">Pickup Address (From)</span>
+        <div class="input-wrap">
+          <span class="ra-icon-box" style="width:16px;height:16px">
+            <img class="ra-icon" src="assets/icons/map-pin.svg" alt="" />
+          </span>
+          <input
+            formControlName="pickupLabel"
+            type="text"
+            placeholder="Home address"
+            autocomplete="street-address"
+          />
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="label">Destination Address (To)</span>
+        <div class="input-wrap">
+          <span class="ra-icon-box" style="width:16px;height:16px">
+            <img class="ra-icon" src="assets/icons/map-pin.svg" alt="" />
+          </span>
+          <input
+            formControlName="destinationLabel"
+            type="text"
+            placeholder="Where are you going?"
+            autocomplete="off"
+          />
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="label">Notes for your Ride Angel (optional)</span>
+        <div class="textarea-wrap">
+          <textarea
+            formControlName="notes"
+            rows="3"
+            maxlength="500"
+            placeholder="e.g. Wheelchair assist, building entrance on the side"
+          ></textarea>
+        </div>
+      </label>
+
+      <section class="return-module">
+        <div class="toggle-header">
+          <div class="toggle-label">
+            <span class="ra-icon-box" style="width:16px;height:16px">
+              <img class="ra-icon" src="assets/icons/calendar-sync.svg" alt="" />
+            </span>
+            <span>Add Return Trip</span>
+          </div>
+          <ion-toggle
+            [checked]="returnNeeded()"
+            (ionChange)="onReturnToggle($any($event).detail.checked)"
+            aria-label="Add return trip"
+          ></ion-toggle>
+        </div>
+
+        @if (returnNeeded()) {
+          <app-date-time-field
+            class="nested"
+            label="Return Pickup Time"
+            mode="time"
+            iconSrc="assets/icons/clock.svg"
+            placeholder="Choose return time"
+            [date]="form.controls.date.value"
+            [time]="form.controls.returnPickupTime.value"
+            (timeChange)="onReturnTimeChange($event)"
+          />
+        }
+      </section>
+
+      <section class="visibility-module">
+        <div class="toggle-header">
+          <div class="toggle-label">
+            <span class="ra-icon-box" style="width:16px;height:16px">
+              <img class="ra-icon" src="assets/icons/eye.svg" alt="" />
+            </span>
+            <span>Visible on Public Board</span>
+          </div>
+          <ion-toggle
+            color="warning"
+            [checked]="publicBoard()"
+            (ionChange)="onPublicToggle($any($event).detail.checked)"
+            aria-label="Visible on public board"
+          ></ion-toggle>
+        </div>
+        <p class="help">
+          Turning this on allows any verified community driver to help if your private Ride Angels are busy. Keep off to only show to close friends.
+        </p>
+      </section>
+
+      <div class="actions">
+        <app-primary-button
+          [label]="editingId() ? 'Save Changes' : 'Schedule & Notify Angels'"
+          (pressed)="save()"
+        />
+      </div>
+    </form>
+  </div>
+</ion-content>

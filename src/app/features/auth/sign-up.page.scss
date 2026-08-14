@@ -1,0 +1,112 @@
+.auth-content {
+  --background: var(--ra-bg);
+}
+
+.auth-page {
+  min-height: 100%;
+  padding: max(12px, calc(var(--ra-safe-top) + 4px)) var(--ra-page-padding)
+    calc(28px + var(--ra-safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.hero {
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.hero app-brand-logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--ra-font-display);
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--ra-ink);
+}
+
+.hero p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ra-text-secondary);
+  line-height: 1.45;
+  max-width: 32ch;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ra-ink);
+}
+
+.optional {
+  color: var(--ra-text-muted);
+  font-weight: 500;
+}
+
+.input-wrap {
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--ra-border);
+  background: var(--ra-surface);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrap input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: var(--ra-font-body);
+  font-size: 15px;
+  color: var(--ra-ink);
+}
+
+.error {
+  margin: 0;
+  color: #b42318;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.switch {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ra-text-secondary);
+}
+
+.switch a {
+  color: var(--ra-primary);
+  font-weight: 700;
+  text-decoration: none;
+}

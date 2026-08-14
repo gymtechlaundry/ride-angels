@@ -1,0 +1,126 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: var(--ra-page-section-y);
+  padding-bottom: var(--ra-page-section-y);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nested {
+  display: block;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ra-ink);
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  background: var(--ra-surface);
+  border: 1px solid var(--ra-border);
+  border-radius: 12px;
+}
+
+.input-wrap input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: var(--ra-font-body);
+  font-size: 14px;
+  color: var(--ra-ink);
+  min-width: 0;
+}
+
+.input-wrap input::placeholder {
+  color: var(--ra-text-secondary);
+}
+
+.textarea-wrap {
+  padding: 10px 12px;
+  background: var(--ra-surface);
+  border: 1px solid var(--ra-border);
+  border-radius: 12px;
+}
+
+.textarea-wrap textarea {
+  width: 100%;
+  border: 0;
+  outline: none;
+  resize: vertical;
+  min-height: 72px;
+  background: transparent;
+  font-family: var(--ra-font-body);
+  font-size: 14px;
+  color: var(--ra-ink);
+  line-height: 1.4;
+}
+
+.textarea-wrap textarea::placeholder {
+  color: var(--ra-text-secondary);
+}
+
+.return-module {
+  background: var(--ra-primary-soft);
+  border-radius: var(--ra-card-radius);
+  padding: var(--ra-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-card-gap);
+}
+
+.visibility-module {
+  background: var(--ra-surface);
+  border: 1px solid var(--ra-border);
+  border-radius: var(--ra-card-radius);
+  padding: var(--ra-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-card-gap);
+}
+
+.toggle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ra-ink);
+}
+
+.help {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ra-text-secondary);
+  line-height: 1.4;
+}
+
+.actions {
+  padding-top: 8px;
+}
+
+ion-toggle {
+  --handle-width: 20px;
+  --handle-height: 20px;
+  width: 44px;
+  height: 24px;
+}

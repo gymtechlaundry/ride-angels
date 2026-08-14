@@ -1,0 +1,146 @@
+<ion-header class="ion-no-border ra-chrome">
+  <div class="header-inner">
+    <app-page-header
+      [title]="persona() === 'angel' ? 'Ride circle' : 'My Ride Angels'"
+      [subtitle]="
+        persona() === 'angel'
+          ? 'Invites and riders you support'
+          : 'The circle of trust you coordinate with'
+      "
+    />
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="angels-page ra-page-shell">
+    @if (persona() === 'rider') {
+      <section class="explainer ra-page-pad">
+        <div class="explain-card">
+          <h3>Who are Ride Angels?</h3>
+          <p>
+            Ride Angels are your family members, close friends, or neighbors who have volunteered to help drive you. They get notified first when you add appointments.
+          </p>
+          <div class="explain-cta">
+            <app-primary-button
+              label="Add Trusted Ride Angel"
+              variant="soft"
+              (pressed)="addAngel()"
+            />
+          </div>
+        </div>
+      </section>
+
+      @if (pendingOutgoing().length) {
+        <section class="list-section ra-page-pad">
+          <h2>Pending invites ({{ pendingOutgoing().length }})</h2>
+          <div class="list">
+            @for (item of pendingOutgoing(); track item.connectionId) {
+              <article class="invite-card">
+                <app-profile-avatar
+                  [src]="item.angel.avatarUrl"
+                  [name]="item.angel.displayName"
+                  [size]="40"
+                  [alt]="item.angel.displayName"
+                />
+                <div class="invite-copy">
+                  <h3>{{ item.angel.displayName }}</h3>
+                  <p>Waiting for them to accept · {{ item.relationshipLabel }}</p>
+                </div>
+                <span class="pill pending">Pending</span>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      <section class="list-section ra-page-pad">
+        <h2>Active Angels ({{ items().length }})</h2>
+        <div class="list">
+          @for (item of items(); track item.connectionId) {
+            <app-angel-card [item]="item" (remove)="removeAngel($event)" />
+          } @empty {
+            <p class="empty">No angels yet. Invite someone you trust.</p>
+          }
+        </div>
+      </section>
+    } @else {
+      @if (pendingIncoming().length) {
+        <section class="list-section ra-page-pad">
+          <h2>Invites for you ({{ pendingIncoming().length }})</h2>
+          <div class="list">
+            @for (item of pendingIncoming(); track item.connectionId) {
+              <article class="invite-card incoming">
+                <app-profile-avatar
+                  [src]="item.rider.avatarUrl"
+                  [name]="item.rider.displayName"
+                  [size]="40"
+                  [alt]="item.rider.displayName"
+                />
+                <div class="invite-copy">
+                  <h3>{{ item.rider.displayName }}</h3>
+                  <p>Wants you as their {{ item.relationshipLabel }}</p>
+                </div>
+                <div class="invite-actions">
+                  <button type="button" class="accept ra-reset" (click)="acceptInvite(item)">
+                    Accept
+                  </button>
+                  <button type="button" class="decline ra-reset" (click)="declineInvite(item)">
+                    Decline
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      } @else {
+        <section class="explainer ra-page-pad">
+          <div class="explain-card muted">
+            <h3>No pending invites</h3>
+            <p>When a rider invites you, it will show up here.</p>
+          </div>
+        </section>
+      }
+
+      <section class="list-section ra-page-pad">
+        <h2>Riders you help ({{ ridersIHelp().length }})</h2>
+        <div class="list">
+          @for (item of ridersIHelp(); track item.connectionId) {
+            <article class="invite-card rider-card">
+              <button
+                type="button"
+                class="rider-open ra-reset"
+                (click)="openRider(item)"
+              >
+                <app-profile-avatar
+                  [src]="item.rider.avatarUrl"
+                  [name]="item.rider.displayName"
+                  [size]="40"
+                  [alt]="item.rider.displayName"
+                />
+                <div class="invite-copy">
+                  <h3>{{ item.rider.displayName }}</h3>
+                  <p>{{ item.relationshipLabel }} · View appointments</p>
+                </div>
+                <span class="pill active">Active</span>
+              </button>
+              <button
+                type="button"
+                class="leave ra-reset"
+                (click)="leaveRider(item, $event)"
+                aria-label="Leave circle"
+              >
+                Leave
+              </button>
+            </article>
+          } @empty {
+            <p class="empty">Accept an invite to start helping a rider.</p>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</ion-content>

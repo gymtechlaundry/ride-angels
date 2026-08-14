@@ -1,0 +1,79 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="notif-page ra-page-shell ra-page-shell--flush-top">
+    <app-page-header
+      title="Push event types"
+      subtitle="Choose which events also send a push. Your inbox follows the In-app channel on Profile."
+      [showBack]="true"
+    />
+
+    <section class="ra-page-pad device">
+      <div class="device-card">
+        <div class="device-head">
+          <div>
+            <p class="eyebrow">This device</p>
+            <h2>Push alerts</h2>
+            <p
+              class="status"
+              [class.ok]="pushStatus() === 'on'"
+              [class.warn]="pushStatus() === 'denied'"
+            >
+              {{ pushStatusLabel() }}
+            </p>
+          </div>
+          @if (isNative) {
+            <ion-toggle
+              [checked]="pushStatus() === 'on'"
+              [disabled]="pushBusy() || pushStatus() === 'loading'"
+              (ionChange)="onDeviceToggle($any($event).detail.checked)"
+              aria-label="Enable push on this device"
+            ></ion-toggle>
+          }
+        </div>
+
+        @if (!isNative) {
+          <p class="hint">Push requires the iOS or Android app build.</p>
+        } @else if (pushStatus() === 'denied') {
+          <p class="hint">
+            Notifications are blocked in system settings. Turn them on, then
+            enable this switch again.
+          </p>
+          <app-primary-button
+            label="Open Settings"
+            variant="soft"
+            (pressed)="openSystemSettings()"
+          />
+        } @else if (pushStatus() === 'on') {
+          <p class="hint">This phone will receive the event types you allow below.</p>
+        } @else {
+          <p class="hint">Turn on to register this phone for push alerts.</p>
+        }
+      </div>
+    </section>
+
+    @for (group of groups; track group.title) {
+      <section class="ra-page-pad group">
+        <h2>{{ group.title }}</h2>
+        <div class="pref-card">
+          @for (item of group.items; track item.type) {
+            <div class="pref-row">
+              <div class="pref-copy">
+                <p class="pref-label">{{ item.label }}</p>
+                <p class="pref-desc">{{ item.description }}</p>
+              </div>
+              <ion-toggle
+                [checked]="isEnabled(item.type)"
+                [disabled]="pushStatus() !== 'on'"
+                (ionChange)="onToggle(item.type, $any($event).detail.checked)"
+                [attr.aria-label]="item.label"
+              ></ion-toggle>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</ion-content>

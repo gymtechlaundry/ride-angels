@@ -1,0 +1,139 @@
+.onboarding-content {
+  --background: var(--ra-bg);
+}
+
+.onboarding {
+  min-height: 100%;
+  padding: max(24px, var(--ra-safe-top)) var(--ra-page-padding)
+    calc(24px + var(--ra-safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.hero {
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.hero app-brand-logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hero p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ra-text-secondary);
+  max-width: 32ch;
+}
+
+.name-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.name-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ra-ink);
+}
+
+.name-fields input {
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--ra-border);
+  padding: 0 12px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.chooser h2 {
+  margin: 0;
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ra-ink);
+}
+
+.hint {
+  margin: 6px 0 14px;
+  font-size: 13px;
+  color: var(--ra-text-muted);
+  line-height: 1.4;
+}
+
+.persona {
+  width: 100%;
+  display: flex;
+  gap: var(--ra-card-gap);
+  align-items: center;
+  text-align: left;
+  padding: var(--ra-card-padding);
+  margin-bottom: 10px;
+  border-radius: var(--ra-card-radius);
+  background: var(--ra-surface);
+  border: 1.5px solid var(--ra-border);
+  box-shadow: var(--ra-shadow-card);
+}
+
+.persona.active {
+  border-color: var(--ra-primary);
+  background: #f4f3ff;
+}
+
+.persona-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--ra-primary-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.persona-icon.angel {
+  background: #fff7e8;
+}
+
+.persona-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-card-stack-tight);
+  min-width: 0;
+}
+
+.persona-copy strong {
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  font-size: var(--ra-card-name-size);
+  color: var(--ra-ink);
+}
+
+.persona-copy span {
+  font-size: var(--ra-card-meta-size);
+  color: var(--ra-text-secondary);
+  line-height: 1.35;
+}
+
+.cta {
+  margin-top: auto;
+  padding-top: 12px;
+}

@@ -1,0 +1,176 @@
+.explainer {
+  padding-top: var(--ra-page-section-y);
+  padding-bottom: var(--ra-page-section-y);
+}
+
+.explain-card {
+  background: var(--ra-warning-bg);
+  border: 1px solid var(--ra-accent);
+  border-radius: var(--ra-card-radius);
+  padding: var(--ra-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-card-gap);
+  box-shadow: none;
+}
+
+.explain-card h3 {
+  margin: 0;
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  font-size: var(--ra-card-name-size);
+  color: var(--ra-accent-text);
+}
+
+.explain-card p {
+  margin: 0;
+  font-size: var(--ra-card-body-size);
+  color: var(--ra-text-secondary);
+  line-height: 1.4;
+}
+
+.explain-cta {
+  width: 100%;
+}
+
+.list-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-page-section-gap);
+  padding-top: var(--ra-page-section-y);
+  padding-bottom: var(--ra-page-section-y);
+}
+
+.list-section h2 {
+  margin: 0;
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  font-size: var(--ra-card-title-size);
+  color: var(--ra-ink);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-page-section-gap);
+}
+
+.empty {
+  margin: 0;
+  font-size: var(--ra-card-body-size);
+  color: var(--ra-text-muted);
+}
+
+.invite-card {
+  display: flex;
+  align-items: center;
+  gap: var(--ra-card-gap);
+  padding: var(--ra-card-padding);
+  background: var(--ra-surface);
+  border: 1px solid var(--ra-border);
+  border-radius: var(--ra-card-radius);
+  box-shadow: var(--ra-shadow-card);
+}
+
+.invite-card.incoming {
+  flex-wrap: wrap;
+}
+
+.invite-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.invite-copy h3 {
+  margin: 0;
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  font-size: var(--ra-card-name-size);
+  color: var(--ra-ink);
+}
+
+.invite-copy p {
+  margin: var(--ra-card-stack-tight) 0 0;
+  font-size: var(--ra-card-meta-size);
+  color: var(--ra-text-secondary);
+}
+
+.pill {
+  font-size: var(--ra-card-eyebrow-size);
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--ra-radius-pill);
+  flex-shrink: 0;
+}
+
+.pill.pending {
+  background: var(--ra-warning-bg);
+  color: var(--ra-warning-text);
+}
+
+.pill.active {
+  background: var(--ra-success-bg);
+  color: var(--ra-success-text);
+}
+
+.invite-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: var(--ra-card-stack-tight);
+}
+
+.accept,
+.decline {
+  flex: 1;
+  height: 36px;
+  border-radius: 12px;
+  font-size: var(--ra-card-body-size);
+  font-weight: 700;
+}
+
+.accept {
+  background: var(--ra-primary);
+  color: #fff;
+}
+
+.decline {
+  background: var(--ra-primary-soft);
+  color: var(--ra-primary);
+}
+
+.explain-card.muted {
+  background: var(--ra-surface);
+  border-color: var(--ra-border);
+}
+
+.explain-card.muted h3 {
+  color: var(--ra-ink);
+}
+
+.rider-card {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--ra-card-gap);
+}
+
+.rider-open {
+  display: flex;
+  align-items: center;
+  gap: var(--ra-card-gap);
+  text-align: left;
+  width: 100%;
+}
+
+.rider-open .invite-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.leave {
+  align-self: flex-end;
+  font-size: var(--ra-card-body-size);
+  font-weight: 700;
+  color: var(--ra-text-muted);
+  padding: 4px 0;
+}

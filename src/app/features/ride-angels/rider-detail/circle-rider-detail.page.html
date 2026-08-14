@@ -1,0 +1,82 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="rider-detail-page ra-page-shell ra-page-shell--flush-top">
+    <app-page-header
+      title="Rider appointments"
+      subtitle="Open and upcoming rides for this rider"
+      [showBack]="true"
+    />
+
+    @if (!allowed()) {
+      <p class="missing ra-page-pad">
+        You can only view appointments for riders in your accepted circle.
+      </p>
+    } @else if (rider(); as r) {
+      <section class="rider-hero ra-page-pad">
+        <app-profile-avatar
+          [src]="r.avatarUrl"
+          [name]="r.displayName"
+          [size]="56"
+          [alt]="r.displayName"
+        />
+        <div>
+          <h2>{{ r.displayName }}</h2>
+          @if (relationshipLabel()) {
+            <p>{{ relationshipLabel() }}</p>
+          }
+        </div>
+      </section>
+
+      <section class="list-section ra-page-pad">
+        <h3>Appointments ({{ rows().length }})</h3>
+        <div class="list">
+          @for (row of rows(); track row.rideRequestId) {
+            <article class="ride-card">
+              <button
+                type="button"
+                class="ride-main ra-reset"
+                (click)="openAppointment(row.appointmentId)"
+              >
+                <div class="ride-top">
+                  <h4>{{ row.title }}</h4>
+                  <app-status-badge [status]="row.statusLabel" />
+                </div>
+                <p class="when">{{ row.whenLabel }}</p>
+                <p class="route">{{ row.routeLabel }}</p>
+                @if (row.claimed && row.claimedByName) {
+                  <p class="claimed">Claimed by {{ row.claimedByName }}</p>
+                } @else if (row.offerPending) {
+                  <p class="claimed">Your offer is pending</p>
+                }
+              </button>
+
+              @if (row.offerPending) {
+                <button
+                  type="button"
+                  class="withdraw-link ra-reset"
+                  (click)="withdrawOffer(row)"
+                >
+                  Remove offer
+                </button>
+              }
+
+              @if (row.canClaim) {
+                <app-primary-button
+                  label="Offer to drive"
+                  (pressed)="claim(row)"
+                />
+              }
+            </article>
+          } @empty {
+            <p class="empty">No open appointments for this rider right now.</p>
+          }
+        </div>
+      </section>
+    } @else {
+      <p class="missing ra-page-pad">Rider not found.</p>
+    }
+  </div>
+</ion-content>

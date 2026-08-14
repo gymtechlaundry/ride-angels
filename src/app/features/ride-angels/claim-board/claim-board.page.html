@@ -1,0 +1,68 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="board-page ra-page-shell">
+    <header class="angel-header ra-page-pad">
+      <div class="header-text">
+        <h1>Open requests</h1>
+        <p>Trusted circle and community rides looking for a driver</p>
+      </div>
+      <span class="angel-mode">
+        <span class="ra-icon-box" style="width:10px;height:10px">
+          <img class="ra-icon" src="assets/icons/shield.svg" alt="" />
+        </span>
+        ANGEL MODE
+      </span>
+    </header>
+
+    <div class="filters ra-page-pad" role="tablist" aria-label="Filter open requests">
+      <button
+        type="button"
+        class="seg ra-reset"
+        role="tab"
+        [class.active]="filter() === 'all'"
+        [attr.aria-selected]="filter() === 'all'"
+        (click)="setFilter('all')"
+      >
+        All
+      </button>
+      <button
+        type="button"
+        class="seg ra-reset"
+        role="tab"
+        [class.active]="filter() === 'private'"
+        [attr.aria-selected]="filter() === 'private'"
+        (click)="setFilter('private')"
+      >
+        Trusted
+      </button>
+      <button
+        type="button"
+        class="seg ra-reset"
+        role="tab"
+        [class.active]="filter() === 'public'"
+        [attr.aria-selected]="filter() === 'public'"
+        (click)="setFilter('public')"
+      >
+        Community
+      </button>
+    </div>
+
+    <section class="feed ra-page-pad">
+      @for (item of items(); track item.rideRequestId) {
+        <app-claim-board-card
+          [item]="item"
+          (open)="openAppointment(item.appointmentId)"
+        />
+      } @empty {
+        <p class="empty">
+          No open
+          {{ filter() === 'private' ? 'trusted' : filter() === 'public' ? 'community' : '' }}
+          requests right now. Confirmed trips stay under Upcoming drives on Home.
+        </p>
+      }
+    </section>
+  </div>
+</ion-content>

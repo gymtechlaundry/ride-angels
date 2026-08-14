@@ -1,0 +1,62 @@
+<ion-content [fullscreen]="true" class="auth-content">
+  <div class="auth-page">
+    <header class="hero">
+      <app-brand-logo variant="splash" maxWidth="240px" />
+      <h1>Create account</h1>
+      <p>Join Ride Angels so your rides stay connected to you.</p>
+    </header>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="name-row">
+        <label class="field">
+          <span class="label">First name</span>
+          <div class="input-wrap">
+            <input formControlName="firstName" type="text" autocomplete="given-name" />
+          </div>
+        </label>
+        <label class="field">
+          <span class="label">Last name</span>
+          <div class="input-wrap">
+            <input formControlName="lastName" type="text" autocomplete="family-name" />
+          </div>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="label">Email</span>
+        <div class="input-wrap">
+          <input formControlName="email" type="email" autocomplete="email" inputmode="email" />
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="label">Phone <span class="optional">(optional)</span></span>
+        <div class="input-wrap">
+          <input formControlName="phone" type="tel" autocomplete="tel" />
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="label">Password</span>
+        <div class="input-wrap">
+          <input formControlName="password" type="password" autocomplete="new-password" />
+        </div>
+      </label>
+
+      @if (error()) {
+        <p class="error" role="alert">{{ error() }}</p>
+      }
+
+      <app-primary-button
+        [label]="submitting() ? 'Creating…' : 'Create Account'"
+        [disabled]="submitting()"
+        (pressed)="submit()"
+      />
+    </form>
+
+    <p class="switch">
+      Already have an account?
+      <a routerLink="/auth/sign-in">Sign in</a>
+    </p>
+  </div>
+</ion-content>

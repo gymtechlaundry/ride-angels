@@ -68,3 +68,17 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Native build artifacts (keep ios/ and android/ project sources)
+**/DerivedData
+**/xcuserdata
+ios/App/Pods
+ios/App/App/public
+android/.gradle
+android/app/build
+android/build
+android/captures
+android/local.properties
+android/key.properties
+android/app/google-services.json
+*.apk

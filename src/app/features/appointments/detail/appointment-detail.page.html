@@ -1,0 +1,269 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="detail-page ra-page-shell ra-page-shell--flush-top">
+    <app-page-header
+      title="Appointment info"
+      subtitle="Trip details, offers, and coordination"
+      [showBack]="true"
+    />
+
+    @if (detail(); as d) {
+      <section class="card-wrap ra-page-pad">
+        <article class="detail-card">
+          <header class="detail-header">
+            <h2>{{ d.appointment.title }}</h2>
+            <app-status-badge [status]="statusLabel()" />
+          </header>
+
+          <div class="info-block">
+            <p class="eyebrow">When</p>
+            <p class="when">{{ d.whenLabel }}</p>
+          </div>
+
+          <div class="route-box">
+            <div class="stop">
+              <span class="ra-icon-box" style="width:16px;height:16px">
+                <img class="ra-icon" src="assets/icons/map-pin-pickup.svg" alt="" />
+              </span>
+              <div>
+                <p class="stop-label">Pickup From</p>
+                <p class="stop-value">{{ d.ride.pickup.label }}</p>
+              </div>
+            </div>
+            <div class="route-line" aria-hidden="true"></div>
+            <div class="stop">
+              <span class="ra-icon-box" style="width:16px;height:16px">
+                <img class="ra-icon" src="assets/icons/map-pin-destination.svg" alt="" />
+              </span>
+              <div>
+                <p class="stop-label">Destination</p>
+                <p class="stop-value">{{ d.ride.destination.label }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-block">
+            <p class="eyebrow">Return Trip</p>
+            <p class="return">{{ returnLabel() }}</p>
+          </div>
+
+          @if (d.appointment.notes) {
+            <div class="info-block">
+              <p class="eyebrow">Notes</p>
+              <p class="notes">{{ d.appointment.notes }}</p>
+            </div>
+          }
+
+          @if (showCalendarStatus()) {
+            <div class="calendar-sync" [class.failed]="calendarStatus() === 'failed'">
+              @if (calendarStatus() === 'synced') {
+                <p class="calendar-msg">Added to your calendar</p>
+              } @else {
+                <p class="calendar-msg">Calendar sync failed</p>
+                <button
+                  type="button"
+                  class="retry ra-reset"
+                  (click)="retryCalendarSync()"
+                >
+                  Retry
+                </button>
+              }
+            </div>
+          }
+
+          @if (
+            isRider() &&
+            d.assignment?.confirmationStatus === 'pending_reconfirm' &&
+            d.angel
+          ) {
+            <p class="awaiting-note">
+              Waiting for {{ d.angel.firstName }} to confirm they can still drive after your changes.
+            </p>
+          }
+
+          @if (needsReconfirm()) {
+            <section class="reconfirm-section">
+              <p class="eyebrow">Needs confirm</p>
+              <p class="reconfirm-copy">
+                {{ d.assignment?.pendingChangeSummary || 'Trip details were updated.' }}
+                Please confirm you can still drive, or cancel with a reason so another angel can help.
+              </p>
+              <div class="reconfirm-actions">
+                <button
+                  type="button"
+                  class="decline ra-reset"
+                  (click)="cancelAsAngel()"
+                >
+                  Can't drive
+                </button>
+                <app-primary-button
+                  label="Still driving"
+                  (pressed)="confirmStillDriving()"
+                />
+              </div>
+            </section>
+          } @else if (isAssignedAngel()) {
+            <div class="driver-section">
+              <div class="driver-card">
+                <div>
+                  <p class="claimed-by">YOU'RE DRIVING</p>
+                  <p class="angel-name">{{ d.appointment.title }}</p>
+                </div>
+              </div>
+              @if (canCancelAsAngel()) {
+                <button
+                  type="button"
+                  class="cancel-btn ra-reset"
+                  (click)="cancelAsAngel()"
+                >
+                  Cancel this ride
+                </button>
+              }
+            </div>
+          } @else if (d.angel && isRider()) {
+            <div class="driver-section">
+              <div class="driver-card">
+                <app-profile-avatar
+                  [src]="d.angel.avatarUrl"
+                  [name]="d.angel.displayName"
+                  [size]="40"
+                  [alt]="d.angel.displayName"
+                />
+                <div>
+                  <p class="claimed-by">RIDE CLAIMED BY</p>
+                  <p class="angel-name">{{ d.angel.displayName }}</p>
+                </div>
+              </div>
+              <button type="button" class="call-btn ra-reset" (click)="callAngel()">
+                <span class="ra-icon-box" style="width:14px;height:14px">
+                  <img class="ra-icon" src="assets/icons/phone.svg" alt="" />
+                </span>
+                Call {{ d.angel.firstName }}
+              </button>
+            </div>
+          } @else if (claimableItem(); as openItem) {
+            <section class="offer-drive-section">
+              @if (riderForAngel(); as rider) {
+                <div class="driver-card rider-card">
+                  <app-profile-avatar
+                    [src]="rider.avatarUrl"
+                    [name]="rider.displayName"
+                    [size]="40"
+                    [alt]="rider.displayName"
+                  />
+                  <div>
+                    <p class="claimed-by open-rider">RIDER</p>
+                    <p class="angel-name">{{ rider.displayName }}</p>
+                    <p class="open-meta">
+                      {{
+                        openItem.visibility === 'public'
+                          ? 'Community board'
+                          : openItem.riderRelationship
+                      }}
+                    </p>
+                  </div>
+                </div>
+              }
+              @if (offerPendingAsAngel()) {
+                <p class="awaiting-note">
+                  Waiting for {{ openItem.riderName.split(' ')[0] }} to accept your offer.
+                </p>
+                <button
+                  type="button"
+                  class="withdraw-offer ra-reset"
+                  (click)="withdrawMyOffer()"
+                >
+                  Remove offer
+                </button>
+              } @else if (canOfferToDrive()) {
+                <app-primary-button
+                  label="Offer to drive"
+                  variant="deep"
+                  iconSrc="assets/icons/car.svg"
+                  (pressed)="offerToDrive()"
+                />
+              }
+            </section>
+          }
+
+          @if (isRider() && pendingOffers().length) {
+            <section class="offers-section">
+              <p class="eyebrow">Ride Offers</p>
+              @for (item of pendingOffers(); track item.offer.id) {
+                <article class="offer-card">
+                  <div class="offer-top">
+                    <app-profile-avatar
+                      [src]="item.angel.avatarUrl"
+                      [name]="item.angel.displayName"
+                      [size]="40"
+                      [alt]="item.angel.displayName"
+                    />
+                    <div class="offer-copy">
+                      <p class="offer-name">{{ item.angel.displayName }}</p>
+                      <p class="offer-msg">
+                        {{ item.offer.message || 'Offered to drive for this appointment.' }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="offer-actions">
+                    <button
+                      type="button"
+                      class="decline ra-reset"
+                      (click)="declineOffer(item.offer.id)"
+                    >
+                      Decline
+                    </button>
+                    <app-primary-button
+                      label="Accept"
+                      (pressed)="acceptOffer(item.offer.id, item.angel.displayName)"
+                    />
+                  </div>
+                </article>
+              }
+            </section>
+          }
+
+          @if (canManageAsRider()) {
+            <div class="board-toggle">
+              <div class="board-copy">
+                <p class="board-title">Show on community board</p>
+                <p class="board-help">
+                  @if (d.assignment) {
+                    Controls whether other volunteers can see this ride if it becomes open again.
+                    Your current Ride Angel keeps this trip either way.
+                  } @else {
+                    When on, community Ride Angels can offer to drive. When off, only your trusted
+                    Ride Angels can see unclaimed requests.
+                  }
+                </p>
+              </div>
+              <ion-toggle
+                [checked]="isPublic()"
+                (ionChange)="onPublicToggle($any($event).detail.checked)"
+                aria-label="Show on community board"
+              ></ion-toggle>
+            </div>
+
+            <div class="manage-actions">
+              <button type="button" class="edit-btn ra-reset" (click)="editAppointment()">
+                Edit appointment
+              </button>
+              <button
+                type="button"
+                class="cancel-btn ra-reset"
+                (click)="cancelAppointment()"
+              >
+                Cancel appointment
+              </button>
+            </div>
+          }
+        </article>
+      </section>
+    } @else {
+      <p class="missing ra-page-pad">Appointment not found.</p>
+    }
+  </div>
+</ion-content>

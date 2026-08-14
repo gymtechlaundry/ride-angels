@@ -1,0 +1,63 @@
+<ion-content [fullscreen]="true" class="onboarding-content">
+  <div class="onboarding">
+    <div class="hero">
+      <app-brand-logo variant="splash" maxWidth="220px" />
+      <p>Tell us a little about you so we can set up your Ride Angels profile.</p>
+    </div>
+
+    <section class="name-fields">
+      <label>
+        First name
+        <input type="text" autocomplete="given-name" [(ngModel)]="firstName" />
+      </label>
+      <label>
+        Last name
+        <input type="text" autocomplete="family-name" [(ngModel)]="lastName" />
+      </label>
+    </section>
+
+    <section class="chooser">
+      <h2>Choose your default mode</h2>
+      <p class="hint">
+        You’ll land in this mode each time you sign in. Switch anytime from
+        Profile — Rider and Ride Angel both stay available.
+      </p>
+
+      <button
+        type="button"
+        class="persona ra-reset"
+        [class.active]="selected() === 'rider'"
+        (click)="select('rider')"
+      >
+        <span class="persona-copy">
+          <strong>Rider</strong>
+          <span>Create appointments and request rides</span>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="persona ra-reset"
+        [class.active]="selected() === 'angel'"
+        (click)="select('angel')"
+      >
+        <span class="persona-copy">
+          <strong>Ride Angel</strong>
+          <span>Help friends and neighbors get to appointments</span>
+        </span>
+      </button>
+    </section>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <div class="cta">
+      <app-primary-button
+        [label]="saving() ? 'Saving…' : 'Continue'"
+        [disabled]="saving()"
+        (pressed)="continue()"
+      />
+    </div>
+  </div>
+</ion-content>

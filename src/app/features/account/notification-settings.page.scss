@@ -1,0 +1,114 @@
+.device {
+  margin-bottom: 0;
+  padding-top: var(--ra-page-section-y);
+  padding-bottom: var(--ra-page-section-y);
+}
+
+.device-card {
+  background: var(--ra-surface);
+  border: 1px solid var(--ra-border);
+  border-radius: var(--ra-card-radius);
+  box-shadow: var(--ra-shadow-card);
+  padding: var(--ra-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-card-gap);
+}
+
+.device-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ra-card-gap);
+}
+
+.device-card h2 {
+  margin: var(--ra-card-stack-tight) 0 0;
+  font-family: var(--ra-font-display);
+  font-size: var(--ra-card-title-size);
+  font-weight: 700;
+  color: var(--ra-ink);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--ra-card-eyebrow-size);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ra-text-muted);
+}
+
+.status {
+  margin: var(--ra-card-meta-gap) 0 0;
+  font-size: var(--ra-card-body-size);
+  font-weight: 600;
+  color: var(--ra-text-secondary);
+}
+
+.status.ok {
+  color: var(--ra-success-text);
+}
+
+.status.warn {
+  color: var(--ra-warning-text, #b45309);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--ra-card-body-size);
+  line-height: 1.4;
+  color: var(--ra-text-secondary);
+}
+
+.group {
+  padding-top: var(--ra-page-section-y);
+  padding-bottom: var(--ra-page-section-y);
+}
+
+.group h2 {
+  margin: 0 0 var(--ra-page-section-gap);
+  font-family: var(--ra-font-display);
+  font-size: var(--ra-card-name-size);
+  font-weight: 700;
+  color: var(--ra-ink);
+}
+
+.pref-card {
+  background: var(--ra-surface);
+  border: 1px solid var(--ra-border);
+  border-radius: var(--ra-card-radius);
+  box-shadow: var(--ra-shadow-card);
+  overflow: hidden;
+}
+
+.pref-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ra-card-gap);
+  padding: var(--ra-card-padding);
+}
+
+.pref-row + .pref-row {
+  border-top: 1px solid var(--ra-border);
+}
+
+.pref-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.pref-label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ra-ink);
+}
+
+.pref-desc {
+  margin: var(--ra-card-stack-tight) 0 0;
+  font-size: var(--ra-card-meta-size);
+  line-height: 1.4;
+  color: var(--ra-text-secondary);
+}

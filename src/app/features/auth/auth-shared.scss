@@ -1,0 +1,346 @@
+.auth-content {
+  --background: var(--ra-bg);
+}
+
+.auth-page {
+  position: relative;
+  min-height: 100%;
+  padding: max(12px, calc(var(--ra-safe-top) + 4px)) var(--ra-page-padding)
+    calc(28px + var(--ra-safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  isolation: isolate;
+  box-sizing: border-box;
+}
+
+.auth-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      120% 70% at 50% -10%,
+      color-mix(in srgb, var(--ra-primary) 14%, transparent),
+      transparent 58%
+    ),
+    radial-gradient(
+      80% 50% at 100% 100%,
+      color-mix(in srgb, var(--ra-accent) 10%, transparent),
+      transparent 55%
+    );
+}
+
+/* Hero + CTAs: brand centered in top half, actions lower in bottom half */
+.auth-page--split {
+  gap: 0;
+}
+
+.auth-back {
+  position: absolute;
+  top: max(12px, calc(var(--ra-safe-top) + 4px));
+  left: var(--ra-page-padding);
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background: var(--ra-primary-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-top {
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42vh;
+  padding-bottom: 0;
+}
+
+.auth-bottom {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 20px;
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+  min-height: 0;
+  padding-top: 24px;
+  padding-bottom: 4px;
+}
+
+.auth-page--split .hero--mark {
+  gap: 0;
+}
+
+.cta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.cta-support {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ra-text-secondary);
+  max-width: 34ch;
+  align-self: center;
+}
+
+.auth-page--split .actions {
+  margin-top: 0;
+  width: 100%;
+}
+
+.auth-page--split .help-card {
+  margin-top: 0;
+  width: 100%;
+}
+
+/* Stack screens (phone / email / verify): header up top */
+.auth-page--form {
+  gap: 16px;
+}
+
+/* Verify: OTP + CTA sit lower */
+.auth-form-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 20px;
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+  min-height: 0;
+  padding-bottom: 4px;
+}
+
+/* Phone / email / create: field centered, actions anchored below */
+.auth-form-middle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+  min-height: 0;
+}
+
+.auth-form-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
+
+/* Keep focused fields clear of the keyboard when content scrolls */
+.auth-page--form .field input,
+.auth-page--form app-otp-input {
+  scroll-margin-block: 96px;
+}
+
+.auth-form-body .cta-block,
+.auth-form-footer .cta-block {
+  gap: 16px;
+}
+
+.auth-form-body .field,
+.auth-form-middle .field {
+  align-self: stretch;
+  max-width: none;
+}
+
+.auth-form-body .actions,
+.auth-form-footer .actions {
+  align-self: stretch;
+  max-width: none;
+  width: 100%;
+}
+
+.auth-form-links {
+  padding-bottom: 4px;
+}
+
+.hero {
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.hero app-brand-logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--ra-font-display);
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  color: var(--ra-ink);
+  max-width: 18ch;
+}
+
+.hero p,
+.hint,
+.help {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ra-text-secondary);
+  max-width: 32ch;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ra-ink);
+}
+
+.field input {
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid var(--ra-border);
+  background: var(--ra-surface);
+  padding: 0 14px;
+  font-size: 16px;
+  color: var(--ra-ink);
+  box-shadow: var(--ra-shadow-card);
+}
+
+.field input:focus {
+  outline: 2px solid color-mix(in srgb, var(--ra-primary) 35%, transparent);
+  outline-offset: 1px;
+  border-color: color-mix(in srgb, var(--ra-primary) 45%, var(--ra-border));
+}
+
+.error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 13px;
+  text-align: center;
+}
+
+.link-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  text-align: center;
+}
+
+.link-row a,
+.text-link {
+  color: var(--ra-primary);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.mock-hint {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--ra-warning-bg);
+  color: var(--ra-warning-text);
+  font-size: 12px;
+}
+
+.quiet-link {
+  color: var(--ra-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.actions a:not(.quiet-link) {
+  color: var(--ra-primary);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  text-align: center;
+}
+
+.help-card {
+  padding: var(--ra-card-padding);
+  border-radius: var(--ra-card-radius);
+  background: var(--ra-surface);
+  border: 1px solid var(--ra-border);
+  box-shadow: var(--ra-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-card-gap);
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+}
+
+.help-card h2 {
+  margin: 0;
+  font-size: var(--ra-card-name-size);
+  font-family: var(--ra-font-display);
+  font-weight: 700;
+  text-align: center;
+  color: var(--ra-ink);
+}
+
+.help-card .help {
+  text-align: center;
+  max-width: none;
+}
+
+.auth-switch {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ra-text-secondary);
+}
+
+.auth-switch a {
+  color: var(--ra-primary);
+  font-weight: 700;
+  text-decoration: none;
+}

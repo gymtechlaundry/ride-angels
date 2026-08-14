@@ -1,0 +1,271 @@
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="discussion-page ra-page-shell ra-page-shell--flush-top">
+    <app-page-header
+      title="Feedback & ideas"
+      subtitle="Share bugs and feature requests with the team"
+      [showBack]="true"
+    />
+
+    @if (!composing()) {
+      <div class="compose-cta ra-page-pad">
+        <app-primary-button
+          label="Start a discussion"
+          variant="soft"
+          (pressed)="startCompose()"
+        />
+      </div>
+    } @else {
+      <section class="compose ra-page-pad">
+        <form class="compose-card" [formGroup]="form" (ngSubmit)="submit()">
+          <p class="eyebrow">New post</p>
+
+          <div class="kind-row" role="radiogroup" aria-label="Post type">
+            <button
+              type="button"
+              class="kind ra-reset"
+              [class.active]="form.controls.kind.value === 'feature'"
+              (click)="form.controls.kind.setValue('feature')"
+            >
+              Feature
+            </button>
+            <button
+              type="button"
+              class="kind ra-reset"
+              [class.active]="form.controls.kind.value === 'bug'"
+              (click)="form.controls.kind.setValue('bug')"
+            >
+              Bug
+            </button>
+            <button
+              type="button"
+              class="kind ra-reset"
+              [class.active]="form.controls.kind.value === 'general'"
+              (click)="form.controls.kind.setValue('general')"
+            >
+              General
+            </button>
+          </div>
+
+          <label class="field">
+            <span class="label">Title</span>
+            <input
+              formControlName="title"
+              type="text"
+              maxlength="120"
+              placeholder="Short summary"
+            />
+          </label>
+
+          <label class="field">
+            <span class="label">Details</span>
+            <textarea
+              formControlName="body"
+              rows="5"
+              maxlength="4000"
+              placeholder="What happened, or what would you like to see?"
+            ></textarea>
+          </label>
+
+          <div class="shots">
+            <div class="shots-head">
+              <span class="label">Screenshots (optional)</span>
+              <span class="hint">Up to 3 · 5 MB each</span>
+            </div>
+
+            <div class="shot-grid">
+              @for (shot of pendingShots(); track shot.id) {
+                <div class="shot">
+                  <img [src]="shot.previewUrl" alt="Screenshot preview" />
+                  <button
+                    type="button"
+                    class="remove ra-reset"
+                    (click)="removeShot(shot.id)"
+                    aria-label="Remove screenshot"
+                  >
+                    ×
+                  </button>
+                </div>
+              }
+
+              @if (pendingShots().length < 3) {
+                @if (isNative) {
+                  <button
+                    type="button"
+                    class="add-shot ra-reset"
+                    (click)="addScreenshotNative()"
+                  >
+                    + Add
+                  </button>
+                } @else {
+                  <label class="add-shot">
+                    + Add
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      (change)="onFileSelected($event)"
+                    />
+                  </label>
+                }
+              }
+            </div>
+          </div>
+
+          <div class="compose-actions">
+            <app-primary-button
+              label="Post"
+              [disabled]="submitting()"
+              (pressed)="submit()"
+            />
+            <button
+              type="button"
+              class="cancel ra-reset"
+              [disabled]="submitting()"
+              (click)="cancelCompose()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+    }
+
+    <section class="feed ra-page-pad">
+      @if (loading() && posts().length === 0) {
+        <p class="empty">Loading discussions…</p>
+      } @else {
+        @for (post of posts(); track trackPost($index, post)) {
+          <article class="post-card">
+            <div class="post-head">
+              <app-profile-avatar
+                [src]="post.authorAvatarUrl"
+                [name]="post.authorDisplayName"
+                [size]="40"
+                [alt]="post.authorDisplayName"
+              />
+              <div class="meta">
+                <strong>
+                  {{ post.authorDisplayName }}
+                  @if (post.authorIsAppCreator) {
+                    <span class="creator-badge">Creator</span>
+                  }
+                </strong>
+                <span
+                  >{{ kindLabel(post.kind) }} ·
+                  {{ relativeTime(post.createdAt) }}</span
+                >
+              </div>
+              <span class="kind-pill" [attr.data-kind]="post.kind">{{
+                kindLabel(post.kind)
+              }}</span>
+            </div>
+            <h2>{{ post.title }}</h2>
+            <p class="body">{{ post.body }}</p>
+            @if (post.screenshotUrls.length) {
+              <div class="gallery">
+                @for (url of post.screenshotUrls; track url) {
+                  <a [href]="url" target="_blank" rel="noopener noreferrer">
+                    <img [src]="url" alt="Attached screenshot" />
+                  </a>
+                }
+              </div>
+            }
+
+            <div class="thread-actions">
+              <button
+                type="button"
+                class="text-action ra-reset"
+                (click)="toggleReply(post.id)"
+              >
+                {{
+                  expandedReplyFor() === post.id
+                    ? 'Hide reply'
+                    : post.replies.length
+                      ? `Reply · ${post.replies.length}`
+                      : 'Reply'
+                }}
+              </button>
+              @if (canDelete(post.authorId)) {
+                <button
+                  type="button"
+                  class="text-action danger ra-reset"
+                  (click)="confirmDeletePost(post)"
+                >
+                  Delete
+                </button>
+              }
+            </div>
+
+            @if (post.replies.length) {
+              <div class="thread">
+                @for (reply of post.replies; track trackReply($index, reply)) {
+                  <div class="reply-card">
+                    <div class="reply-head">
+                      <app-profile-avatar
+                        [src]="reply.authorAvatarUrl"
+                        [name]="reply.authorDisplayName"
+                        [size]="28"
+                        [alt]="reply.authorDisplayName"
+                      />
+                      <div class="meta">
+                        <strong>
+                          {{ reply.authorDisplayName }}
+                          @if (reply.authorIsAppCreator) {
+                            <span class="creator-badge">Creator</span>
+                          }
+                        </strong>
+                        <span>{{ relativeTime(reply.createdAt) }}</span>
+                      </div>
+                      @if (canDelete(reply.authorId)) {
+                        <button
+                          type="button"
+                          class="text-action danger compact ra-reset"
+                          (click)="confirmDeleteReply(post.id, reply)"
+                        >
+                          Delete
+                        </button>
+                      }
+                    </div>
+                    <p class="body">{{ reply.body }}</p>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (expandedReplyFor() === post.id) {
+              <div class="reply-compose">
+                <textarea
+                  rows="3"
+                  maxlength="2000"
+                  [value]="replyDraft(post.id)"
+                  (input)="onReplyInput(post.id, $event)"
+                  placeholder="Write a reply…"
+                ></textarea>
+                <div class="reply-compose-actions">
+                  <button
+                    type="button"
+                    class="send-reply ra-reset"
+                    [disabled]="
+                      !replyDraft(post.id).trim() || replyBusyId() === post.id
+                    "
+                    (click)="submitReply(post.id)"
+                  >
+                    {{ replyBusyId() === post.id ? 'Posting…' : 'Post reply' }}
+                  </button>
+                </div>
+              </div>
+            }
+          </article>
+        } @empty {
+          <p class="empty">
+            No posts yet. Start a discussion about a bug or feature idea.
+          </p>
+        }
+      }
+    </section>
+  </div>
+</ion-content>
