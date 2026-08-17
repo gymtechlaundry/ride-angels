@@ -1,9 +1,5 @@
-<ion-content [fullscreen]="true">
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
-
-  <div class="discussion-page ra-page-shell ra-page-shell--flush-top">
+<ion-header class="ion-no-border ra-chrome">
+  <div class="header-inner">
     <app-page-header
       title="Feedback & ideas"
       subtitle="Share bugs and feature requests with the team"
@@ -18,7 +14,17 @@
           (pressed)="startCompose()"
         />
       </div>
-    } @else {
+    }
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="discussion-page ra-page-shell">
+    @if (composing()) {
       <section class="compose ra-page-pad">
         <form class="compose-card" [formGroup]="form" (ngSubmit)="submit()">
           <p class="eyebrow">New post</p>
@@ -156,49 +162,137 @@
                 </strong>
                 <span
                   >{{ kindLabel(post.kind) }} ·
-                  {{ relativeTime(post.createdAt) }}</span
+                  {{ relativeTime(post.createdAt)
+                  }}{{
+                    wasEdited(post.createdAt, post.updatedAt) ? ' · Edited' : ''
+                  }}</span
                 >
               </div>
               <span class="kind-pill" [attr.data-kind]="post.kind">{{
                 kindLabel(post.kind)
               }}</span>
             </div>
-            <h2>{{ post.title }}</h2>
-            <p class="body">{{ post.body }}</p>
-            @if (post.screenshotUrls.length) {
-              <div class="gallery">
-                @for (url of post.screenshotUrls; track url) {
-                  <a [href]="url" target="_blank" rel="noopener noreferrer">
-                    <img [src]="url" alt="Attached screenshot" />
-                  </a>
+
+            @if (editingPostId() === post.id) {
+              <form
+                class="inline-edit"
+                [formGroup]="editPostForm"
+                (ngSubmit)="saveEditPost(post.id)"
+              >
+                <div class="kind-row" role="radiogroup" aria-label="Post type">
+                  <button
+                    type="button"
+                    class="kind ra-reset"
+                    [class.active]="editPostForm.controls.kind.value === 'feature'"
+                    (click)="editPostForm.controls.kind.setValue('feature')"
+                  >
+                    Feature
+                  </button>
+                  <button
+                    type="button"
+                    class="kind ra-reset"
+                    [class.active]="editPostForm.controls.kind.value === 'bug'"
+                    (click)="editPostForm.controls.kind.setValue('bug')"
+                  >
+                    Bug
+                  </button>
+                  <button
+                    type="button"
+                    class="kind ra-reset"
+                    [class.active]="
+                      editPostForm.controls.kind.value === 'general'
+                    "
+                    (click)="editPostForm.controls.kind.setValue('general')"
+                  >
+                    General
+                  </button>
+                </div>
+
+                <label class="field">
+                  <span class="label">Title</span>
+                  <input
+                    formControlName="title"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Short summary"
+                  />
+                </label>
+
+                <label class="field">
+                  <span class="label">Details</span>
+                  <textarea
+                    formControlName="body"
+                    rows="4"
+                    maxlength="4000"
+                    placeholder="What happened, or what would you like to see?"
+                  ></textarea>
+                </label>
+
+                <div class="inline-edit-actions">
+                  <button
+                    type="submit"
+                    class="send-reply ra-reset"
+                    [disabled]="editBusy()"
+                  >
+                    {{ editBusy() ? 'Saving…' : 'Save' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="cancel ra-reset"
+                    [disabled]="editBusy()"
+                    (click)="cancelEditPost()"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            } @else {
+              <h2>{{ post.title }}</h2>
+              <p class="body">{{ post.body }}</p>
+              @if (post.screenshotUrls.length) {
+                <div class="gallery">
+                  @for (url of post.screenshotUrls; track url) {
+                    <a [href]="url" target="_blank" rel="noopener noreferrer">
+                      <img [src]="url" alt="Attached screenshot" />
+                    </a>
+                  }
+                </div>
+              }
+
+              <div class="thread-actions">
+                <button
+                  type="button"
+                  class="text-action ra-reset"
+                  (click)="toggleReply(post.id)"
+                >
+                  {{
+                    expandedReplyFor() === post.id
+                      ? 'Hide reply'
+                      : post.replies.length
+                        ? `Reply · ${post.replies.length}`
+                        : 'Reply'
+                  }}
+                </button>
+                @if (canEdit(post.authorId)) {
+                  <button
+                    type="button"
+                    class="text-action ra-reset"
+                    (click)="startEditPost(post)"
+                  >
+                    Edit
+                  </button>
+                }
+                @if (canDelete(post.authorId)) {
+                  <button
+                    type="button"
+                    class="text-action danger ra-reset"
+                    (click)="confirmDeletePost(post)"
+                  >
+                    Delete
+                  </button>
                 }
               </div>
             }
-
-            <div class="thread-actions">
-              <button
-                type="button"
-                class="text-action ra-reset"
-                (click)="toggleReply(post.id)"
-              >
-                {{
-                  expandedReplyFor() === post.id
-                    ? 'Hide reply'
-                    : post.replies.length
-                      ? `Reply · ${post.replies.length}`
-                      : 'Reply'
-                }}
-              </button>
-              @if (canDelete(post.authorId)) {
-                <button
-                  type="button"
-                  class="text-action danger ra-reset"
-                  (click)="confirmDeletePost(post)"
-                >
-                  Delete
-                </button>
-              }
-            </div>
 
             @if (post.replies.length) {
               <div class="thread">
@@ -218,25 +312,80 @@
                             <span class="creator-badge">Creator</span>
                           }
                         </strong>
-                        <span>{{ relativeTime(reply.createdAt) }}</span>
-                      </div>
-                      @if (canDelete(reply.authorId)) {
-                        <button
-                          type="button"
-                          class="text-action danger compact ra-reset"
-                          (click)="confirmDeleteReply(post.id, reply)"
+                        <span
+                          >{{ relativeTime(reply.createdAt)
+                          }}{{
+                            wasEdited(reply.createdAt, reply.updatedAt)
+                              ? ' · Edited'
+                              : ''
+                          }}</span
                         >
-                          Delete
-                        </button>
+                      </div>
+                      @if (
+                        editingReplyId() !== reply.id &&
+                        (canEdit(reply.authorId) || canDelete(reply.authorId))
+                      ) {
+                        <div class="reply-actions">
+                          @if (canEdit(reply.authorId)) {
+                            <button
+                              type="button"
+                              class="text-action compact ra-reset"
+                              (click)="startEditReply(reply)"
+                            >
+                              Edit
+                            </button>
+                          }
+                          @if (canDelete(reply.authorId)) {
+                            <button
+                              type="button"
+                              class="text-action danger compact ra-reset"
+                              (click)="confirmDeleteReply(post.id, reply)"
+                            >
+                              Delete
+                            </button>
+                          }
+                        </div>
                       }
                     </div>
-                    <p class="body">{{ reply.body }}</p>
+                    @if (editingReplyId() === reply.id) {
+                      <div class="reply-compose">
+                        <textarea
+                          rows="3"
+                          maxlength="2000"
+                          [value]="editReplyDraft()"
+                          (input)="onEditReplyInput($event)"
+                          placeholder="Edit your reply…"
+                        ></textarea>
+                        <div class="inline-edit-actions">
+                          <button
+                            type="button"
+                            class="send-reply ra-reset"
+                            [disabled]="
+                              !editReplyDraft().trim() || editBusy()
+                            "
+                            (click)="saveEditReply(post.id, reply.id)"
+                          >
+                            {{ editBusy() ? 'Saving…' : 'Save' }}
+                          </button>
+                          <button
+                            type="button"
+                            class="cancel ra-reset"
+                            [disabled]="editBusy()"
+                            (click)="cancelEditReply()"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <p class="body">{{ reply.body }}</p>
+                    }
                   </div>
                 }
               </div>
             }
 
-            @if (expandedReplyFor() === post.id) {
+            @if (expandedReplyFor() === post.id && editingPostId() !== post.id) {
               <div class="reply-compose">
                 <textarea
                   rows="3"

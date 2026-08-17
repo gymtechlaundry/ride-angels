@@ -1,9 +1,10 @@
 .compose-cta {
-  padding-top: var(--ra-page-section-y);
+  padding-top: 4px;
   padding-bottom: var(--ra-page-section-y);
 }
 
 .compose {
+  padding-top: var(--ra-page-section-y);
   padding-bottom: 16px;
 }
 
@@ -309,6 +310,32 @@
 
 .text-action.compact {
   font-size: 12px;
+}
+
+.reply-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.inline-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ra-card-gap);
+}
+
+.inline-edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.inline-edit-actions .cancel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ra-text-secondary);
 }
 
 .thread {

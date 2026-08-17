@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   AlertController,
   IonContent,
+  IonHeader,
   IonRefresher,
   IonRefresherContent,
   RefresherCustomEvent,
@@ -36,6 +37,7 @@ type PendingShot = {
   selector: 'app-discussion-page',
   standalone: true,
   imports: [
+    IonHeader,
     IonContent,
     IonRefresher,
     IonRefresherContent,
@@ -62,6 +64,9 @@ export class DiscussionPage implements OnInit, ViewWillEnter {
   readonly pendingShots = signal<PendingShot[]>([]);
   readonly replyDrafts = signal<Record<string, string>>({});
   readonly expandedReplyFor = signal<string | null>(null);
+  readonly editingPostId = signal<string | null>(null);
+  readonly editingReplyId = signal<string | null>(null);
+  readonly editBusy = signal(false);
   readonly isNative = Capacitor.isNativePlatform();
   readonly currentUserId = computed(
     () => this.auth.getCurrentUserOrNull()?.id ?? null,
@@ -73,6 +78,14 @@ export class DiscussionPage implements OnInit, ViewWillEnter {
     title: ['', [Validators.required, Validators.maxLength(120)]],
     body: ['', [Validators.required, Validators.maxLength(4000)]],
   });
+
+  readonly editPostForm = this.fb.nonNullable.group({
+    kind: ['feature' as FeedbackKind, Validators.required],
+    title: ['', [Validators.required, Validators.maxLength(120)]],
+    body: ['', [Validators.required, Validators.maxLength(4000)]],
+  });
+
+  readonly editReplyDraft = signal('');
 
   async ngOnInit(): Promise<void> {
     await this.feedback.refresh();
@@ -98,7 +111,19 @@ export class DiscussionPage implements OnInit, ViewWillEnter {
     return this.isMine(authorId) || this.isModerator();
   }
 
+  canEdit(authorId: string): boolean {
+    return this.isMine(authorId);
+  }
+
+  wasEdited(createdAt: string, updatedAt: string): boolean {
+    return (
+      new Date(updatedAt).getTime() - new Date(createdAt).getTime() > 2000
+    );
+  }
+
   startCompose(): void {
+    this.cancelEditPost();
+    this.cancelEditReply();
     this.composing.set(true);
   }
 
@@ -161,6 +186,80 @@ export class DiscussionPage implements OnInit, ViewWillEnter {
       );
     } finally {
       this.replyBusyId.set(null);
+    }
+  }
+
+  startEditPost(post: FeedbackPost): void {
+    this.cancelEditReply();
+    this.composing.set(false);
+    this.editingPostId.set(post.id);
+    this.editPostForm.reset({
+      kind: post.kind,
+      title: post.title,
+      body: post.body,
+    });
+  }
+
+  cancelEditPost(): void {
+    this.editingPostId.set(null);
+    this.editPostForm.reset({ kind: 'feature', title: '', body: '' });
+  }
+
+  async saveEditPost(postId: string): Promise<void> {
+    if (this.editPostForm.invalid || this.editBusy()) {
+      this.editPostForm.markAllAsTouched();
+      return;
+    }
+    this.editBusy.set(true);
+    try {
+      const value = this.editPostForm.getRawValue();
+      await this.feedback.updatePost(postId, {
+        kind: value.kind,
+        title: value.title,
+        body: value.body,
+      });
+      this.cancelEditPost();
+      await this.showToast('Discussion updated.');
+    } catch (err) {
+      await this.showToast(
+        err instanceof Error ? err.message : 'Could not update discussion.',
+      );
+    } finally {
+      this.editBusy.set(false);
+    }
+  }
+
+  startEditReply(reply: FeedbackReply): void {
+    this.cancelEditPost();
+    this.editingReplyId.set(reply.id);
+    this.editReplyDraft.set(reply.body);
+  }
+
+  cancelEditReply(): void {
+    this.editingReplyId.set(null);
+    this.editReplyDraft.set('');
+  }
+
+  onEditReplyInput(event: Event): void {
+    this.editReplyDraft.set((event.target as HTMLTextAreaElement).value);
+  }
+
+  async saveEditReply(postId: string, replyId: string): Promise<void> {
+    const body = this.editReplyDraft().trim();
+    if (!body || this.editBusy()) {
+      return;
+    }
+    this.editBusy.set(true);
+    try {
+      await this.feedback.updateReply(postId, replyId, body);
+      this.cancelEditReply();
+      await this.showToast('Reply updated.');
+    } catch (err) {
+      await this.showToast(
+        err instanceof Error ? err.message : 'Could not update reply.',
+      );
+    } finally {
+      this.editBusy.set(false);
     }
   }
 

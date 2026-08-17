@@ -18,6 +18,7 @@ export type FeedbackReply = {
   authorIsAppCreator: boolean;
   body: string;
   createdAt: string;
+  updatedAt: string;
 };
 
 export type FeedbackPost = {
@@ -31,6 +32,7 @@ export type FeedbackPost = {
   body: string;
   screenshotUrls: string[];
   createdAt: string;
+  updatedAt: string;
   replies: FeedbackReply[];
 };
 
@@ -45,6 +47,7 @@ type FeedbackPostRow = {
   body: string;
   screenshot_urls: string[] | null;
   created_at: string;
+  updated_at?: string | null;
 };
 
 type FeedbackReplyRow = {
@@ -56,13 +59,14 @@ type FeedbackReplyRow = {
   author_is_app_creator?: boolean | null;
   body: string;
   created_at: string;
+  updated_at?: string | null;
 };
 
 const MOCK_KEY = 'ra.feedback_threads.v2';
 const POST_SELECT =
-  'id, author_id, author_display_name, author_avatar_url, author_is_app_creator, kind, title, body, screenshot_urls, created_at';
+  'id, author_id, author_display_name, author_avatar_url, author_is_app_creator, kind, title, body, screenshot_urls, created_at, updated_at';
 const REPLY_SELECT =
-  'id, post_id, author_id, author_display_name, author_avatar_url, author_is_app_creator, body, created_at';
+  'id, post_id, author_id, author_display_name, author_avatar_url, author_is_app_creator, body, created_at, updated_at';
 
 @Injectable({ providedIn: 'root' })
 export class FeedbackService {
@@ -151,6 +155,7 @@ export class FeedbackService {
       body,
       screenshotUrls,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       replies: [],
     };
 
@@ -204,6 +209,7 @@ export class FeedbackService {
       authorIsAppCreator: isCreator,
       body,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     if (!isSupabaseConfigured()) {
@@ -242,6 +248,145 @@ export class FeedbackService {
         post.id === postId
           ? { ...post, replies: [...post.replies, mapped] }
           : post,
+      ),
+    );
+    return mapped;
+  }
+
+  async updatePost(
+    postId: string,
+    input: { kind: FeedbackKind; title: string; body: string },
+  ): Promise<FeedbackPost> {
+    const user = this.auth.getCurrentUser();
+    const title = input.title.trim();
+    const body = input.body.trim();
+    if (!title || !body) {
+      throw new Error('Title and details are required.');
+    }
+
+    const existing = this.posts().find((p) => p.id === postId);
+    if (!existing) {
+      throw new Error('Discussion not found.');
+    }
+    if (existing.authorId !== user.id) {
+      throw new Error('You can only edit your own discussions.');
+    }
+
+    const updatedAt = new Date().toISOString();
+
+    if (!isSupabaseConfigured()) {
+      const next = this.readMock().map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              kind: input.kind,
+              title,
+              body,
+              updatedAt,
+            }
+          : post,
+      );
+      this.writeMock(next);
+      this.posts.set(next);
+      const mapped = next.find((p) => p.id === postId);
+      if (!mapped) {
+        throw new Error('Discussion not found.');
+      }
+      return mapped;
+    }
+
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('feedback_posts')
+      .update({
+        kind: input.kind,
+        title,
+        body,
+      })
+      .eq('id', postId)
+      .eq('author_id', user.id)
+      .select(POST_SELECT)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const mapped = mapPostRow(
+      data as FeedbackPostRow,
+      existing.replies,
+    );
+    this.posts.update((list) =>
+      list.map((post) => (post.id === postId ? mapped : post)),
+    );
+    return mapped;
+  }
+
+  async updateReply(postId: string, replyId: string, bodyRaw: string): Promise<FeedbackReply> {
+    const user = this.auth.getCurrentUser();
+    const body = bodyRaw.trim();
+    if (!body) {
+      throw new Error('Reply cannot be empty.');
+    }
+
+    const post = this.posts().find((p) => p.id === postId);
+    const existing = post?.replies.find((r) => r.id === replyId);
+    if (!existing) {
+      throw new Error('Reply not found.');
+    }
+    if (existing.authorId !== user.id) {
+      throw new Error('You can only edit your own replies.');
+    }
+
+    const updatedAt = new Date().toISOString();
+
+    if (!isSupabaseConfigured()) {
+      let mapped: FeedbackReply | null = null;
+      const next = this.readMock().map((p) => {
+        if (p.id !== postId) {
+          return p;
+        }
+        return {
+          ...p,
+          replies: p.replies.map((r) => {
+            if (r.id !== replyId) {
+              return r;
+            }
+            mapped = { ...r, body, updatedAt };
+            return mapped;
+          }),
+        };
+      });
+      this.writeMock(next);
+      this.posts.set(next);
+      if (!mapped) {
+        throw new Error('Reply not found.');
+      }
+      return mapped;
+    }
+
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('feedback_replies')
+      .update({ body })
+      .eq('id', replyId)
+      .eq('author_id', user.id)
+      .select(REPLY_SELECT)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const mapped = mapReplyRow(data as FeedbackReplyRow);
+    this.posts.update((list) =>
+      list.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              replies: p.replies.map((r) => (r.id === replyId ? mapped : r)),
+            }
+          : p,
       ),
     );
     return mapped;
@@ -401,10 +546,12 @@ export class FeedbackService {
       return parsed.map((p) => ({
         ...p,
         authorIsAppCreator: !!p.authorIsAppCreator,
+        updatedAt: p.updatedAt || p.createdAt,
         replies: Array.isArray(p.replies)
           ? p.replies.map((r) => ({
               ...r,
               authorIsAppCreator: !!r.authorIsAppCreator,
+              updatedAt: r.updatedAt || r.createdAt,
             }))
           : [],
       }));
@@ -430,6 +577,7 @@ function mapPostRow(row: FeedbackPostRow, replies: FeedbackReply[]): FeedbackPos
     body: row.body,
     screenshotUrls: row.screenshot_urls ?? [],
     createdAt: row.created_at,
+    updatedAt: row.updated_at || row.created_at,
     replies,
   };
 }
@@ -444,6 +592,7 @@ function mapReplyRow(row: FeedbackReplyRow): FeedbackReply {
     authorIsAppCreator: !!row.author_is_app_creator,
     body: row.body,
     createdAt: row.created_at,
+    updatedAt: row.updated_at || row.created_at,
   };
 }
 
