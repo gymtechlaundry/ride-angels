@@ -16,4 +16,10 @@ Visual source of truth: `reference/ride-angels-approved-brand-board.png`
 ```bash
 npm run generate:icons
 ```
+This regenerates icons, then **restores** the hand-tuned portrait splash assets
+(`ios/.../Splash.imageset` and Android `splash.png` drawables). Do not let
+`capacitor-assets` leave square splash images in place — iOS stretches those
+outside the viewport. To intentionally rebuild splash from `resources/splash.png`,
+run `npx capacitor-assets generate …` separately and verify portrait sizes
+(e.g. ~1284×2778), not 2732×2732 squares.
 PWA webp icons are moved to `src/assets/pwa/` so they do not mix with UI SVGs in `src/assets/icons/`.

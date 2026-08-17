@@ -23,7 +23,7 @@
     "ios:live": "npx cap run ios -l --host=localhost --port=4200",
     "android:live": "bash scripts/android-with-jdk.sh npx cap run android -l --host=localhost --port=4200 --forwardPorts=4200:4200",
     "ios:live:device": "node scripts/ios-live-device.mjs",
-    "generate:icons": "npx capacitor-assets generate --iconBackgroundColor '#6C47FF' --iconBackgroundColorDark '#1E1B4B' --splashBackgroundColor '#F5F6FA' --splashBackgroundColorDark '#1E1B4B' && mkdir -p src/assets/pwa && mv -f src/assets/icons/icon-*.webp src/assets/pwa/ 2>/dev/null || true",
+    "generate:icons": "bash scripts/generate-icons.sh",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
