@@ -9,19 +9,15 @@ export type BrandLogoVariant =
   | 'mark-purple-card'
   | 'mark-light-card';
 
+/** Runtime logos only — other kit rasters stay in src/assets but are not packaged. */
 const LOGO_SRC: Record<BrandLogoVariant, string> = {
-  /** Clean vertical lockup matching the iOS splash (transparent on #F5F6FA). */
   splash: 'assets/branding/logos/ride-angels-splash-lockup.png',
-  'horizontal-light':
-    'assets/branding/logos/ride-angels-horizontal-light-approved.png',
-  'horizontal-dark':
-    'assets/branding/logos/ride-angels-horizontal-dark-approved.png',
-  vertical: 'assets/branding/logos/ride-angels-vertical-approved.png',
+  'horizontal-light': 'assets/branding/logos/ride-angels-splash-lockup.png',
+  'horizontal-dark': 'assets/branding/logos/ride-angels-splash-lockup.png',
+  vertical: 'assets/branding/logos/ride-angels-splash-lockup.png',
   mark: 'assets/branding/logos/ride-angels-mark-approved.png',
-  'mark-purple-card':
-    'assets/branding/logos/ride-angels-mark-purple-card-approved.png',
-  'mark-light-card':
-    'assets/branding/logos/ride-angels-mark-light-card-approved.png',
+  'mark-purple-card': 'assets/branding/logos/ride-angels-mark-approved.png',
+  'mark-light-card': 'assets/branding/logos/ride-angels-mark-approved.png',
 };
 
 /**

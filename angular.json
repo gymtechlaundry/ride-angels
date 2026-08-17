@@ -32,7 +32,18 @@
               {
                 "glob": "**/*",
                 "input": "src/assets",
-                "output": "assets"
+                "output": "assets",
+                "ignore": [
+                  "icons/apple-splash-*",
+                  "images/**",
+                  "branding/reference/**",
+                  "branding/icons/**",
+                  "branding/guide/**",
+                  "branding/**/*.md",
+                  "branding/logos/ride-angels-horizontal-*.png",
+                  "branding/logos/ride-angels-vertical-approved.png",
+                  "branding/logos/ride-angels-mark-*-card-approved.png"
+                ]
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
@@ -107,7 +118,18 @@
               {
                 "glob": "**/*",
                 "input": "src/assets",
-                "output": "assets"
+                "output": "assets",
+                "ignore": [
+                  "icons/apple-splash-*",
+                  "images/**",
+                  "branding/reference/**",
+                  "branding/icons/**",
+                  "branding/guide/**",
+                  "branding/**/*.md",
+                  "branding/logos/ride-angels-horizontal-*.png",
+                  "branding/logos/ride-angels-vertical-approved.png",
+                  "branding/logos/ride-angels-mark-*-card-approved.png"
+                ]
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],

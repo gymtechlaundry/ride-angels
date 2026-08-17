@@ -14,8 +14,9 @@ export class RideRealtimeService {
   private channel: RealtimeChannel | null = null;
   private userId: string | null = null;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingTables = new Set<string>();
 
-  startForCurrentUser(onChange: () => void): void {
+  startForCurrentUser(onChange: (table: string) => void): void {
     if (!isSupabaseConfigured()) {
       return;
     }
@@ -31,11 +32,18 @@ export class RideRealtimeService {
       this.stop();
       this.userId = id;
 
-      const notify = () => {
+      const notify = (table: string) => {
+        this.pendingTables.add(table);
         if (this.debounceTimer) {
           clearTimeout(this.debounceTimer);
         }
-        this.debounceTimer = setTimeout(() => onChange(), 400);
+        this.debounceTimer = setTimeout(() => {
+          const tables = [...this.pendingTables];
+          this.pendingTables.clear();
+          // Prefer ride-domain tables over notifications when both fire together.
+          const rideTable = tables.find((t) => t !== 'notifications');
+          onChange(rideTable ?? tables[0] ?? 'notifications');
+        }, 400);
       };
 
       this.channel = client
@@ -48,32 +56,32 @@ export class RideRealtimeService {
             table: 'notifications',
             filter: `recipient_profile_id=eq.${id}`,
           },
-          notify,
+          () => notify('notifications'),
         )
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'ride_requests' },
-          notify,
+          () => notify('ride_requests'),
         )
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'appointments' },
-          notify,
+          () => notify('appointments'),
         )
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'ride_offers' },
-          notify,
+          () => notify('ride_offers'),
         )
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'ride_assignments' },
-          notify,
+          () => notify('ride_assignments'),
         )
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'ride_angel_connections' },
-          notify,
+          () => notify('ride_angel_connections'),
         )
         .subscribe();
     });
@@ -84,6 +92,7 @@ export class RideRealtimeService {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = null;
     }
+    this.pendingTables.clear();
     if (this.channel && isSupabaseConfigured()) {
       void getSupabaseClient().removeChannel(this.channel);
     }

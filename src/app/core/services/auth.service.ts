@@ -724,7 +724,9 @@ export class AuthService {
       return;
     }
     const { DomainSyncService } = await import('./domain-sync.service');
-    await this.injector.get(DomainSyncService).refreshForCurrentUser();
+    await this.injector
+      .get(DomainSyncService)
+      .refreshForCurrentUser({ force: true });
     try {
       const { PushRegistrationService } = await import(
         './push-registration.service'

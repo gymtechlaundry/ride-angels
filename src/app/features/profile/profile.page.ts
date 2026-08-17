@@ -198,7 +198,7 @@ export class ProfilePage implements OnInit {
         this.partnerLinks.load(),
         this.notifPrefs.load(),
         this.push.refreshStatus(),
-        this.domainSync.refreshForCurrentUser(),
+        this.domainSync.refreshForCurrentUser({ force: true }),
       ]);
       if (this.anyCalendarConnected()) {
         await this.refreshCalendars();

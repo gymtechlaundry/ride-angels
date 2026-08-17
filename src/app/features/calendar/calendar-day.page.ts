@@ -83,7 +83,7 @@ export class CalendarDayPage implements ViewWillEnter {
 
   async onRefresh(event: RefresherCustomEvent): Promise<void> {
     try {
-      await this.domainSync.refreshForCurrentUser();
+      await this.domainSync.refreshForCurrentUser({ force: true });
     } finally {
       event.target.complete();
     }

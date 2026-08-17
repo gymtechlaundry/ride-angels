@@ -14,14 +14,15 @@ import {
 } from '../models';
 import { isPastLocalDateTime } from '../utils/date-time';
 
+/** Offline-demo avatars — large PNGs are not packaged in Cap builds. */
 export const ASSET = {
-  eleanor: 'assets/images/eleanor.png',
-  auntSarah: 'assets/images/aunt-sarah.png',
-  david: 'assets/images/david.png',
-  emily: 'assets/images/emily.png',
-  angelSarah: 'assets/images/angel-sarah.png',
-  angelDavid: 'assets/images/angel-david.png',
-  angelEmily: 'assets/images/angel-emily.png',
+  eleanor: '',
+  auntSarah: '',
+  david: '',
+  emily: '',
+  angelSarah: '',
+  angelDavid: '',
+  angelEmily: '',
 } as const;
 
 export const CURRENT_RIDER_ID = 'user-eleanor';
