@@ -114,9 +114,8 @@ truth for production).
 Use a **release** sync (no live-reload `server.url`):
 
 ```bash
-npm run build:ios:release    # then archive / TestFlight
-npm run build:android:release
-# AAB: cd android && bash ../scripts/android-with-jdk.sh ./gradlew :app:bundleRelease
+npm run ios:release       # Xcode → Product → Archive → TestFlight
+npm run android:bundle    # Play Console AAB
 ```
 
 On each platform:

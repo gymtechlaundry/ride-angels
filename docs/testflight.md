@@ -16,15 +16,11 @@ Public App Store / Play Store listing (copy, privacy labels, screenshots, review
 ## Build the release bundle (from repo root)
 
 ```bash
-# 1) Production web assets + Capacitor sync (must NOT include a live-reload server.url)
-npm run build:ios:release
-
-# 2) Confirm live-reload is gone (should print nothing or no "url": "http...")
-grep -n '"url"' ios/App/App/capacitor.config.json || echo "OK: no live server url"
-
-# 3) Open Xcode
+# Production www/ + Cap sync + open Xcode (must NOT include a live-reload server.url)
 npm run ios:release
-# or: open ios/App/App.xcodeproj
+
+# Confirm live-reload is gone (should print nothing or no "url": "http...")
+grep -n '"url"' ios/App/App/capacitor.config.json || echo "OK: no live server url"
 ```
 
 If `capacitor.config.json` still has `"url": "http://…"`, remove it and re-run `npx cap sync ios`. A TestFlight build that points at your Mac will show a white screen for testers.

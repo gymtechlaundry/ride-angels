@@ -222,12 +222,13 @@ Google also requires in-app account deletion for apps that create accounts (alre
 ### Build a release AAB
 
 ```bash
-npm run build:android:release
-# then in Android Studio: Build → Generate Signed App Bundle
-# or: ./scripts/android-with-jdk.sh ./gradlew -p android bundleRelease
+# Bump versionCode in android/app/build.gradle, then:
+npm run android:bundle
 ```
 
 Output: `android/app/build/outputs/bundle/release/app-release.aab`
+
+Or open Android Studio after a prod sync: `npm run android:release`.
 
 Increment `versionCode` in `android/app/build.gradle` for every Play upload (`versionName` can stay `1.0` until you bump marketing version).
 
