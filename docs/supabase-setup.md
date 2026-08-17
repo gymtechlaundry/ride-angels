@@ -61,30 +61,28 @@ If migrations are skipped, the app shows errors like missing `profiles` table or
 
 ---
 
-## 3. Authentication — Phone (Twilio)
+## 3. Authentication — Phone (Twilio Verify)
 
-Primary sign-in: **passwordless SMS OTP**.
+Primary sign-in: **passwordless SMS OTP** via **Twilio Verify** (not Programmable
+Messaging / toll-free From numbers).
 
 1. Dashboard → **Authentication → Providers**
 2. Enable **Phone**
-3. Configure SMS provider (commonly **Twilio**):
-   - Account SID, Auth Token, Message Service SID or From number
-   - Follow Supabase docs for your provider
+3. SMS provider: **Twilio Verify**
+   - Account SID, Auth Token, **Verify Service SID** (`VA…`)
+   - Follow [phone-otp.md](./phone-otp.md)
 4. **Do not** put Twilio credentials in the Ionic app — Supabase Auth sends SMS
 
-### Toll-free / US messaging compliance (required)
+### Why not toll-free Messaging?
 
-US carriers require verification before Twilio can send SMS from most numbers.
+US toll-free Messaging verification for the previous From number was rejected
+(Twilio **30526**). Twilio Verify is the supported OTP path and does not use that
+toll-free sender.
 
-- **Toll-free (e.g. +18559705852):** complete **Toll-Free Verification** in Twilio
-  Console for that number. Until status is **Approved**, OTP texts will not
-  deliver (Console shows a red banner on the number’s Configure page).
-- **Local 10DLC:** requires A2P brand/campaign registration instead.
-
-While verification is pending, use **Authentication → Phone → Test phone numbers**
+While Verify is being configured, use **Authentication → Phone → Test phone numbers**
 so iOS/Android builds can exercise the OTP UI without real SMS.
 
-Full runbook (verification copy, Supabase fields, device smoke):
+Full runbook (Verify setup, test numbers, device smoke):
 [phone-otp.md](./phone-otp.md).
 
 **App behavior**

@@ -3,6 +3,8 @@
 Parity checklist for Ride Angels Android vs the working iOS build.
 Package ID: `org.rideangels.app`.
 
+Public Play Store listing (copy, Data safety, AAB, production track): [store-publish.md](./store-publish.md).
+
 ## One-time Firebase / FCM setup
 
 Push registration already works in the Capacitor client. Delivery needs Firebase
@@ -66,8 +68,8 @@ at your keystore before generating a release AAB.
 
 ## Feature parity smoke
 
-1. **Auth** — OTP sign-in (phone/email). For phone SMS delivery and Twilio
-   toll-free verification, see [`phone-otp.md`](./phone-otp.md). QA test
+1. **Auth** — OTP sign-in (phone/email). For phone SMS via Twilio Verify, see
+   [`phone-otp.md`](./phone-otp.md). QA test
    numbers: [`supabase/seed/QA_TRIO.md`](../supabase/seed/QA_TRIO.md).
 2. **Rides** — create / claim / offer / calendar tab + list.
 3. **Push** — Profile → Enable push → allow permission → confirm `device_push_tokens`

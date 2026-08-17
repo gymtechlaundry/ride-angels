@@ -412,6 +412,26 @@
       </div>
     </section>
 
+    <section class="settings-section ra-page-pad">
+      <div class="settings-card about-card">
+        <div class="settings-head">
+          <div>
+            <p class="eyebrow">About</p>
+          </div>
+        </div>
+        <a
+          class="studio-credit"
+          [href]="studioUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open Hyperion App Studio website"
+        >
+          {{ studioCredit }}
+        </a>
+        <p class="studio-copyright">{{ studioCopyright }}</p>
+      </div>
+    </section>
+
     <section class="actions ra-page-pad">
       <div class="action-buttons">
         <app-primary-button

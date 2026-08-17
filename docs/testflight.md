@@ -2,6 +2,8 @@
 
 Upload Ride Angels (`org.rideangels.app`) to TestFlight.
 
+Public App Store / Play Store listing (copy, privacy labels, screenshots, review notes): [store-publish.md](./store-publish.md).
+
 ## Prerequisites
 
 - [ ] Apple Developer Program membership (paid)
@@ -48,7 +50,7 @@ If `capacitor.config.json` still has `"url": "http://…"`, remove it and re-run
 ## Smoke test on a device
 
 - [ ] Sign in with phone or email OTP (real SMS/email)
-  - Phone SMS: Twilio toll-free must be **Approved** — see [phone-otp.md](./phone-otp.md)
+  - Phone SMS: Twilio **Verify** configured — see [phone-otp.md](./phone-otp.md)
   - Pending SMS: use Dashboard **Test phone numbers** (QA trio `123456`)
 - [ ] Complete onboarding if needed
 - [ ] Rider: add appointment (with notes), see trusted angels notified in-app

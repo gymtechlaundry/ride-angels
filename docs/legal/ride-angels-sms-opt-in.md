@@ -1,8 +1,7 @@
 # Ride Angels — SMS opt-in disclosure
 
 This page documents how Ride Angels obtains consent to send SMS one-time
-passcodes (OTP) for account authentication. Used for Twilio toll-free
-messaging verification.
+passcodes (OTP) for account authentication (Twilio Verify / Auth OTP).
 
 ## Product
 

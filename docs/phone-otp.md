@@ -1,19 +1,38 @@
 # Phone OTP (iOS / Android)
 
-Ride Angels phone sign-in uses **Supabase Auth → Twilio SMS**. The Capacitor app
-is the same on iOS and Android; delivery failures are almost always Twilio /
+Ride Angels phone sign-in uses **Supabase Auth → Twilio Verify**. The Capacitor
+app is the same on iOS and Android; delivery failures are almost always Twilio /
 Dashboard config, not platform-specific code.
 
 App flow: [`src/app/core/services/auth.service.ts`](../src/app/core/services/auth.service.ts)
-normalizes to E.164 (`+1…`) then calls `signInWithOtp` / `verifyOtp`.
+normalizes to E.164 (`+1…`) then calls `signInWithOtp` / `verifyOtp`. **No app
+code change** is required when switching SMS providers in Supabase.
 
 ```mermaid
 flowchart LR
   App[iOS_or_Android] --> GoTrue[Supabase_Auth]
-  GoTrue --> Twilio[Twilio_SMS]
-  Twilio -->|"needs TFN verified"| Carrier[Carrier]
+  GoTrue --> Verify[Twilio_Verify]
+  Verify --> Carrier[Carrier]
   Carrier --> Phone[User_phone]
 ```
+
+---
+
+## Why Twilio Verify (not Twilio Messaging)
+
+US **toll-free Messaging** verification for `+18559705852` was **rejected**
+(Twilio reason **30526** — high-risk domain). That path cannot be resubmitted on
+the same domain.
+
+**Twilio Verify** is the right OTP product:
+
+- Built for one-time codes (not marketing / conversation SMS)
+- Uses a **Verify Service** (`VA…` SID), not your toll-free From number
+- Avoids Toll-Free Messaging Verification for Auth OTP
+- Same Supabase client APIs (`signInWithOtp` / `verifyOtp`)
+
+Keep the rejected toll-free number released/deleted in Twilio if you no longer
+need it for Messaging. Do **not** put that number in the Verify Supabase fields.
 
 ---
 
@@ -23,113 +42,51 @@ flowchart LR
 |------|--------|
 | App OTP send/verify | Done (shared iOS/Android code) |
 | Supabase Phone + QA test OTPs | Live — `+15555550101`…`103` → `123456` (`message_id: test-otp`) |
-| Twilio toll-free messaging verification for `+18559705852` | **You must submit** in Twilio Console (blocks real SMS) |
-| Device smoke on TestFlight / Play Internal | Use test OTPs now; real SMS after TFN Approved |
+| Twilio Verify Service + Supabase provider | Done — Service `VAe0461acfec2df955fb4a91a7a51319ca` (`Ride Angels OTP`); hosted Phone provider = `twilio_verify` |
+| Device smoke on TestFlight / Play Internal | Use test OTPs until Verify is wired; then real SMS |
 
 ---
 
-## 1. Twilio toll-free messaging verification (required for real SMS)
+## 1. Create a Twilio Verify Service
 
-**Number in use:** `(855) 970-5852` → E.164 `+18559705852`
+1. Open [Twilio Console → Verify → Services](https://console.twilio.com/us1/develop/verify/services)
+2. **Create new** service
+   - Friendly name: `Ride Angels OTP`
+   - Enable **SMS**
+   - Leave Fraud Guard on (recommended)
+3. Copy the **Service SID** (starts with `VA`)
+4. From Account Dashboard, copy **Account SID** and **Auth Token**
 
-If the Twilio number page shows a red banner:
-
-> Toll-free verification for messaging is required…
-
-**outbound OTP will not deliver** until verification is **Approved**.
-
-### Step 1/2 — Business and contact (matches Console form)
-
-| Field | Value |
-|-------|--------|
-| Business profile | Ride Angels (existing ISV / BU profile) |
-| Legal entity name | Ride Angels |
-| Website URL | `https://hyperionappstudio.com` (or `https://rideangels.org` when live) |
-| Business type | Sole Proprietor |
-| Business DBA | Devin Cooper |
-
-Business address / contact should match the Trust Hub profile (already filled).
-
-### Step 2/2 — Messaging use case (paste these)
-
-| Field | Value |
-|-------|--------|
-| Estimated monthly volume | `1,000` (fine for early launch) |
-| Opt-in type | Prefer **Website** if available; **Mobile / QR Code** is OK if that is the closest match for in-app entry |
-| Messaging use case categories | `Two-Factor Authentication` (or `Account Notifications` / OTP — pick the OTP/2FA category in the picker) |
-| Proof of consent (opt-in) collected | Host [`docs/legal/ride-angels-sms-opt-in.md`](./legal/ride-angels-sms-opt-in.md) publicly, **or** paste a public URL to a screenshot of the in-app phone screen. Temporary: upload the markdown / PDF to a public Drive/Dropbox link |
-| Use case description | see block below |
-| Sample message | `Your Ride Angels code is: 123456` |
-| E-mail for notifications | `looking@devincoopers.space` |
-| Additional information | `Transactional OTP only. No marketing, no promotional SMS. Users enter their own number in the Ride Angels iOS/Android app.` |
-| Opt-In Confirmation Message | *(leave blank — OTP is the message)* |
-| Help Message Sample | `Ride Angels: For help with sign-in codes, contact looking@devincoopers.space or reply HELP. Msg&data rates may apply.` |
-| Privacy Policy URL | Host [`docs/legal/ride-angels-privacy.md`](./legal/ride-angels-privacy.md) publicly (required) |
-| Terms & Conditions URL | Host [`docs/legal/ride-angels-terms.md`](./legal/ride-angels-terms.md) publicly (required) |
-| Opt-In Keywords | *(optional)* `START` |
-| Contains Age Gated Content | **Unchecked** |
-| Terms of Service Agreement | **Checked** |
-
-**Use case description** (copy/paste):
-
-```text
-Ride Angels is a mobile app (iOS and Android) that helps people coordinate
-trusted rides to appointments. We send SMS only as transactional one-time
-passcodes when a user creates an account or signs in with their phone number.
-The user types their own mobile number in the app and taps Continue to request
-the code. We do not send marketing or promotional messages. Message frequency
-is limited to authentication events. Reply STOP to opt out; reply HELP for help.
-```
-
-### Hosting the legal URLs (required for Submit)
-
-Twilio needs **https** URLs for privacy, terms, and opt-in proof. Repo drafts live under
-[`docs/legal/`](./legal/). Publish them somewhere public before clicking
-**Send information for verification**, for example:
-
-1. GitHub → upload the three files to a public repo / GitHub Pages, **or**
-2. Add matching pages on `https://hyperionappstudio.com`, **or**
-3. Export to PDF and use a public share link (weaker; Pages preferred)
-
-Then paste those live URLs into the form fields.
-
-### After submit
-
-1. Wait for **Approved** (often several business days).
-2. Confirm Supabase **Authentication → Phone** still has Twilio SID/token and From `+18559705852`.
-3. Retest OTP with a real handset number (not a test OTP number).
-
-Optional (unrelated to OTP): accept emergency calling terms / add emergency address to clear the orange Console banners.
-
-**Inbound messaging webhooks** on the number’s Configure tab are not required for
-Supabase Auth OTP (Supabase sends *outbound* SMS via the Twilio REST API).
+Trial accounts can only SMS **verified** personal numbers until you upgrade.
+Add your handset under Twilio → Phone Numbers → Verified Caller IDs if needed.
 
 ---
 
-## 2. Supabase Phone provider (Twilio)
+## 2. Supabase Phone provider (Twilio Verify)
 
 Project: `zuvfzmpdmjwewcuyxtac`
 
 1. Dashboard → **Authentication → Providers → Phone**
-2. Enable **Phone** (already used by hosted test OTP)
-3. SMS provider: **Twilio**
+2. Enable **Phone**
+3. SMS provider: **Twilio Verify** (not “Twilio”)
 4. Paste:
    - **Twilio Account SID**
    - **Twilio Auth Token**
-   - **Message Service SID** *or* From number `+18559705852`
+   - **Twilio Verify Service SID** (`VA…`) — *not* a Messaging Service / phone SID
 5. Save
+6. Disable / clear the old **Twilio** (Messaging) provider fields if still filled so Auth does not keep trying the rejected toll-free path
 
 Never put Twilio credentials in the Ionic app (`environment*.ts` only gets
 Supabase URL + anon key).
 
-Official reference: [Supabase phone login (Twilio)](https://supabase.com/docs/guides/auth/phone-login?showSMSProvider=Twilio)
+Official reference: [Supabase phone login](https://supabase.com/docs/guides/auth/phone-login)
 
 ---
 
 ## 3. Test phone numbers (immediate device testing)
 
-While toll-free verification is pending, use **Authentication → Providers → Phone → Test phone numbers**.
-Supabase accepts the fixed code **without sending SMS**.
+Use **Authentication → Providers → Phone → Test phone numbers** anytime you need
+OTP without burning Verify credits.
 
 | Phone (E.164) | OTP | Purpose |
 |---------------|-----|---------|
@@ -139,11 +96,16 @@ Supabase accepts the fixed code **without sending SMS**.
 
 Hosted Auth already returns `message_id: "test-otp"` for these numbers.
 
-Add your own device numbers temporarily the same way (e.g. `+1XXXXXXXXXX` → `123456`)
-for TestFlight / Play Internal builds, then remove when real SMS works.
+Add your own device numbers temporarily the same way for TestFlight / Play
+Internal, then remove when real Verify SMS works.
 
-**Auth phone format:** GoTrue stores phones as digits-only (`15555550101`). The app
-sends E.164 (`+15555550101`) — that pairing is expected.
+**Auth phone format:** GoTrue stores phones as digits-only (`15555550101`). The
+app sends E.164 (`+15555550101`) — that pairing is expected.
+
+Local CLI `config.toml` maps the same trio under `[auth.sms.test_otp]`. For local
+GoTrue + Verify, enable `[auth.sms.twilio_verify]` and set env
+`SUPABASE_AUTH_SMS_TWILIO_VERIFY_AUTH_TOKEN` (hosted Dashboard is the source of
+truth for production).
 
 ---
 
@@ -174,13 +136,23 @@ curl -sS -X POST "$SUPABASE_URL/auth/v1/otp" \
 # expect: {"message_id":"test-otp"}
 ```
 
-### After TFN is Approved
+### After Twilio Verify is configured
 
 Repeat with a **real** handset number (not on the test list). If SMS fails:
 
-1. Twilio → **Monitor → Logs → Messaging** (error codes / TFN not verified)  
+1. Twilio → **Monitor → Logs → Verify** (not Messaging)  
 2. Supabase → **Authentication** logs  
-3. Confirm Phone provider From / Messaging Service matches the verified number  
+3. Confirm Phone provider is **Twilio Verify** with a `VA…` Service SID  
+4. Trial Twilio: confirm the destination number is a Verified Caller ID  
+
+---
+
+## 5. Legacy: toll-free Messaging (do not use for OTP)
+
+Previous runbook targeted Twilio **Programmable Messaging** From `+18559705852`
+and Toll-Free Verification. That verification was rejected (**30526**). Prefer
+Verify above. Legal drafts for a future Messaging / marketing use case still live
+under [`docs/legal/`](./legal/).
 
 ---
 

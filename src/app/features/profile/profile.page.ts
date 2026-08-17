@@ -31,6 +31,11 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 import { ProfileAvatarComponent } from '../../shared/components/profile-avatar/profile-avatar.component';
 import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
 import { environment } from '../../../environments/environment';
+import {
+  STUDIO_COPYRIGHT,
+  STUDIO_CREDIT,
+  STUDIO_URL,
+} from '../../core/config/studio';
 
 export interface CalendarProviderRow {
   id: CalendarProviderId;
@@ -95,6 +100,9 @@ export class ProfilePage implements OnInit {
     return this.notifPrefs.isChannelEnabled('in_app');
   });
   readonly channelBusy = signal(false);
+  readonly studioCredit = STUDIO_CREDIT;
+  readonly studioCopyright = STUDIO_COPYRIGHT;
+  readonly studioUrl = STUDIO_URL;
 
   /** Provider rows for Profile — device now; Google when env flag is on. */
   readonly calendarRows = computed((): CalendarProviderRow[] => {

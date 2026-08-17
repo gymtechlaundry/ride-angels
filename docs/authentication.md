@@ -112,9 +112,9 @@ When `environment.supabase.url` / `anonKey` are empty, the app uses a local OTP 
 2. **Authentication → Providers**
    - Enable **Phone**
    - Enable **Email** (OTP / magic link provider)
-3. **Phone**: configure SMS (Twilio / MessageBird / etc.)  
-   - US toll-free senders need **Twilio Toll-Free Verification** before SMS delivers;
-     see [phone-otp.md](./phone-otp.md)  
+3. **Phone**: configure SMS with **Twilio Verify** (Verify Service SID `VA…`)  
+   — preferred for OTP; avoids toll-free Messaging verification. See
+   [phone-otp.md](./phone-otp.md)  
 4. **Email templates**: use OTP token style with `{{ .Token }}` (not only magic links)  
 5. Copy **Project URL** + **anon public key** into `environment.supabase`  
 6. Never put `service_role` in the Ionic app  

@@ -216,11 +216,12 @@ V1 core flows use **fetch on refresh** (`DomainSyncService.refreshForCurrentUser
 
 ## Twilio (SMS OTP)
 
-Phone OTP is configured in **Supabase Dashboard → Authentication → Providers → Phone**. Use Twilio (or another supported SMS provider) there.
+Phone OTP is configured in **Supabase Dashboard → Authentication → Providers → Phone** using **Twilio Verify**.
 
 - The Ionic app never embeds Twilio credentials
 - SMS is sent by Supabase Auth during `signInWithOtp` / `verifyOtp`
-- US **toll-free** numbers require Twilio **Toll-Free Verification** before carriers accept SMS — until Approved, real phones get no code (use Dashboard test OTPs meanwhile)
+- Prefer **Twilio Verify** (Verify Service SID `VA…`). US toll-free Messaging
+  verification is not required for Verify OTP; previous TFN path was rejected — see [phone-otp.md](./phone-otp.md)
 - Runbook: [phone-otp.md](./phone-otp.md) · setup overview: [supabase-setup.md](./supabase-setup.md)
 
 ---

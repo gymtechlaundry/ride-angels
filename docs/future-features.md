@@ -146,6 +146,7 @@ Keep brief so this file stays a backlog, not a changelog.
 | Doc | Topic |
 |-----|--------|
 | [testflight.md](./testflight.md) | Upload / TestFlight checklist |
+| [store-publish.md](./store-publish.md) | App Store + Play Store public listing (independent tracks) |
 | [calendar-integration.md](./calendar-integration.md) | Apple live / Google deferred |
 | [organization-readiness.md](./organization-readiness.md) | Org layer prep |
 | [backend-architecture.md](./backend-architecture.md) | Stack, RLS, Realtime notes |

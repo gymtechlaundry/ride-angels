@@ -19,6 +19,7 @@ The app is OTP-only; there is no password login. The seed creates phone-confirme
 
 For **real SMS** (non-test numbers) on iOS/Android store builds, complete Twilio
 toll-free verification first — see [`docs/phone-otp.md`](../../docs/phone-otp.md).
+Configure **Twilio Verify** for real SMS; until then use Dashboard test OTPs.
 
 ## Fixed OTP setup (required once)
 
