@@ -15,7 +15,7 @@ import {
   RIDE_REQUEST_REPOSITORY,
 } from '../repositories/tokens';
 import { isSupabaseConfigured } from '../supabase/supabase-client';
-import { isPastLocalDateTime } from '../utils/date-time';
+import { isPastAppointmentListWindow, isPastLocalDateTime } from '../utils/date-time';
 import { AuthService } from './auth.service';
 import { CalendarSyncService } from './calendar-sync.service';
 import { RideDomainRepository } from './ride-domain.repository';
@@ -172,7 +172,8 @@ export class AppointmentService {
 
   /**
    * Whether an appointment should appear on Home / Calendar / circle lists.
-   * Past and completed rides stay in the DB for a future history feature.
+   * Visible through return pickup (or start + 2h); completed/cancelled stay out.
+   * Rows remain in the DB for a future history feature.
    */
   isActiveListItem(
     appointment: Appointment | null | undefined,
@@ -181,11 +182,17 @@ export class AppointmentService {
     if (!appointment || appointment.status === 'cancelled') {
       return false;
     }
-    if (isPastLocalDateTime(appointment.date, appointment.time)) {
-      return false;
-    }
     const resolved =
       ride ?? this.getRideRequestForAppointment(appointment.id);
+    if (
+      isPastAppointmentListWindow(
+        appointment.date,
+        appointment.time,
+        resolved?.returnPickupTime,
+      )
+    ) {
+      return false;
+    }
     if (!resolved) {
       return true;
     }

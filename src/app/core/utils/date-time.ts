@@ -156,3 +156,44 @@ export function isPastLocalDateTime(
   }
   return ms < now.getTime();
 }
+
+/**
+ * End of the Home/Calendar visibility window for a trip.
+ * Prefer return pickup on the appointment date when it is at/after start;
+ * if return is earlier (overnight wrap), treat it as the next local day;
+ * otherwise start + 2 hours.
+ */
+export function appointmentListEndMs(
+  dateKey: string,
+  startTime: string,
+  returnPickupTime?: string | null,
+): number {
+  const startMs = localDateTimeMs(dateKey, startTime);
+  if (Number.isNaN(startMs)) {
+    return Number.NaN;
+  }
+  const trimmed = returnPickupTime?.trim();
+  if (trimmed) {
+    const returnMs = localDateTimeMs(dateKey, trimmed);
+    if (!Number.isNaN(returnMs)) {
+      return returnMs >= startMs
+        ? returnMs
+        : returnMs + 24 * 60 * 60 * 1000;
+    }
+  }
+  return startMs + 2 * 60 * 60 * 1000;
+}
+
+/** True when the list window has ended (strictly before `now`). */
+export function isPastAppointmentListWindow(
+  dateKey: string,
+  startTime: string,
+  returnPickupTime?: string | null,
+  now: Date = new Date(),
+): boolean {
+  const endMs = appointmentListEndMs(dateKey, startTime, returnPickupTime);
+  if (Number.isNaN(endMs)) {
+    return false;
+  }
+  return endMs < now.getTime();
+}

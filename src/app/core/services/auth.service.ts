@@ -303,6 +303,7 @@ export class AuthService {
     const user = this.getCurrentUser();
 
     if (isSupabaseConfigured()) {
+      await this.purgeOwnStorageFiles(user.authUserId);
       const { error } = await getSupabaseClient().rpc('delete_own_account');
       if (error) {
         throw mapDomainError(error.message);
@@ -325,6 +326,39 @@ export class AuthService {
       this.session.set(null);
       this.currentUser.set(null);
       await Preferences.remove({ key: 'ra.mockSessionAuthUserId' });
+    }
+  }
+
+  /**
+   * Remove this user's Storage objects via the Storage API (SQL deletes are blocked).
+   * Best-effort: account RPC still runs if list/remove fails so deletion is not stuck.
+   */
+  private async purgeOwnStorageFiles(authUserId: string): Promise<void> {
+    const supabase = getSupabaseClient();
+    const buckets = ['avatars', 'feedback-screenshots'] as const;
+    for (const bucket of buckets) {
+      const { data: files, error: listError } = await supabase.storage
+        .from(bucket)
+        .list(authUserId, { limit: 100 });
+      if (listError) {
+        console.warn(`[auth] list ${bucket} for delete`, listError.message);
+        continue;
+      }
+      if (!files?.length) {
+        continue;
+      }
+      const paths = files
+        .filter((f) => !!f.name && f.name !== '.emptyFolderPlaceholder')
+        .map((f) => `${authUserId}/${f.name}`);
+      if (!paths.length) {
+        continue;
+      }
+      const { error: removeError } = await supabase.storage
+        .from(bucket)
+        .remove(paths);
+      if (removeError) {
+        console.warn(`[auth] remove ${bucket} for delete`, removeError.message);
+      }
     }
   }
 

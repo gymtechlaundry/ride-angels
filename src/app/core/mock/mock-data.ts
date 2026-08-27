@@ -12,7 +12,7 @@ import {
   RideStatusLabel,
   User,
 } from '../models';
-import { isPastLocalDateTime } from '../utils/date-time';
+import { isPastAppointmentListWindow, isPastLocalDateTime } from '../utils/date-time';
 
 /** Offline-demo avatars — large PNGs are not packaged in Cap builds. */
 export const ASSET = {
@@ -389,10 +389,16 @@ export function buildRideCards(
     if (appt.status === 'cancelled') {
       continue;
     }
-    if (isPastLocalDateTime(appt.date, appt.time)) {
+    const ride = rides.find((r) => r.appointmentId === appt.id);
+    if (
+      isPastAppointmentListWindow(
+        appt.date,
+        appt.time,
+        ride?.returnPickupTime,
+      )
+    ) {
       continue;
     }
-    const ride = rides.find((r) => r.appointmentId === appt.id);
     if (!ride) {
       continue;
     }
@@ -468,7 +474,13 @@ export function buildUpcomingDrivesForAngel(
     if (!appt || appt.status === 'cancelled') {
       continue;
     }
-    if (isPastLocalDateTime(appt.date, appt.time)) {
+    if (
+      isPastAppointmentListWindow(
+        appt.date,
+        appt.time,
+        ride.returnPickupTime,
+      )
+    ) {
       continue;
     }
     const rider = users.find((u) => u.id === ride.riderId);
