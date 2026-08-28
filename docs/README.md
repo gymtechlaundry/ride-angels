@@ -6,6 +6,7 @@ Universal test/store steps: `~/Projects/hyperion-studio/Playbooks/`
 | --- | --- |
 | [PRODUCT.md](./PRODUCT.md) | What Ride Angels is |
 | [IDENTITY.md](./IDENTITY.md) | IDs, versions, URLs |
+| [SERVICES.md](./SERVICES.md) | Vendors, project refs, env names, 1Password titles |
 | [SMOKE.md](./SMOKE.md) | Device checklist |
 | [LISTING.md](./LISTING.md) | Store copy (from former store-publish.md) |
 | [STORE.md](./STORE.md) | Pointers to studio playbooks |
