@@ -82,3 +82,10 @@ android/local.properties
 android/key.properties
 android/app/google-services.json
 *.apk
+
+# Secrets (Hyperion)
+.env
+.env.*
+!.env.example
+*.p8
+*firebase-adminsdk*

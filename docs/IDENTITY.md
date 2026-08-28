@@ -14,6 +14,8 @@ SKU (iOS): ride-angels-ios
 
 **Grandfathered:** do not change the bundle ID (`org.rideangels.app`) or the live site path (`/rideangels/`, no hyphen). New Hyperion apps use `com.hyperionappstudio.<slug>` — see `~/Projects/hyperion-studio/Playbooks/naming.md`.
 
+Vendors and key **names**: [SERVICES.md](./SERVICES.md).
+
 ## Public URLs
 
 ```
