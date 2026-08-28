@@ -381,6 +381,7 @@ export class AuthService {
     this.currentUser.set(updated);
     this.upsertDirectory(updated);
     await this.applyDefaultPersona(updated);
+    await this.claimStashedCircleInvite();
   }
 
   /**
@@ -768,6 +769,25 @@ export class AuthService {
       await this.injector.get(PushRegistrationService).prepare();
     } catch (err) {
       console.warn('[auth] push prepare skipped', err);
+    }
+    if (this.currentUser()?.onboardingCompleted) {
+      await this.claimStashedCircleInvite();
+    }
+  }
+
+  private async claimStashedCircleInvite(): Promise<void> {
+    try {
+      const { CircleInviteService } = await import('./circle-invite.service');
+      const result = await this.injector
+        .get(CircleInviteService)
+        .claimPendingInvite();
+      if (result.claimed) {
+        console.info(
+          `[auth] claimed circle invite from ${result.riderDisplayName ?? 'rider'}`,
+        );
+      }
+    } catch (err) {
+      console.warn('[auth] circle invite claim skipped', err);
     }
   }
 

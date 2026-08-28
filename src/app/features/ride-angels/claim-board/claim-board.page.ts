@@ -7,7 +7,6 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
-import { ClaimBoardFilter } from '../../../core/models';
 import { ClaimBoardService } from '../../../core/services/claim-board.service';
 import { DomainSyncService } from '../../../core/services/domain-sync.service';
 import { ClaimBoardCardComponent } from '../../../shared/components/claim-board-card/claim-board-card.component';
@@ -25,7 +24,6 @@ export class ClaimBoardPage implements ViewWillEnter {
   private readonly router = inject(Router);
 
   readonly items = this.board.openBoardItems;
-  readonly filter = this.board.filter;
 
   ionViewWillEnter(): void {
     void this.domainSync.refreshForCurrentUser();
@@ -37,10 +35,6 @@ export class ClaimBoardPage implements ViewWillEnter {
     } finally {
       event.target.complete();
     }
-  }
-
-  setFilter(filter: ClaimBoardFilter): void {
-    this.board.setFilter(filter);
   }
 
   openAppointment(appointmentId: string): void {

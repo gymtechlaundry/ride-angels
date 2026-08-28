@@ -158,11 +158,7 @@
                     <p class="claimed-by open-rider">RIDER</p>
                     <p class="angel-name">{{ rider.displayName }}</p>
                     <p class="open-meta">
-                      {{
-                        openItem.visibility === 'public'
-                          ? 'Community board'
-                          : openItem.riderRelationship
-                      }}
+                      {{ openItem.riderRelationship }}
                     </p>
                   </div>
                 </div>
@@ -227,26 +223,6 @@
           }
 
           @if (canManageAsRider()) {
-            <div class="board-toggle">
-              <div class="board-copy">
-                <p class="board-title">Show on community board</p>
-                <p class="board-help">
-                  @if (d.assignment) {
-                    Controls whether other volunteers can see this ride if it becomes open again.
-                    Your current Ride Angel keeps this trip either way.
-                  } @else {
-                    When on, community Ride Angels can offer to drive. When off, only your trusted
-                    Ride Angels can see unclaimed requests.
-                  }
-                </p>
-              </div>
-              <ion-toggle
-                [checked]="isPublic()"
-                (ionChange)="onPublicToggle($any($event).detail.checked)"
-                aria-label="Show on community board"
-              ></ion-toggle>
-            </div>
-
             <div class="manage-actions">
               <button type="button" class="edit-btn ra-reset" (click)="editAppointment()">
                 Edit appointment

@@ -52,7 +52,6 @@ export class AddAppointmentPage implements OnInit {
   private readonly toast = inject(ToastController);
 
   readonly returnNeeded = signal(true);
-  readonly publicBoard = signal(false);
   readonly editingId = signal<string | null>(null);
   readonly minDate = toDateKey(new Date());
 
@@ -80,7 +79,6 @@ export class AddAppointmentPage implements OnInit {
     }
     this.editingId.set(id);
     this.returnNeeded.set(detail.ride.returnNeeded);
-    this.publicBoard.set(detail.ride.visibility === 'public');
     this.form.patchValue({
       title: detail.appointment.title,
       date: detail.appointment.date,
@@ -104,10 +102,6 @@ export class AddAppointmentPage implements OnInit {
 
   onReturnToggle(checked: boolean): void {
     this.returnNeeded.set(checked);
-  }
-
-  onPublicToggle(checked: boolean): void {
-    this.publicBoard.set(checked);
   }
 
   onAppointmentDateChange(date: string): void {
@@ -153,12 +147,11 @@ export class AddAppointmentPage implements OnInit {
         destinationLine1: value.destinationLabel,
         returnNeeded: this.returnNeeded(),
         returnPickupTime: this.returnNeeded() ? value.returnPickupTime : undefined,
-        publicBoard: this.publicBoard(),
+        publicBoard: false,
         notes: value.notes.trim() || undefined,
       });
 
       const rider = this.auth.getCurrentUser();
-      const visibility = this.publicBoard() ? 'community board' : 'private circle';
 
       // Supabase: create_appointment_with_ride fans out persisted angel notifications.
       // Local mock: optimistic notify only.
@@ -168,7 +161,7 @@ export class AddAppointmentPage implements OnInit {
             userId: angelId,
             type: 'appointment_changed',
             title: 'New ride request',
-            body: `${rider.displayName} needs a ride for ${appointment.title} (${visibility}).`,
+            body: `${rider.displayName} needs a ride for ${appointment.title} (private circle).`,
             relatedAppointmentId: appointment.id,
           });
         }
@@ -208,7 +201,7 @@ export class AddAppointmentPage implements OnInit {
         destinationLine1: value.destinationLabel,
         returnNeeded: this.returnNeeded(),
         returnPickupTime: this.returnNeeded() ? value.returnPickupTime : undefined,
-        publicBoard: this.publicBoard(),
+        publicBoard: false,
         notes: value.notes.trim() || undefined,
       });
 

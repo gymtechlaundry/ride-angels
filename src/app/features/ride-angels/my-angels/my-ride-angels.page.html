@@ -22,7 +22,9 @@
         <div class="explain-card">
           <h3>Who are Ride Angels?</h3>
           <p>
-            Ride Angels are your family members, close friends, or neighbors who have volunteered to help drive you. They get notified first when you add appointments.
+            Ride Angels are family, close friends, or neighbors who have volunteered
+            to drive you. Invites work even if they do not have the app yet — we
+            email them a private link to join your circle.
           </p>
           <div class="explain-cta">
             <app-primary-button
@@ -51,6 +53,29 @@
                   <p>Waiting for them to accept · {{ item.relationshipLabel }}</p>
                 </div>
                 <span class="pill pending">Pending</span>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      @if (waitingEmailInvites().length) {
+        <section class="list-section ra-page-pad">
+          <h2>Waiting to join ({{ waitingEmailInvites().length }})</h2>
+          <div class="list">
+            @for (invite of waitingEmailInvites(); track invite.id) {
+              <article class="invite-card">
+                <div class="invite-copy">
+                  <h3>{{ invite.email }}</h3>
+                  <p>Invite emailed · {{ invite.relationshipLabel }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="accept ra-reset"
+                  (click)="reshareOutbound(invite)"
+                >
+                  Share
+                </button>
               </article>
             }
           </div>

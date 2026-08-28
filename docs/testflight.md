@@ -4,6 +4,8 @@ Upload Ride Angels (`org.rideangels.app`) to TestFlight.
 
 Public App Store / Play Store listing (copy, privacy labels, screenshots, review notes): [store-publish.md](./store-publish.md).
 
+Trusted-circle invites (email + deep link): [circle-invites.md](./circle-invites.md).
+
 ## Prerequisites
 
 - [ ] Apple Developer Program membership (paid)

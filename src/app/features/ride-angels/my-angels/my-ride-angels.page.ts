@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   AlertController,
@@ -10,6 +10,10 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../../core/services/auth.service';
+import {
+  CircleInviteService,
+  OutboundCircleInvite,
+} from '../../../core/services/circle-invite.service';
 import { DomainSyncService } from '../../../core/services/domain-sync.service';
 import {
   AngelListItem,
@@ -44,8 +48,9 @@ type RiderHelpItem = {
   templateUrl: './my-ride-angels.page.html',
   styleUrl: './my-ride-angels.page.scss',
 })
-export class MyRideAngelsPage {
+export class MyRideAngelsPage implements OnInit {
   private readonly angels = inject(RideAngelService);
+  private readonly invites = inject(CircleInviteService);
   private readonly auth = inject(AuthService);
   private readonly domainSync = inject(DomainSyncService);
   private readonly router = inject(Router);
@@ -57,10 +62,18 @@ export class MyRideAngelsPage {
   readonly pendingOutgoing = this.angels.pendingOutgoing;
   readonly pendingIncoming = this.angels.pendingIncoming;
   readonly ridersIHelp = this.angels.ridersIHelp;
+  readonly waitingEmailInvites = this.invites.pendingOutbound;
+
+  ngOnInit(): void {
+    void this.invites.refreshOutbound();
+  }
 
   async onRefresh(event: RefresherCustomEvent): Promise<void> {
     try {
-      await this.domainSync.refreshForCurrentUser({ force: true });
+      await Promise.all([
+        this.domainSync.refreshForCurrentUser({ force: true }),
+        this.invites.refreshOutbound(),
+      ]);
     } finally {
       event.target.complete();
     }
@@ -70,7 +83,7 @@ export class MyRideAngelsPage {
     const alert = await this.alert.create({
       header: 'Invite Ride Angel',
       message:
-        'Enter the verified email of someone who already has a Ride Angels account (they must have completed signup and added that email).',
+        'Enter their email. If they already use Ride Angels, they get an in-app invite. If not, we email them a link to download the app and join your circle.',
       inputs: [
         {
           name: 'email',
@@ -101,50 +114,92 @@ export class MyRideAngelsPage {
 
   private async sendInvite(email: string, relationship: string): Promise<void> {
     try {
-      const connection = await this.angels.inviteByEmail({
+      const result = await this.invites.createInvite({
         email,
         relationshipLabel: relationship,
       });
-      const angel = this.auth.getUserById(connection.angelId);
-      const toast = await this.toast.create({
-        message: `Invite sent to ${angel?.displayName ?? email}.`,
-        duration: 2000,
-        position: 'top',
-        color: 'primary',
-      });
-      await toast.present();
       const top = await this.alert.getTop();
       await top?.dismiss();
-    } catch (err) {
-      const toast = await this.toast.create({
-        message: err instanceof Error ? err.message : 'Could not send invite.',
-        duration: 2600,
-        position: 'top',
-        color: 'danger',
+
+      if (result.kind === 'existing_user') {
+        await this.showToast(
+          `Invite sent to ${result.angelDisplayName}.`,
+          'primary',
+        );
+        return;
+      }
+
+      const shareAlert = await this.alert.create({
+        header: result.emailSent ? 'Invite emailed' : 'Invite ready',
+        message: result.emailSent
+          ? `We emailed ${result.email}. You can also share the link by text.`
+          : `We created an invite for ${result.email}. Share the link so they can join (email send may need Resend configured).`,
+        buttons: [
+          { text: 'Done', role: 'cancel' },
+          {
+            text: 'Share link',
+            handler: () => {
+              void this.shareInvite(result.inviteUrl);
+            },
+          },
+        ],
       });
-      await toast.present();
+      await shareAlert.present();
+    } catch (err) {
+      await this.showToast(
+        err instanceof Error ? err.message : 'Could not send invite.',
+        'danger',
+      );
     }
   }
 
+  async shareInvite(inviteUrl: string): Promise<void> {
+    try {
+      const name =
+        this.auth.getCurrentUserOrNull()?.displayName?.trim() || 'Someone';
+      await this.invites.shareInviteUrl(inviteUrl, name);
+      await this.showToast('Invite link shared.', 'primary');
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Could not share invite.';
+      if (/clipboard|copied|writeText/i.test(message) || message.includes('Sharing is not available')) {
+        try {
+          await navigator.clipboard.writeText(inviteUrl);
+          await this.showToast('Invite link copied.', 'primary');
+          return;
+        } catch {
+          /* fall through */
+        }
+      }
+      await this.showToast(message, 'danger');
+    }
+  }
+
+  async reshareOutbound(invite: OutboundCircleInvite): Promise<void> {
+    await this.shareInvite(invite.inviteUrl);
+  }
+
   async acceptInvite(item: PendingInviteItem): Promise<void> {
-    await this.angels.acceptInvite(item.connectionId);
-    const toast = await this.toast.create({
-      message: `You're now a Ride Angel for ${item.rider.displayName}.`,
-      duration: 2000,
-      position: 'top',
-      color: 'primary',
-    });
-    await toast.present();
+    try {
+      await this.angels.acceptInvite(item.connectionId);
+      await this.showToast(`You are now helping ${item.rider.displayName}.`, 'primary');
+    } catch (err) {
+      await this.showToast(
+        err instanceof Error ? err.message : 'Could not accept invite.',
+        'danger',
+      );
+    }
   }
 
   async declineInvite(item: PendingInviteItem): Promise<void> {
-    await this.angels.declineInvite(item.connectionId);
-    const toast = await this.toast.create({
-      message: 'Invite declined.',
-      duration: 1600,
-      position: 'top',
-    });
-    await toast.present();
+    try {
+      await this.angels.declineInvite(item.connectionId);
+    } catch (err) {
+      await this.showToast(
+        err instanceof Error ? err.message : 'Could not decline invite.',
+        'danger',
+      );
+    }
   }
 
   async removeAngel(item: AngelListItem): Promise<void> {
@@ -157,14 +212,7 @@ export class MyRideAngelsPage {
           text: 'Remove',
           role: 'destructive',
           handler: () => {
-            void this.angels.removeAngel(item.connectionId).then(async () => {
-              const toast = await this.toast.create({
-                message: `${item.angel.displayName} removed.`,
-                duration: 1800,
-                position: 'top',
-              });
-              await toast.present();
-            });
+            void this.angels.removeAngel(item.connectionId);
           },
         },
       ],
@@ -180,25 +228,31 @@ export class MyRideAngelsPage {
     event.stopPropagation();
     const alert = await this.alert.create({
       header: 'Leave this circle?',
-      message: `You will no longer see ${item.rider.displayName}'s private ride requests.`,
+      message: `You will stop seeing ${item.rider.displayName}'s private ride requests.`,
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
           text: 'Leave',
           role: 'destructive',
           handler: () => {
-            void this.angels.removeAngel(item.connectionId).then(async () => {
-              const toast = await this.toast.create({
-                message: `Left ${item.rider.displayName}'s circle.`,
-                duration: 1800,
-                position: 'top',
-              });
-              await toast.present();
-            });
+            void this.angels.removeAngel(item.connectionId);
           },
         },
       ],
     });
     await alert.present();
+  }
+
+  private async showToast(
+    message: string,
+    color: 'primary' | 'danger',
+  ): Promise<void> {
+    const toast = await this.toast.create({
+      message,
+      duration: 2200,
+      position: 'top',
+      color,
+    });
+    await toast.present();
   }
 }

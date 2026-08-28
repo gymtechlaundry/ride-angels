@@ -7,7 +7,7 @@
     <header class="angel-header ra-page-pad">
       <div class="header-text">
         <h1>Open requests</h1>
-        <p>Trusted circle and community rides looking for a driver</p>
+        <p>Ride requests from people in your trusted circle</p>
       </div>
       <span class="angel-mode">
         <span class="ra-icon-box" style="width:10px;height:10px">
@@ -17,39 +17,6 @@
       </span>
     </header>
 
-    <div class="filters ra-page-pad" role="tablist" aria-label="Filter open requests">
-      <button
-        type="button"
-        class="seg ra-reset"
-        role="tab"
-        [class.active]="filter() === 'all'"
-        [attr.aria-selected]="filter() === 'all'"
-        (click)="setFilter('all')"
-      >
-        All
-      </button>
-      <button
-        type="button"
-        class="seg ra-reset"
-        role="tab"
-        [class.active]="filter() === 'private'"
-        [attr.aria-selected]="filter() === 'private'"
-        (click)="setFilter('private')"
-      >
-        Trusted
-      </button>
-      <button
-        type="button"
-        class="seg ra-reset"
-        role="tab"
-        [class.active]="filter() === 'public'"
-        [attr.aria-selected]="filter() === 'public'"
-        (click)="setFilter('public')"
-      >
-        Community
-      </button>
-    </div>
-
     <section class="feed ra-page-pad">
       @for (item of items(); track item.rideRequestId) {
         <app-claim-board-card
@@ -58,9 +25,8 @@
         />
       } @empty {
         <p class="empty">
-          No open
-          {{ filter() === 'private' ? 'trusted' : filter() === 'public' ? 'community' : '' }}
-          requests right now. Confirmed trips stay under Upcoming drives on Home.
+          No open requests from your circle right now. Confirmed trips stay under
+          Upcoming drives on Home.
         </p>
       }
     </section>
