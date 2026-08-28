@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -13,6 +13,7 @@ import { NotificationService } from './notification.service';
 @Injectable({ providedIn: 'root' })
 export class NativePlatformService {
   private readonly notifications = inject(NotificationService);
+  private readonly injector = inject(Injector);
 
   async initialize(): Promise<void> {
     if (!Capacitor.isNativePlatform()) {
@@ -61,6 +62,43 @@ export class NativePlatformService {
         void this.notifications.refreshForCurrentUser();
       }
     });
+
+    void App.addListener('appUrlOpen', ({ url }) => {
+      void this.handleAppUrl(url);
+    });
+
+    try {
+      const launch = await App.getLaunchUrl();
+      if (launch?.url) {
+        void this.handleAppUrl(launch.url);
+      }
+    } catch {
+      // getLaunchUrl unavailable on some platforms
+    }
+  }
+
+  private async handleAppUrl(url: string): Promise<void> {
+    try {
+      const { CircleInviteService } = await import('./circle-invite.service');
+      const invites = this.injector.get(CircleInviteService);
+      const token = await invites.stashTokenFromUrl(url);
+      if (!token) {
+        return;
+      }
+      const { AuthService } = await import('./auth.service');
+      const auth = this.injector.get(AuthService);
+      if (!auth.getCurrentUserOrNull()?.onboardingCompleted) {
+        return;
+      }
+      const result = await invites.claimPendingInvite(token);
+      if (result.claimed && result.riderDisplayName) {
+        console.info(
+          `[circle-invite] claimed invite from ${result.riderDisplayName}`,
+        );
+      }
+    } catch (err) {
+      console.warn('[native] invite deep link', err);
+    }
   }
 
   get isNative(): boolean {

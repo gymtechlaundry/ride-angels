@@ -113,26 +113,6 @@
         }
       </section>
 
-      <section class="visibility-module">
-        <div class="toggle-header">
-          <div class="toggle-label">
-            <span class="ra-icon-box" style="width:16px;height:16px">
-              <img class="ra-icon" src="assets/icons/eye.svg" alt="" />
-            </span>
-            <span>Visible on Public Board</span>
-          </div>
-          <ion-toggle
-            color="warning"
-            [checked]="publicBoard()"
-            (ionChange)="onPublicToggle($any($event).detail.checked)"
-            aria-label="Visible on public board"
-          ></ion-toggle>
-        </div>
-        <p class="help">
-          Turning this on allows any verified community driver to help if your private Ride Angels are busy. Keep off to only show to close friends.
-        </p>
-      </section>
-
       <div class="actions">
         <app-primary-button
           [label]="editingId() ? 'Save Changes' : 'Schedule & Notify Angels'"

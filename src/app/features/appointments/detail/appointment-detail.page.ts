@@ -5,7 +5,6 @@ import {
   IonContent,
   IonRefresher,
   IonRefresherContent,
-  IonToggle,
   RefresherCustomEvent,
   ToastController,
 } from '@ionic/angular/standalone';
@@ -34,7 +33,6 @@ import { PrimaryButtonComponent } from '../../../shared/components/primary-butto
     IonContent,
     IonRefresher,
     IonRefresherContent,
-    IonToggle,
     PageHeaderComponent,
     StatusBadgeComponent,
     ProfileAvatarComponent,
@@ -89,8 +87,6 @@ export class AppointmentDetailPage {
     }
     return toStatusLabel(d.ride.status, d.assignment?.confirmationStatus);
   });
-
-  readonly isPublic = computed(() => this.detail()?.ride.visibility === 'public');
 
   readonly isRider = computed(() => {
     const user = this.auth.getCurrentUserOrNull();
@@ -245,26 +241,6 @@ export class AppointmentDetailPage {
         'Turn on calendar sync in Profile to add this ride.',
         'danger',
       );
-    }
-  }
-
-  async onPublicToggle(checked: boolean): Promise<void> {
-    const ride = this.detail()?.ride;
-    if (!ride || !this.canManageAsRider()) {
-      return;
-    }
-    try {
-      await this.appointments.setPublicVisibility(ride.id, checked);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Could not update board visibility.';
-      const toast = await this.toast.create({
-        message,
-        duration: 2400,
-        position: 'top',
-        color: 'danger',
-      });
-      await toast.present();
     }
   }
 

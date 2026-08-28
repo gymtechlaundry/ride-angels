@@ -22,10 +22,8 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
           </span>
         } @else if (item.offerPendingByCurrentUser) {
           <app-status-badge status="Awaiting confirm" />
-        } @else if (item.visibility === 'private') {
-          <span class="tag private">PRIVATE CIRCLE</span>
         } @else {
-          <span class="tag public">PUBLIC BOARD</span>
+          <span class="tag private">PRIVATE CIRCLE</span>
         }
       </div>
 

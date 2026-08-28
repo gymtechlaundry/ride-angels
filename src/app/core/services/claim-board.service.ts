@@ -18,10 +18,10 @@ export class ClaimBoardService {
   private readonly angels = inject(RideAngelService);
   private readonly authorization = inject(AuthorizationService);
 
-  /** Discovery filter for open requests (not upcoming drives). */
-  readonly filter = signal<ClaimBoardFilter>('all');
+  /** Discovery locked to trusted circle while public board is paused. */
+  readonly filter = signal<ClaimBoardFilter>('private');
 
-  /** All open rides (ignores filter) — for tab badges. */
+  /** Open trusted-circle rides (ignores filter signal) — for tab badges. */
   readonly allOpenBoardItems = computed(() => {
     const angelId = this.resolveAngelId();
     if (!angelId) {
@@ -41,32 +41,27 @@ export class ClaimBoardService {
       this.angels.allConnections(),
       angelId,
       { includeClaimedByMe: false },
-    ).map((item) => ({
-      ...item,
-      offerPendingByCurrentUser: pendingOfferRideIds.has(item.rideRequestId),
-    }));
+    )
+      .filter((item) => item.visibility === 'private')
+      .map((item) => ({
+        ...item,
+        offerPendingByCurrentUser: pendingOfferRideIds.has(item.rideRequestId),
+      }));
   });
 
   /** Open rides only — commitments live in AppointmentService.upcomingDrives. */
-  readonly openBoardItems = computed(() => {
-    const all = this.allOpenBoardItems();
-    const filter = this.filter();
-    if (filter === 'all') {
-      return all;
-    }
-    return all.filter((item) => item.visibility === filter);
-  });
+  readonly openBoardItems = this.allOpenBoardItems;
 
   /** @deprecated Prefer openBoardItems — kept as alias for templates. */
   readonly boardItems = this.openBoardItems;
 
   setFilter(filter: ClaimBoardFilter): void {
-    this.filter.set(filter);
+    // Public board paused — keep trusted-only.
+    this.filter.set(filter === 'public' ? 'private' : filter);
   }
 
   /**
-   * Private circle and public board: submit an offer so the rider can choose
-   * among multiple angels.
+   * Trusted circle: submit an offer so the rider can choose among angels.
    */
   async respondICanDrive(
     item: ClaimBoardItem,
