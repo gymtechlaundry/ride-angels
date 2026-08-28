@@ -1,6 +1,6 @@
 # Ride Angels — Privacy (SMS / authentication)
 
-**Last updated:** 2026-08-14
+**Last updated:** 2026-08-28
 
 Ride Angels is operated by **Hyperion App Studio** (sole proprietor: Devin Cooper).
 
@@ -32,5 +32,5 @@ run the app backend.
 
 ## Contact
 
-looking@devincoopers.space  
+support@hyperionappstudio.com  
 https://hyperionappstudio.com

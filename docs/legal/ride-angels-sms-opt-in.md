@@ -30,5 +30,5 @@ Your Ride Angels code is: 123456
 ## Contact
 
 - Studio: [Hyperion App Studio](https://hyperionappstudio.com)
-- Verification / support contact: looking@devincoopers.space
+- Verification / support contact: support@hyperionappstudio.com
 - Toll-free sender (after verification): +1 (855) 970-5852

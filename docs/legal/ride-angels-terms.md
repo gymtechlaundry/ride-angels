@@ -1,6 +1,6 @@
 # Ride Angels — Terms (SMS / authentication)
 
-**Last updated:** 2026-08-14
+**Last updated:** 2026-08-28
 
 By using Ride Angels phone sign-in, you agree that:
 
@@ -14,4 +14,4 @@ By using Ride Angels phone sign-in, you agree that:
 6. You are responsible for keeping your device secure and not sharing OTP codes.
 
 Full product terms may be updated as the public website and App Store listings
-are published. Contact: looking@devincoopers.space.
+are published. Contact: support@hyperionappstudio.com.
