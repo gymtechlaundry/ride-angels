@@ -590,6 +590,27 @@ export class AppointmentService {
     this.queueCalendarSync(rideRequestId);
   }
 
+  async markOnMyWay(rideRequestId: string): Promise<void> {
+    const assignment = this.getAssignmentForRide(rideRequestId);
+    if (!assignment) {
+      throw new Error('This trip is not currently assigned to you.');
+    }
+
+    if (isSupabaseConfigured()) {
+      await this.assignmentsRepo.markOnMyWay(rideRequestId);
+      const assignments = await this.assignmentsRepo.listVisible();
+      this.assignments.set(assignments);
+      return;
+    }
+
+    const now = new Date().toISOString();
+    this.assignments.update((list) =>
+      list.map((a) =>
+        a.id === assignment.id ? { ...a, onMyWayAt: now } : a,
+      ),
+    );
+  }
+
   private buildChangeSummary(
     previous: Appointment,
     previousRide: RideRequest,

@@ -150,6 +150,10 @@ export class SupabaseRideAssignmentRepository
   cancelByAngel(rideRequestId: string, reason: string): Promise<void> {
     return this.domain.cancelAssignmentByAngel(rideRequestId, reason);
   }
+
+  markOnMyWay(rideRequestId: string): Promise<void> {
+    return this.domain.markAngelOnMyWayRpc(rideRequestId);
+  }
 }
 
 @Injectable({ providedIn: 'root' })

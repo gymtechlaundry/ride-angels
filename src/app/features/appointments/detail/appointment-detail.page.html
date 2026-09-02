@@ -113,6 +113,42 @@
                   <p class="angel-name">{{ d.appointment.title }}</p>
                 </div>
               </div>
+              @if (riderForAngel(); as rider) {
+                <div class="driver-card rider-card">
+                  <app-profile-avatar
+                    [src]="rider.avatarUrl"
+                    [name]="rider.displayName"
+                    [size]="40"
+                    [alt]="rider.displayName"
+                  />
+                  <div>
+                    <p class="claimed-by open-rider">RIDER</p>
+                    <p class="angel-name">{{ rider.displayName }}</p>
+                  </div>
+                </div>
+              }
+              @if (onMyWayAt()) {
+                <p class="on-my-way-note">On the way — rider notified</p>
+              }
+              @if (riderPhone()) {
+                <div class="contact-row">
+                  <button type="button" class="call-btn ra-reset" (click)="callRider()">
+                    <span class="ra-icon-box" style="width:14px;height:14px">
+                      <img class="ra-icon" src="assets/icons/phone.svg" alt="" />
+                    </span>
+                    Call
+                  </button>
+                  <button type="button" class="call-btn ra-reset" (click)="textRider()">
+                    Text
+                  </button>
+                </div>
+              }
+              @if (canMarkOnMyWay()) {
+                <app-primary-button
+                  label="On my way"
+                  (pressed)="markOnMyWay()"
+                />
+              }
               @if (canCancelAsAngel()) {
                 <button
                   type="button"
@@ -135,14 +171,24 @@
                 <div>
                   <p class="claimed-by">RIDE CLAIMED BY</p>
                   <p class="angel-name">{{ d.angel.displayName }}</p>
+                  @if (onMyWayAt()) {
+                    <p class="on-my-way-badge">On the way</p>
+                  }
                 </div>
               </div>
-              <button type="button" class="call-btn ra-reset" (click)="callAngel()">
-                <span class="ra-icon-box" style="width:14px;height:14px">
-                  <img class="ra-icon" src="assets/icons/phone.svg" alt="" />
-                </span>
-                Call {{ d.angel.firstName }}
-              </button>
+              @if (angelPhone()) {
+                <div class="contact-row">
+                  <button type="button" class="call-btn ra-reset" (click)="callAngel()">
+                    <span class="ra-icon-box" style="width:14px;height:14px">
+                      <img class="ra-icon" src="assets/icons/phone.svg" alt="" />
+                    </span>
+                    Call {{ d.angel.firstName }}
+                  </button>
+                  <button type="button" class="call-btn ra-reset" (click)="textAngel()">
+                    Text
+                  </button>
+                </div>
+              }
             </div>
           } @else if (claimableItem(); as openItem) {
             <section class="offer-drive-section">

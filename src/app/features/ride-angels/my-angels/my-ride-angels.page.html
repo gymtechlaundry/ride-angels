@@ -23,8 +23,8 @@
           <h3>Who are Ride Angels?</h3>
           <p>
             Ride Angels are family, close friends, or neighbors who have volunteered
-            to drive you. Invites work even if they do not have the app yet — we
-            email them a private link to join your circle.
+            to drive you. Invite by email or phone — if they don’t have the app yet,
+            we send a private link so they can join your circle.
           </p>
           <div class="explain-cta">
             <app-primary-button
@@ -66,8 +66,10 @@
             @for (invite of waitingEmailInvites(); track invite.id) {
               <article class="invite-card">
                 <div class="invite-copy">
-                  <h3>{{ invite.email }}</h3>
-                  <p>Invite emailed · {{ invite.relationshipLabel }}</p>
+                  <h3>{{ outboundLabel(invite) }}</h3>
+                  <p>
+                    {{ outboundStatusCopy(invite) }} · {{ invite.relationshipLabel }}
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -88,7 +90,16 @@
           @for (item of items(); track item.connectionId) {
             <app-angel-card [item]="item" (remove)="removeAngel($event)" />
           } @empty {
-            <p class="empty">No angels yet. Invite someone you trust.</p>
+            <div class="empty-coach">
+              <p class="empty">
+                Invite family, friends, or neighbors by email or phone. They’ll
+                get a private link to join your circle — even if they don’t have
+                the app yet.
+              </p>
+              <button type="button" class="empty-link ra-reset" (click)="addAngel()">
+                Invite someone
+              </button>
+            </div>
           }
         </div>
       </section>
@@ -162,7 +173,10 @@
               </button>
             </article>
           } @empty {
-            <p class="empty">Accept an invite to start helping a rider.</p>
+            <p class="empty">
+              Accept an invite from a rider, or ask them to invite you by email
+              or phone from My Ride Angels.
+            </p>
           }
         </div>
       </section>

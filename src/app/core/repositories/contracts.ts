@@ -70,6 +70,7 @@ export interface RideAssignmentRepositoryPort {
   confirmAfterChange(rideRequestId: string): Promise<void>;
   declineAfterChange(rideRequestId: string): Promise<void>;
   cancelByAngel(rideRequestId: string, reason: string): Promise<void>;
+  markOnMyWay(rideRequestId: string): Promise<void>;
 }
 
 export interface RideAngelConnectionRepositoryPort {

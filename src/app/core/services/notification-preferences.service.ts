@@ -56,6 +56,11 @@ export const NOTIFICATION_PREF_GROUPS: Array<{
         description: 'When a rider accepts your offer',
       },
       {
+        type: 'angel_on_my_way',
+        label: 'On the way',
+        description: 'When your Ride Angel is heading to pick you up',
+      },
+      {
         type: 'offer_declined',
         label: 'Offer declined',
         description: 'When a rider declines your offer',
