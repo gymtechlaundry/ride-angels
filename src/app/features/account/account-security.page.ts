@@ -68,22 +68,22 @@ export class AccountSecurityPage implements OnInit {
 
   readonly recoveryTitle = computed(() => {
     if (this.missingEmail() && !this.missingPhone()) {
-      return 'Add an email for backup sign-in';
+      return 'Add an email so you can always sign in';
     }
     if (this.missingPhone() && !this.missingEmail()) {
-      return 'Add a phone number for backup sign-in';
+      return 'Add a phone so family can find you';
     }
     return 'Add a backup sign-in method';
   });
 
   readonly recoveryBody = computed(() => {
     if (this.missingEmail() && !this.missingPhone()) {
-      return 'You joined with your phone. Adding a verified email gives you another way to sign in if you change numbers or lose access to SMS.';
+      return 'You joined with your phone. Adding a verified email gives you another way to sign in if you change numbers — same account, not a new one.';
     }
     if (this.missingPhone() && !this.missingEmail()) {
-      return 'You joined with email. Adding a verified phone number makes it easier to sign in on this device later.';
+      return 'You joined with email. Adding a verified phone helps family find and invite you, and lets them call or text you about rides — same account, not a new one.';
     }
-    return 'Add another verified method so you can always reach this same Ride Angels account.';
+    return 'Add another verified method so family can reach this same Ride Angels account and you always have a backup way to sign in.';
   });
 
   readonly recoveryActionLabel = computed(() => {

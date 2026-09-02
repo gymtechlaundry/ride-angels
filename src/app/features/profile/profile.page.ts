@@ -77,6 +77,7 @@ export class ProfilePage implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   readonly user = computed(() => this.auth.getCurrentUserOrNull());
+  readonly persona = this.auth.activePersona;
   readonly prefs = this.calendarSync.prefs;
   readonly calendars = signal<ExternalCalendarInfo[]>([]);
   readonly showCalendarPicker = signal(false);
@@ -157,7 +158,6 @@ export class ProfilePage implements OnInit {
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
   });
-  readonly editDefaultPersona = signal<'rider' | 'angel'>('rider');
 
   readonly signInMethods = computed(() => {
     void this.auth.currentUser();
@@ -264,6 +264,28 @@ export class ProfilePage implements OnInit {
     });
   }
 
+  async switchMode(persona: 'rider' | 'angel'): Promise<void> {
+    if (this.persona() === persona || this.profileBusy()) {
+      return;
+    }
+    this.profileBusy.set(true);
+    try {
+      await this.auth.setDefaultPersona(persona);
+      await this.showToast(
+        persona === 'angel'
+          ? 'Ride Angel mode — Home shows drives; Calendar shows open requests.'
+          : 'Rider mode — Home shows your rides and appointments.',
+      );
+    } catch (err) {
+      await this.showToast(
+        err instanceof Error ? err.message : 'Could not switch mode.',
+        'danger',
+      );
+    } finally {
+      this.profileBusy.set(false);
+    }
+  }
+
   async saveProfile(): Promise<void> {
     if (this.editForm.invalid) {
       this.editForm.markAllAsTouched();
@@ -276,12 +298,11 @@ export class ProfilePage implements OnInit {
         firstName: value.firstName,
         lastName: value.lastName,
       });
-      await this.auth.setDefaultPersona(this.editDefaultPersona());
       this.editing.set(false);
       await this.showToast('Profile updated.');
     } catch (err) {
       await this.showToast(
-        err instanceof Error ? err.message : 'Could not update profile.',
+        err instanceof Error ? err.message : 'Could not save profile.',
         'danger',
       );
     } finally {
@@ -593,9 +614,6 @@ export class ProfilePage implements OnInit {
       firstName: u.firstName,
       lastName: u.lastName,
     });
-    this.editDefaultPersona.set(
-      u.defaultPersona === 'angel' ? 'angel' : 'rider',
-    );
   }
 
   private async refreshCalendars(): Promise<void> {

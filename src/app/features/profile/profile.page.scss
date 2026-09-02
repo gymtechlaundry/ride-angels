@@ -453,6 +453,23 @@
   color: var(--ra-success-text);
 }
 
+.mode-heading {
+  margin: 4px 0 0;
+  font-family: var(--ra-font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ra-ink);
+}
+
+.mode-card .field-hint,
+.signin-section .field-hint {
+  margin: 6px 0 12px;
+}
+
+.signin-section .field + .field {
+  margin-top: 12px;
+}
+
 .mode-options {
   display: flex;
   flex-direction: column;

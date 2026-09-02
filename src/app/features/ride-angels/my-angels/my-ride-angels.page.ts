@@ -105,7 +105,7 @@ export class MyRideAngelsPage implements OnInit {
     const alert = await this.alert.create({
       header: 'Invite Ride Angel',
       message:
-        'Enter their email or phone. If they already use Ride Angels, they get an in-app invite. If not, we send a private link (email or text).',
+        'Enter the email or phone they already use for Ride Angels if they have an account. If not, we’ll send a private join link. Using a different contact than they signed up with can create a second account.',
       inputs: [
         {
           name: 'identifier',
