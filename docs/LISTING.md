@@ -48,10 +48,10 @@ Questions or account help: https://hyperionappstudio.com/rideangels/support/
 ride,driver,appointment,caregiver,family,senior,volunteer,transport,carpool,trusted,medical
 ```
 
-**What’s New (first public version):**
+**What’s New (resubmit after review):**
 
 ```
-Welcome to Ride Angels — coordinate rides to appointments with the people you already trust.
+Fixes sign-in so your one-time code still works if you leave the app to open Messages or Mail. Trusted-circle invites and ride offers keep working as before.
 ```
 
 ## Screenshot shot list
