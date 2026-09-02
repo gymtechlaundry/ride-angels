@@ -2,7 +2,7 @@
 
 Map of vendors. **IDs and dashboard URLs only — never paste API keys, tokens, `.p8` bodies, or `service_role`.**
 
-Playbook: `~/Projects/hyperion-studio/Playbooks/secrets.md`. How-tos: [phone-otp.md](./phone-otp.md), [push-notifications.md](./push-notifications.md), [circle-invites.md](./circle-invites.md), [partner-integrations.md](./partner-integrations.md).
+Playbook: `~/Projects/hyperion-studio/Playbooks/secrets.md`. How-tos: [phone-otp.md](./phone-otp.md), [push-notifications.md](./push-notifications.md), [circle-invites.md](./circle-invites.md), [ride-reminders.md](./ride-reminders.md), [partner-integrations.md](./partner-integrations.md).
 
 ## Status
 

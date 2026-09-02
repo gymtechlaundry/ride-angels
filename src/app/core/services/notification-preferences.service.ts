@@ -78,6 +78,22 @@ export const NOTIFICATION_PREF_GROUPS: Array<{
     ],
   },
   {
+    title: 'Reminders',
+    items: [
+      {
+        type: 'appointment_reminder',
+        label: 'Day-before reminders',
+        description:
+          'Drive tomorrow, or when a circle ride still needs a Ride Angel',
+      },
+      {
+        type: 'pickup_reminder',
+        label: 'Hour-before pickup',
+        description: 'When you are driving and pickup is about an hour away',
+      },
+    ],
+  },
+  {
     title: 'Cancellations',
     items: [
       {

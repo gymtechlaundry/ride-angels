@@ -94,6 +94,8 @@ insert into public.notifications (
 `notification_preferences.preferences` is a jsonb map of type → boolean.
 Missing keys default to **enabled**. In-app inbox is never filtered by these prefs.
 
+Scheduled drive / unclaimed-ride reminders: [ride-reminders.md](./ride-reminders.md).
+
 ## Smoke test
 
 1. **Native build** — Xcode (iOS) or `npm run android:run` on device; allow notifications when prompted.
