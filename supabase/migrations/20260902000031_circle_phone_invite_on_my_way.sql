@@ -25,6 +25,9 @@ create unique index circle_invites_rider_email_pending_idx
   where status = 'pending' and email is not null;
 
 -- —— create_circle_invite: email OR E.164 phone ——
+-- Must drop first: CREATE OR REPLACE cannot rename p_email → p_identifier.
+drop function if exists public.create_circle_invite(text, text);
+
 create or replace function public.create_circle_invite(
   p_identifier text,
   p_relationship_label text default 'Trusted contact'
@@ -240,6 +243,8 @@ comment on function public.create_circle_invite(text, text) is
   'Invite by email or E.164 phone: pending connection if profile exists, else token for email/SMS share.';
 
 -- list outbound includes phone invites
+drop function if exists public.list_my_outbound_circle_invites();
+
 create or replace function public.list_my_outbound_circle_invites()
 returns table (
   id uuid,
