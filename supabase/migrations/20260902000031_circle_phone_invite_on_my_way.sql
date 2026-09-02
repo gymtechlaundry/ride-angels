@@ -25,6 +25,9 @@ create unique index circle_invites_rider_email_pending_idx
   where status = 'pending' and email is not null;
 
 -- —— create_circle_invite: email OR E.164 phone ——
+-- Must drop first: CREATE OR REPLACE cannot rename p_email → p_identifier.
+drop function if exists public.create_circle_invite(text, text);
+
 create or replace function public.create_circle_invite(
   p_identifier text,
   p_relationship_label text default 'Trusted contact'
