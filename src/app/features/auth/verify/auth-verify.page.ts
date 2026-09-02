@@ -101,8 +101,13 @@ export class AuthVerifyPage {
   });
 
   constructor() {
+    void this.ensureChallenge();
+  }
+
+  private async ensureChallenge(): Promise<void> {
+    await this.flow.hydrate();
     if (!this.flow.pending()) {
-      void this.router.navigateByUrl('/auth');
+      await this.router.navigateByUrl('/auth');
     }
   }
 
@@ -118,9 +123,15 @@ export class AuthVerifyPage {
     this.busy.set(true);
     this.error.set(null);
     try {
+      await this.flow.hydrate();
       const pending = this.flow.pending();
+      if (!pending) {
+        this.error.set('No verification in progress.');
+        await this.router.navigateByUrl('/auth');
+        return;
+      }
       await this.auth.verifyPendingOtp(this.code());
-      if (pending?.intent === 'add_identity') {
+      if (pending.intent === 'add_identity') {
         await this.router.navigateByUrl('/account/security', { replaceUrl: true });
         return;
       }

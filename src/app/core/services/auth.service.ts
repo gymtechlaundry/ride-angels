@@ -81,6 +81,7 @@ export class AuthService {
 
   async initialize(): Promise<void> {
     await this.profiles.ensureReady();
+    await this.flow.hydrate();
     const { value: persona } = await Preferences.get({ key: KEYS.activePersona });
     this.persona.set(persona === 'angel' ? 'angel' : 'rider');
 
@@ -165,7 +166,7 @@ export class AuthService {
   }
 
   async verifyPendingOtp(token: string): Promise<User> {
-    const pending = this.flow.requirePending();
+    const pending = await this.flow.requirePending();
     try {
       if (pending.intent === 'add_identity') {
         return await this.verifyIdentityAddition(pending.channel, pending.identifier, token);
@@ -177,7 +178,7 @@ export class AuthService {
   }
 
   async resendPendingOtp(): Promise<void> {
-    const pending = this.flow.requirePending();
+    const pending = await this.flow.requirePending();
     await this.sendOtp(pending);
   }
 
@@ -186,7 +187,7 @@ export class AuthService {
   async addEmailToCurrentUser(rawEmail: string): Promise<void> {
     this.requireAuth();
     const email = normalizeEmail(rawEmail);
-    this.flow.start('add_identity', 'email', email);
+    await this.flow.start('add_identity', 'email', email);
     try {
       if (isSupabaseConfigured()) {
         const { error } = await getSupabaseClient().auth.updateUser({ email });
@@ -197,7 +198,7 @@ export class AuthService {
         await this.mockSendOtp(email, 'email');
       }
     } catch (err) {
-      this.flow.clear();
+      await this.flow.clear();
       throw mapAuthError(err, 'add_identity');
     }
   }
@@ -205,7 +206,7 @@ export class AuthService {
   async addPhoneToCurrentUser(rawPhone: string): Promise<void> {
     this.requireAuth();
     const phone = toE164(rawPhone, environment.defaultCountryCallingCode);
-    this.flow.start('add_identity', 'phone', phone);
+    await this.flow.start('add_identity', 'phone', phone);
     try {
       if (isSupabaseConfigured()) {
         const { error } = await getSupabaseClient().auth.updateUser({ phone });
@@ -216,7 +217,7 @@ export class AuthService {
         await this.mockSendOtp(phone, 'phone');
       }
     } catch (err) {
-      this.flow.clear();
+      await this.flow.clear();
       throw mapAuthError(err, 'add_identity');
     }
   }
@@ -256,7 +257,7 @@ export class AuthService {
    */
   async signOut(options?: { scope?: SignOutScope }): Promise<void> {
     const scope = options?.scope ?? 'local';
-    this.flow.clear();
+    await this.flow.clear();
     this.signingOut = true;
     try {
       if (isSupabaseConfigured()) {
@@ -322,7 +323,7 @@ export class AuthService {
     try {
       await this.signOut();
     } catch {
-      this.flow.clear();
+      await this.flow.clear();
       this.session.set(null);
       this.currentUser.set(null);
       await Preferences.remove({ key: 'ra.mockSessionAuthUserId' });
@@ -562,12 +563,12 @@ export class AuthService {
     channel: 'phone' | 'email',
     identifier: string,
   ): Promise<void> {
-    this.flow.clear();
+    await this.flow.clear();
     try {
       await this.sendOtp({ intent, channel, identifier });
-      this.flow.start(intent, channel, identifier);
+      await this.flow.start(intent, channel, identifier);
     } catch (err) {
-      this.flow.clear();
+      await this.flow.clear();
       throw err;
     }
   }
@@ -661,7 +662,7 @@ export class AuthService {
         err instanceof Error ? err.message : 'Profile could not be loaded.';
       throw new AuthError(message, 'validation');
     }
-    this.flow.clear();
+    await this.flow.clear();
     const user = this.currentUser();
     if (!user) {
       throw new AuthError('Profile could not be loaded.', 'validation');
@@ -684,7 +685,7 @@ export class AuthService {
       const updated = await this.profiles.update(user.authUserId, patch);
       this.currentUser.set(updated);
       await this.mockLinkIdentity(user.authUserId, channel, identifier);
-      this.flow.clear();
+      await this.flow.clear();
       return updated;
     }
 
@@ -707,7 +708,7 @@ export class AuthService {
         await this.syncProfileFromAuthUser(userData.user);
       }
     }
-    this.flow.clear();
+    await this.flow.clear();
     return this.getCurrentUser();
   }
 
@@ -984,7 +985,7 @@ export class AuthService {
         value: account.authUserId,
       });
       this.upsertDirectory(profile);
-      this.flow.clear();
+      await this.flow.clear();
       return profile;
     }
 
@@ -1017,7 +1018,7 @@ export class AuthService {
     this.currentUser.set(profile);
     await Preferences.set({ key: 'ra.mockSessionAuthUserId', value: authUserId });
     this.upsertDirectory(profile);
-    this.flow.clear();
+    await this.flow.clear();
     return profile;
   }
 }

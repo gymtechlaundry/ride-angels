@@ -11,6 +11,8 @@ export const otpChallengeGuard: CanActivateFn = async () => {
 
   if (!auth.isReady()) {
     await auth.initialize();
+  } else {
+    await flow.hydrate();
   }
 
   if (flow.pending()) {
