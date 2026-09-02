@@ -13,8 +13,8 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
         <div class="title-block">
           <h3 class="title">{{ ride.title }}</h3>
           @if (ride.viewAs === 'angel' && ride.visibility) {
-            <span class="source" [class.public]="ride.visibility === 'public'">
-              {{ ride.visibility === 'public' ? 'Community' : 'Trusted circle' }}
+            <span class="source">
+              Trusted circle
             </span>
           }
         </div>

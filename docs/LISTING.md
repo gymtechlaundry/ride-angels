@@ -17,13 +17,13 @@ Need a lift to an appointment? Ask the people who already show up for you. Rider
 ```
 Ride Angels helps you get to appointments with the people you already trust — family, close friends, and neighbors who have offered to drive.
 
-Create a ride request, notify your circle, and let someone you know claim the trip. If your trusted drivers are busy, you can optionally open the request to community Ride Angels.
+Create a ride request, notify your circle, and let someone you know claim the trip. Trips stay private to your trusted Ride Angels.
 
 FOR RIDERS
 • Add an appointment with pickup, destination, date, and notes
 • Notify your trusted Ride Angels first
 • Review ride offers and accept the driver you want
-• Keep trips private to your circle, or open them to the community
+• Keep trips private to your circle
 • Stay updated from the in-app inbox
 
 FOR RIDE ANGELS
@@ -45,7 +45,7 @@ Questions or account help: https://hyperionappstudio.com/rideangels/support/
 **Keywords (iOS):**
 
 ```
-ride,driver,appointment,caregiver,family,senior,volunteer,transport,carpool,community,medical
+ride,driver,appointment,caregiver,family,senior,volunteer,transport,carpool,trusted,medical
 ```
 
 **What’s New (first public version):**
