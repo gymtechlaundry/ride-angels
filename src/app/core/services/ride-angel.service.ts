@@ -262,6 +262,13 @@ export class RideAngelService {
       return;
     }
 
+    if (isSupabaseConfigured()) {
+      await this.connectionsRepo.acceptInvite(connectionId);
+      const list = await this.connectionsRepo.listForCurrentUser();
+      this.connections.set(list);
+      return;
+    }
+
     const acceptedAt = new Date().toISOString();
     this.connections.update((list) =>
       list.map((c) =>
@@ -270,13 +277,6 @@ export class RideAngelService {
           : c,
       ),
     );
-
-    if (isSupabaseConfigured()) {
-      await this.connectionsRepo.updateStatus(connectionId, {
-        status: 'accepted',
-        accepted_at: acceptedAt,
-      });
-    }
 
     this.notifications.notify({
       userId: connection.riderId,

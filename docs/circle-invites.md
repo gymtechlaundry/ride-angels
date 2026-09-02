@@ -6,11 +6,11 @@ Trusted-circle invites for people who may not have Ride Angels yet.
 
 1. Rider opens **My Ride Angels → Add Trusted Ride Angel** and enters email.
 2. RPC `create_circle_invite`:
-   - **Existing onboarded profile** → pending `ride_angel_connections` (in-app accept).
+   - **Existing onboarded profile** → pending `ride_angel_connections` + in-app/push `angel_invited`.
    - **No profile** → `circle_invites` row + token; Edge Function emails the link via **Resend**.
 3. Rider can **Share** the same link (Messages / Mail / copy).
 4. Invitee opens `https://hyperionappstudio.com/rideangels/invite/{token}` (or `org.rideangels.app://invite/{token}`).
-5. After signup + onboarding, the app claims the token → **pending** connection → Accept on Ride circle.
+5. After signup + onboarding, the app claims the token → **pending** connection → Accept on Ride circle (`accept_ride_angel_invite` notifies the rider with `angel_accepted`).
 
 Public / community board UI is paused; new rides stay private to the circle.
 

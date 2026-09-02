@@ -89,6 +89,7 @@ export interface RideAngelConnectionRepositoryPort {
     }>,
   ): Promise<void>;
   removeConnection(id: string): Promise<void>;
+  acceptInvite(connectionId: string): Promise<void>;
 }
 
 export interface NotificationRepositoryPort {
