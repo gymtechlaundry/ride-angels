@@ -211,6 +211,24 @@ export class RideDomainRepository {
     return { assignmentId: result.assignment_id };
   }
 
+  async declineRideOfferRpc(offerId: string): Promise<void> {
+    const { error } = await getSupabaseClient().rpc('decline_ride_offer', {
+      p_offer_id: offerId,
+    });
+    if (error) {
+      throw this.mapRpcError(error.message);
+    }
+  }
+
+  async acceptRideAngelInviteRpc(connectionId: string): Promise<void> {
+    const { error } = await getSupabaseClient().rpc('accept_ride_angel_invite', {
+      p_connection_id: connectionId,
+    });
+    if (error) {
+      throw this.mapRpcError(error.message);
+    }
+  }
+
   async listNotifications(recipientId: string): Promise<
     import('../models').AppNotification[]
   > {

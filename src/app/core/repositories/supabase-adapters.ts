@@ -115,7 +115,7 @@ export class SupabaseRideOfferRepository implements RideOfferRepositoryPort {
   }
 
   declineOffer(offerId: string): Promise<void> {
-    return this.domain.updateOfferStatus(offerId, 'declined');
+    return this.domain.declineRideOfferRpc(offerId);
   }
 
   withdrawOffer(offerId: string, reason: string): Promise<void> {
@@ -187,6 +187,10 @@ export class SupabaseRideAngelConnectionRepository
 
   removeConnection(id: string): Promise<void> {
     return this.domain.removeRideAngelConnection(id);
+  }
+
+  acceptInvite(connectionId: string): Promise<void> {
+    return this.domain.acceptRideAngelInviteRpc(connectionId);
   }
 }
 

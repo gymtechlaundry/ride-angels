@@ -260,6 +260,9 @@ export class RideOfferService {
 
     if (isSupabaseConfigured()) {
       await this.offersRepo.declineOffer(offerId);
+      const offers = await this.offersRepo.listVisible();
+      this.offers.set(offers);
+      return;
     }
 
     this.offers.update((list) =>
