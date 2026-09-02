@@ -10,26 +10,6 @@
             Your loved ones are here for you.
           }
         </p>
-        <div class="mode-switch" role="group" aria-label="App mode">
-          <button
-            type="button"
-            class="mode-chip ra-reset"
-            [class.active]="persona() === 'rider'"
-            [disabled]="modeBusy()"
-            (click)="switchMode('rider')"
-          >
-            Rider mode
-          </button>
-          <button
-            type="button"
-            class="mode-chip ra-reset"
-            [class.active]="persona() === 'angel'"
-            [disabled]="modeBusy()"
-            (click)="switchMode('angel')"
-          >
-            Angel mode
-          </button>
-        </div>
       </div>
       <div class="welcome-actions">
         <button
@@ -60,22 +40,6 @@
         </button>
       </div>
     </header>
-
-    @if (showContactNudge()) {
-      <section class="contact-nudge ra-page-pad">
-        <button type="button" class="nudge-card ra-reset" (click)="openContactNudge()">
-          <strong>{{ contactNudgeTitle() }}</strong>
-          <span>{{ contactNudgeBody() }}</span>
-        </button>
-        <button
-          type="button"
-          class="nudge-dismiss ra-reset"
-          (click)="dismissContactNudge()"
-        >
-          Not now
-        </button>
-      </section>
-    }
 
     @if (persona() === 'rider') {
       <section class="banner-wrap ra-page-pad">
@@ -116,6 +80,22 @@
   </ion-refresher>
 
   <div class="home-page ra-page-shell">
+    @if (showContactNudge()) {
+      <section class="alert-strip ra-page-pad">
+        <button type="button" class="strip ra-reset" (click)="openContactNudge()">
+          <strong>{{ contactNudgeTitle() }}</strong>
+          <span>{{ contactNudgeBody() }}</span>
+        </button>
+        <button
+          type="button"
+          class="nudge-dismiss ra-reset"
+          (click)="dismissContactNudge()"
+        >
+          Not now
+        </button>
+      </section>
+    }
+
     @if (persona() === 'rider') {
       @if (pendingOffers().length) {
         <section class="alert-strip ra-page-pad">

@@ -7,7 +7,6 @@ import {
   IonRefresher,
   IonRefresherContent,
   RefresherCustomEvent,
-  ToastController,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { RideCardView } from '../../core/models';
@@ -47,7 +46,6 @@ export class HomePage implements ViewWillEnter {
   private readonly notifications = inject(NotificationService);
   private readonly domainSync = inject(DomainSyncService);
   private readonly router = inject(Router);
-  private readonly toast = inject(ToastController);
 
   readonly user = computed(() => this.auth.getCurrentUserOrNull());
   readonly persona = this.auth.activePersona;
@@ -57,7 +55,6 @@ export class HomePage implements ViewWillEnter {
   readonly pendingInvites = this.angels.pendingIncoming;
   readonly unread = this.notifications.unreadForCurrentUser;
   readonly contactNudgeDismissed = signal(false);
-  readonly modeBusy = signal(false);
 
   readonly missingPhone = computed(() => {
     void this.auth.currentUser();
@@ -127,28 +124,6 @@ export class HomePage implements ViewWillEnter {
       await this.domainSync.refreshForCurrentUser({ force: true });
     } finally {
       event.target.complete();
-    }
-  }
-
-  async switchMode(persona: 'rider' | 'angel'): Promise<void> {
-    if (this.persona() === persona || this.modeBusy()) {
-      return;
-    }
-    this.modeBusy.set(true);
-    try {
-      await this.auth.setDefaultPersona(persona);
-      const toast = await this.toast.create({
-        message:
-          persona === 'angel'
-            ? 'Ride Angel mode — you’ll see drives and open requests.'
-            : 'Rider mode — you’ll see your rides and appointments.',
-        duration: 2400,
-        position: 'top',
-        color: 'primary',
-      });
-      await toast.present();
-    } finally {
-      this.modeBusy.set(false);
     }
   }
 
