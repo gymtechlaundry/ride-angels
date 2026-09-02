@@ -1,6 +1,13 @@
 <ion-header class="ion-no-border ra-chrome">
   <div class="header-inner">
-    <app-page-header title="Profile" subtitle="Your Ride Angels account" />
+    <app-page-header
+      title="Profile"
+      [subtitle]="
+        persona() === 'angel'
+          ? 'Ride Angel mode · account and settings'
+          : 'Rider mode · account and settings'
+      "
+    />
   </div>
 </ion-header>
 
@@ -67,79 +74,6 @@
                 <input formControlName="lastName" type="text" autocomplete="family-name" />
               </label>
 
-              <div class="field">
-                <span class="label">Default mode</span>
-                <p class="field-hint">Used each time you sign in.</p>
-                <div class="mode-options compact">
-                  <button
-                    type="button"
-                    class="mode-option ra-reset"
-                    [class.active]="editDefaultPersona() === 'rider'"
-                    (click)="editDefaultPersona.set('rider')"
-                  >
-                    <strong>Rider</strong>
-                    <span>Request and manage rides</span>
-                  </button>
-                  <button
-                    type="button"
-                    class="mode-option ra-reset"
-                    [class.active]="editDefaultPersona() === 'angel'"
-                    (click)="editDefaultPersona.set('angel')"
-                  >
-                    <strong>Ride Angel</strong>
-                    <span>Claim and drive rides</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="field">
-                <span class="label">Phone number</span>
-                <div class="identity-row">
-                  <div>
-                    <p class="identity-value">
-                      {{ phoneMethod()?.value || 'Not added' }}
-                    </p>
-                    <p
-                      class="identity-status"
-                      [class.ok]="phoneMethod()?.status === 'verified'"
-                    >
-                      {{ methodStatusLabel(phoneMethod()?.status) }}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    class="text-action muted ra-reset"
-                    (click)="manageSignIn('phone')"
-                  >
-                    {{ phoneMethod()?.status === 'verified' ? 'Change' : 'Add' }}
-                  </button>
-                </div>
-              </div>
-
-              <div class="field">
-                <span class="label">Email address</span>
-                <div class="identity-row">
-                  <div>
-                    <p class="identity-value">
-                      {{ emailMethod()?.value || 'Not added' }}
-                    </p>
-                    <p
-                      class="identity-status"
-                      [class.ok]="emailMethod()?.status === 'verified'"
-                    >
-                      {{ methodStatusLabel(emailMethod()?.status) }}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    class="text-action muted ra-reset"
-                    (click)="manageSignIn('email')"
-                  >
-                    {{ emailMethod()?.status === 'verified' ? 'Change' : 'Add' }}
-                  </button>
-                </div>
-              </div>
-
               <div class="edit-actions">
                 <app-primary-button
                   label="Save"
@@ -158,9 +92,102 @@
             </form>
           } @else {
             <button type="button" class="edit-link ra-reset" (click)="startEdit()">
-              Edit profile
+              Edit name & photo
             </button>
           }
+        </div>
+      </section>
+
+      <section class="mode-section ra-page-pad">
+        <div class="card mode-card">
+          <p class="eyebrow">App mode</p>
+          <h3 class="mode-heading">
+            You’re in {{ persona() === 'angel' ? 'Ride Angel' : 'Rider' }} mode
+          </h3>
+          <p class="field-hint">
+            This controls what you see on Home and Calendar. Changing it also
+            becomes your mode the next time you sign in.
+          </p>
+          <div class="mode-options compact">
+            <button
+              type="button"
+              class="mode-option ra-reset"
+              [class.active]="persona() === 'rider'"
+              [disabled]="profileBusy()"
+              (click)="switchMode('rider')"
+            >
+              <strong>Rider</strong>
+              <span>Request rides and manage appointments</span>
+            </button>
+            <button
+              type="button"
+              class="mode-option ra-reset"
+              [class.active]="persona() === 'angel'"
+              [disabled]="profileBusy()"
+              (click)="switchMode('angel')"
+            >
+              <strong>Ride Angel</strong>
+              <span>See open requests and drive for your circle</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="signin-section ra-page-pad">
+        <div class="card">
+          <p class="eyebrow">Sign-in & contact</p>
+          <p class="field-hint">
+            Family invites and Call/Text use these. Adding a method never creates
+            a second account.
+          </p>
+
+          <div class="field">
+            <span class="label">Phone number</span>
+            <div class="identity-row">
+              <div>
+                <p class="identity-value">
+                  {{ phoneMethod()?.value || 'Not added' }}
+                </p>
+                <p
+                  class="identity-status"
+                  [class.ok]="phoneMethod()?.status === 'verified'"
+                >
+                  {{ methodStatusLabel(phoneMethod()?.status) }}
+                </p>
+              </div>
+              <button
+                type="button"
+                class="text-action muted ra-reset"
+                (click)="manageSignIn('phone')"
+              >
+                {{ phoneMethod()?.status === 'verified' ? 'Change' : 'Add' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label">Email address</span>
+            <div class="identity-row">
+              <div>
+                <p class="identity-value">
+                  {{ emailMethod()?.value || 'Not added' }}
+                </p>
+                <p
+                  class="identity-status"
+                  [class.ok]="emailMethod()?.status === 'verified'"
+                >
+                  {{ methodStatusLabel(emailMethod()?.status) }}
+                </p>
+              </div>
+              <button
+                type="button"
+                class="text-action muted ra-reset"
+                (click)="manageSignIn('email')"
+              >
+                {{ emailMethod()?.status === 'verified' ? 'Change' : 'Add' }}
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     }
@@ -441,7 +468,7 @@
         />
 
         <app-primary-button
-          label="Account & Security"
+          label="Account & devices"
           variant="soft"
           (pressed)="openSecurity()"
         />

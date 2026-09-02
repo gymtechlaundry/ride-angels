@@ -142,6 +142,11 @@
                     Text
                   </button>
                 </div>
+              } @else if (riderForAngel()) {
+                <p class="no-phone-note">
+                  No phone on file. Ask them to add one in Profile so you can call
+                  or text.
+                </p>
               }
               @if (canMarkOnMyWay()) {
                 <app-primary-button
@@ -188,6 +193,10 @@
                     Text
                   </button>
                 </div>
+              } @else {
+                <p class="no-phone-note">
+                  No phone on file. They can add one in Profile for Call / Text.
+                </p>
               }
             </div>
           } @else if (claimableItem(); as openItem) {

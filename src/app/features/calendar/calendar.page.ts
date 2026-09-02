@@ -73,12 +73,12 @@ export class CalendarPage implements OnInit, ViewWillEnter {
   readonly subtitle = computed(() => {
     if (this.viewMode() === 'list') {
       return this.persona() === 'angel'
-        ? 'Trusted-circle rides looking for a driver'
-        : 'All of your upcoming rides in one list';
+        ? 'Angel mode · open requests from your circle'
+        : 'Rider mode · all of your upcoming rides';
     }
     return this.persona() === 'angel'
-      ? 'Tap a day to see drives and open requests'
-      : 'Tap a day to see rides scheduled that day';
+      ? 'Angel mode · tap a day for drives and open requests'
+      : 'Rider mode · tap a day for scheduled rides';
   });
 
   ngOnInit(): void {
