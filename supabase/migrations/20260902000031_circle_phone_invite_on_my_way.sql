@@ -243,6 +243,8 @@ comment on function public.create_circle_invite(text, text) is
   'Invite by email or E.164 phone: pending connection if profile exists, else token for email/SMS share.';
 
 -- list outbound includes phone invites
+drop function if exists public.list_my_outbound_circle_invites();
+
 create or replace function public.list_my_outbound_circle_invites()
 returns table (
   id uuid,
