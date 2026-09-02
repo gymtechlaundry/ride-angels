@@ -205,6 +205,13 @@ export class AppleCalendarProvider implements CalendarProvider {
         externalCalendarId: calendarId ?? undefined,
       };
     } catch {
+      // Modify can fail if EventKit id is stale (reinstall / other device).
+      // Delete the old id first when possible so recreate does not leave orphans.
+      try {
+        await CapacitorCalendar.deleteEvent({ id: externalEventId });
+      } catch {
+        // Already gone or not deletable on this device.
+      }
       const created = await this.createRideEvent(calendarId, payload);
       return { ...created, recreated: created.ok };
     }

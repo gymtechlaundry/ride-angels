@@ -175,6 +175,42 @@ describe('CalendarSyncService', () => {
     expect(updateCalls).toBe(1);
   });
 
+  it('serializes concurrent syncs so only one create runs', async () => {
+    const service = TestBed.inject(CalendarSyncService);
+    await service.loadPreferences();
+    let releaseCreate!: (value: CalendarWriteResult) => void;
+    createImpl = () =>
+      new Promise<CalendarWriteResult>((resolve) => {
+        releaseCreate = resolve;
+      });
+
+    const first = service.syncRideForCurrentUser({
+      ride,
+      appointment,
+      assignment,
+    });
+    const second = service.syncRideForCurrentUser({
+      ride,
+      appointment,
+      assignment,
+    });
+
+    // Let both queue; first should be inside create, second waiting on lock.
+    await Promise.resolve();
+    expect(createCalls).toBe(1);
+
+    releaseCreate({
+      ok: true,
+      externalEventId: 'evt-1',
+      externalCalendarId: 'cal-1',
+    });
+    await Promise.all([first, second]);
+
+    expect(createCalls).toBe(1);
+    expect(updateCalls).toBe(1);
+    expect(service.statusForRide(ride.id)).toBe('synced');
+  });
+
   it('syncs rider appointments before they are claimed', async () => {
     const service = TestBed.inject(CalendarSyncService);
     await service.loadPreferences();
