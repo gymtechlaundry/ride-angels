@@ -38,6 +38,8 @@ export class CalendarSyncService {
   private readonly lastStatusByRide = signal<Record<string, CalendarSyncUiStatus>>(
     {},
   );
+  /** Serialize syncs per ride so mutation + realtime cannot double-create. */
+  private readonly syncLocks = new Map<string, Promise<void>>();
 
   readonly prefs = this.preferences.asReadonly();
   readonly syncEnabled = computed(() => !!this.preferences()?.syncEnabled);
@@ -230,8 +232,37 @@ export class CalendarSyncService {
    * Reconcile current user's calendar for one ride.
    * Safe to call after create / claim / accept / update / cancel / refresh.
    * Riders sync appointments as soon as they are created; angels sync while assigned.
+   * Concurrent calls for the same ride are serialized (mutation + realtime race).
    */
   async syncRideForCurrentUser(input: {
+    ride: RideRequest;
+    appointment: Appointment;
+    assignment?: RideAssignment | null;
+    riderName?: string;
+    angelName?: string;
+  }): Promise<void> {
+    const rideId = input.ride.id;
+    const previous = this.syncLocks.get(rideId) ?? Promise.resolve();
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const chained = previous
+      .catch(() => undefined)
+      .then(() => gate);
+    this.syncLocks.set(rideId, chained);
+    await previous.catch(() => undefined);
+    try {
+      await this.runSyncRideForCurrentUser(input);
+    } finally {
+      release();
+      if (this.syncLocks.get(rideId) === chained) {
+        this.syncLocks.delete(rideId);
+      }
+    }
+  }
+
+  private async runSyncRideForCurrentUser(input: {
     ride: RideRequest;
     appointment: Appointment;
     assignment?: RideAssignment | null;
