@@ -20,6 +20,7 @@ import {
   PendingInviteItem,
   RideAngelService,
 } from '../../../core/services/ride-angel.service';
+import { formatPhoneDisplay } from '../../../core/utils/phone';
 import { AngelCardComponent } from '../../../shared/components/angel-card/angel-card.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
@@ -79,17 +80,38 @@ export class MyRideAngelsPage implements OnInit {
     }
   }
 
+  outboundLabel(invite: OutboundCircleInvite): string {
+    if (invite.email) {
+      return invite.email;
+    }
+    if (invite.phone) {
+      try {
+        return formatPhoneDisplay(invite.phone);
+      } catch {
+        return invite.phone;
+      }
+    }
+    return 'Invite';
+  }
+
+  outboundStatusCopy(invite: OutboundCircleInvite): string {
+    if (invite.phone && !invite.email) {
+      return 'Waiting for them to join';
+    }
+    return 'Invite sent';
+  }
+
   async addAngel(): Promise<void> {
     const alert = await this.alert.create({
       header: 'Invite Ride Angel',
       message:
-        'Enter their email. If they already use Ride Angels, they get an in-app invite. If not, we email them a link to download the app and join your circle.',
+        'Enter their email or phone. If they already use Ride Angels, they get an in-app invite. If not, we send a private link (email or text).',
       inputs: [
         {
-          name: 'email',
-          type: 'email',
-          placeholder: 'Email',
-          attributes: { autocomplete: 'email' },
+          name: 'identifier',
+          type: 'text',
+          placeholder: 'Email or phone',
+          attributes: { autocomplete: 'email tel' },
         },
         {
           name: 'relationship',
@@ -102,8 +124,11 @@ export class MyRideAngelsPage implements OnInit {
         { text: 'Cancel', role: 'cancel' },
         {
           text: 'Send invite',
-          handler: (data: { email?: string; relationship?: string }) => {
-            void this.sendInvite(data.email ?? '', data.relationship ?? 'Friend');
+          handler: (data: { identifier?: string; relationship?: string }) => {
+            void this.sendInvite(
+              data.identifier ?? '',
+              data.relationship ?? 'Friend',
+            );
             return false;
           },
         },
@@ -112,10 +137,13 @@ export class MyRideAngelsPage implements OnInit {
     await alert.present();
   }
 
-  private async sendInvite(email: string, relationship: string): Promise<void> {
+  private async sendInvite(
+    identifier: string,
+    relationship: string,
+  ): Promise<void> {
     try {
       const result = await this.invites.createInvite({
-        email,
+        identifier,
         relationshipLabel: relationship,
       });
       const top = await this.alert.getTop();
@@ -126,6 +154,36 @@ export class MyRideAngelsPage implements OnInit {
           `Invite sent to ${result.angelDisplayName}.`,
           'primary',
         );
+        return;
+      }
+
+      if (result.kind === 'phone_invite') {
+        const name =
+          this.auth.getCurrentUserOrNull()?.displayName?.trim() || 'Someone';
+        const shareAlert = await this.alert.create({
+          header: 'Invite ready',
+          message: `Share the link with ${formatPhoneDisplay(result.phone)} so they can join your circle.`,
+          buttons: [
+            { text: 'Done', role: 'cancel' },
+            {
+              text: 'Text link',
+              handler: () => {
+                this.invites.shareInviteViaSms(
+                  result.phone,
+                  result.inviteUrl,
+                  name,
+                );
+              },
+            },
+            {
+              text: 'Share…',
+              handler: () => {
+                void this.shareInvite(result.inviteUrl);
+              },
+            },
+          ],
+        });
+        await shareAlert.present();
         return;
       }
 
@@ -176,6 +234,12 @@ export class MyRideAngelsPage implements OnInit {
   }
 
   async reshareOutbound(invite: OutboundCircleInvite): Promise<void> {
+    if (invite.phone && !invite.email) {
+      const name =
+        this.auth.getCurrentUserOrNull()?.displayName?.trim() || 'Someone';
+      this.invites.shareInviteViaSms(invite.phone, invite.inviteUrl, name);
+      return;
+    }
     await this.shareInvite(invite.inviteUrl);
   }
 

@@ -71,6 +71,7 @@ export type NotificationType =
   | 'ride_changed'
   | 'appointment_reminder'
   | 'pickup_reminder'
+  | 'angel_on_my_way'
   | 'angel_cancelled'
   | 'rider_cancelled'
   | 'ride_cancelled'
@@ -292,6 +293,8 @@ export interface RideAssignment {
   coordinatingOrganizationId?: string;
   confirmationStatus?: AssignmentConfirmationStatus;
   pendingChangeSummary?: string;
+  /** Set when the assigned angel taps “On my way”. */
+  onMyWayAt?: string;
 }
 
 export interface AppNotification {

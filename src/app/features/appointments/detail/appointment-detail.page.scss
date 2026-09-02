@@ -192,6 +192,24 @@
   font-weight: 700;
 }
 
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.on-my-way-note,
+.on-my-way-badge {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ra-success-text);
+}
+
+.on-my-way-badge {
+  margin-top: 4px;
+}
+
 .offers-section {
   display: flex;
   flex-direction: column;

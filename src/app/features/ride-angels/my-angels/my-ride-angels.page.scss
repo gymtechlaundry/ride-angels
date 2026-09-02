@@ -61,6 +61,20 @@
   color: var(--ra-text-muted);
 }
 
+.empty-coach {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty-link {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ra-primary);
+  padding: 0;
+}
+
 .invite-card {
   display: flex;
   align-items: center;

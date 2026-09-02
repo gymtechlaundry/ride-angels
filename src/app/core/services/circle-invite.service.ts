@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { getSupabaseClient, isSupabaseConfigured } from '../supabase/supabase-client';
+import { normalizeEmail, toE164 } from '../utils/phone';
 import { AuthService } from './auth.service';
 import { DomainSyncService } from './domain-sync.service';
 import { RideAngelService } from './ride-angel.service';
@@ -24,11 +25,20 @@ export type CreateCircleInviteResult =
       inviteUrl: string;
       riderDisplayName: string;
       emailSent: boolean;
+    }
+  | {
+      kind: 'phone_invite';
+      inviteId: string;
+      token: string;
+      phone: string;
+      inviteUrl: string;
+      riderDisplayName: string;
     };
 
 export type OutboundCircleInvite = {
   id: string;
   email: string;
+  phone: string;
   relationshipLabel: string;
   status: string;
   token: string;
@@ -38,7 +48,7 @@ export type OutboundCircleInvite = {
 };
 
 /**
- * Tokenized family circle invites (email via Resend Edge Function + deep link claim).
+ * Tokenized family circle invites (email via Resend + phone share link / deep link claim).
  */
 @Injectable({ providedIn: 'root' })
 export class CircleInviteService {
@@ -66,6 +76,7 @@ export class CircleInviteService {
       rows.map((row: Record<string, unknown>) => ({
         id: String(row['id']),
         email: String(row['email'] ?? ''),
+        phone: String(row['phone'] ?? ''),
         relationshipLabel: String(row['relationship_label'] ?? 'Trusted contact'),
         status: String(row['status'] ?? 'pending'),
         token: String(row['token'] ?? ''),
@@ -80,19 +91,33 @@ export class CircleInviteService {
   }
 
   async createInvite(payload: {
-    email: string;
+    identifier: string;
     relationshipLabel: string;
   }): Promise<CreateCircleInviteResult> {
-    const email = payload.email.trim().toLowerCase();
-    if (!email || !email.includes('@')) {
-      throw new Error('Enter a valid email address.');
+    const raw = payload.identifier.trim();
+    if (!raw) {
+      throw new Error('Enter an email or phone number.');
     }
+
+    let identifier: string;
+    let channel: 'email' | 'phone';
+    if (raw.includes('@')) {
+      identifier = normalizeEmail(raw);
+      channel = 'email';
+    } else {
+      identifier = toE164(raw);
+      channel = 'phone';
+    }
+
     const relationshipLabel =
       payload.relationshipLabel.trim() || 'Trusted contact';
 
     if (!isSupabaseConfigured()) {
+      if (channel === 'phone') {
+        throw new Error('Phone invites need a connected backend.');
+      }
       const connection = await this.angels.inviteByEmail({
-        email,
+        email: identifier,
         relationshipLabel,
       });
       return {
@@ -100,12 +125,12 @@ export class CircleInviteService {
         connectionId: connection.id,
         angelId: connection.angelId,
         angelDisplayName:
-          this.auth.getUserById(connection.angelId)?.displayName ?? email,
+          this.auth.getUserById(connection.angelId)?.displayName ?? identifier,
       };
     }
 
     const { data, error } = await getSupabaseClient().rpc('create_circle_invite', {
-      p_email: email,
+      p_identifier: identifier,
       p_relationship_label: relationshipLabel,
     });
     if (error) {
@@ -123,6 +148,18 @@ export class CircleInviteService {
         angelDisplayName: String(
           result['angel_display_name'] ?? 'Ride Angel',
         ),
+      };
+    }
+
+    if (kind === 'phone_invite') {
+      await this.refreshOutbound();
+      return {
+        kind: 'phone_invite',
+        inviteId: String(result['invite_id']),
+        token: String(result['token']),
+        phone: String(result['phone'] ?? identifier),
+        inviteUrl: String(result['invite_url'] ?? ''),
+        riderDisplayName: String(result['rider_display_name'] ?? 'You'),
       };
     }
 
@@ -152,7 +189,7 @@ export class CircleInviteService {
       kind: 'email_invite',
       inviteId,
       token: String(result['token']),
-      email: String(result['email'] ?? email),
+      email: String(result['email'] ?? identifier),
       inviteUrl,
       riderDisplayName: String(result['rider_display_name'] ?? 'You'),
       emailSent,
@@ -229,6 +266,13 @@ export class CircleInviteService {
     }
     throw new Error('Sharing is not available on this device.');
   }
+
+  /** Open Messages with the invite link prefilled for a phone number. */
+  shareInviteViaSms(phone: string, inviteUrl: string, inviterName: string): void {
+    const text = `${inviterName} invited you to be a Ride Angel on Ride Angels. Join their trusted circle: ${inviteUrl}`;
+    const href = `sms:${phone}?&body=${encodeURIComponent(text)}`;
+    window.location.href = href;
+  }
 }
 
 export function extractInviteToken(url: string): string | null {
@@ -268,6 +312,9 @@ function mapInviteError(message: string): string {
   }
   if (key.includes('invalid_email')) {
     return 'Enter a valid email address.';
+  }
+  if (key.includes('invalid_phone') || key.includes('invalid_identifier')) {
+    return 'Enter a valid email or phone number.';
   }
   if (key.includes('invite_expired')) {
     return 'This invite has expired. Ask them to send a new one.';

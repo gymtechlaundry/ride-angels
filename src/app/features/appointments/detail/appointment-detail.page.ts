@@ -210,6 +210,28 @@ export class AppointmentDetailPage {
     return status === 'synced' || status === 'failed';
   });
 
+  readonly angelPhone = computed(() => this.detail()?.angel?.phone?.trim() || '');
+
+  readonly riderPhone = computed(() => {
+    const rider = this.riderForAngel();
+    if (!rider || !('phone' in rider)) {
+      return '';
+    }
+    return String((rider as { phone?: string }).phone ?? '').trim();
+  });
+
+  readonly onMyWayAt = computed(
+    () => this.detail()?.assignment?.onMyWayAt?.trim() || '',
+  );
+
+  readonly canMarkOnMyWay = computed(
+    () =>
+      this.isAssignedAngel() &&
+      this.canCancelAsAngel() &&
+      !this.onMyWayAt() &&
+      !this.needsReconfirm(),
+  );
+
   async onRefresh(event: RefresherCustomEvent): Promise<void> {
     try {
       await this.domainSync.refreshForCurrentUser({ force: true });
@@ -248,9 +270,55 @@ export class AppointmentDetailPage {
     if (this.isAssignedAngel()) {
       return;
     }
-    const phone = this.detail()?.angel?.phone;
+    const phone = this.angelPhone();
     if (phone) {
-      window.location.href = `tel:${phone.replace(/\D/g, '')}`;
+      openTel(phone);
+    }
+  }
+
+  textAngel(): void {
+    if (this.isAssignedAngel()) {
+      return;
+    }
+    const phone = this.angelPhone();
+    if (phone) {
+      openSms(phone);
+    }
+  }
+
+  callRider(): void {
+    if (!this.isAssignedAngel()) {
+      return;
+    }
+    const phone = this.riderPhone();
+    if (phone) {
+      openTel(phone);
+    }
+  }
+
+  textRider(): void {
+    if (!this.isAssignedAngel()) {
+      return;
+    }
+    const phone = this.riderPhone();
+    if (phone) {
+      openSms(phone);
+    }
+  }
+
+  async markOnMyWay(): Promise<void> {
+    const rideId = this.detail()?.ride?.id;
+    if (!rideId || !this.canMarkOnMyWay()) {
+      return;
+    }
+    try {
+      await this.appointments.markOnMyWay(rideId);
+      await this.showToast('You’re on the way. The rider was notified.', 'primary');
+    } catch (err) {
+      await this.showToast(
+        err instanceof Error ? err.message : 'Could not update status.',
+        'danger',
+      );
     }
   }
 
@@ -516,4 +584,22 @@ export class AppointmentDetailPage {
     });
     await toast.present();
   }
+}
+
+/** Prefer E.164 (`+…`) for dialer / Messages. */
+function toDialablePhone(raw: string): string {
+  const trimmed = raw.trim();
+  if (trimmed.startsWith('+')) {
+    return trimmed.replace(/[^\d+]/g, '');
+  }
+  const digits = trimmed.replace(/\D/g, '');
+  return digits || trimmed;
+}
+
+function openTel(phone: string): void {
+  window.location.href = `tel:${toDialablePhone(phone)}`;
+}
+
+function openSms(phone: string): void {
+  window.location.href = `sms:${toDialablePhone(phone)}`;
 }

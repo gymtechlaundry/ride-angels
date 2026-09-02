@@ -109,6 +109,10 @@ export class HomePage implements ViewWillEnter {
     void this.router.navigate(['/tabs/ride-angels']);
   }
 
+  openOpenRequests(): void {
+    void this.router.navigate(['/tabs/calendar']);
+  }
+
   openOffer(item: OfferListItem): void {
     void this.router.navigate(['/tabs/home/appointment', item.appointmentId]);
   }

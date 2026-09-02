@@ -116,7 +116,20 @@
               </div>
             </div>
           } @empty {
-            <p class="empty">No rides scheduled yet. Add an appointment above to get started.</p>
+            <div class="empty-coach">
+              <p class="empty">
+                No rides yet. Add an appointment, then invite people you trust so
+                someone can offer to drive.
+              </p>
+              <div class="empty-actions">
+                <button type="button" class="empty-link ra-reset" (click)="addAppointment()">
+                  Add appointment
+                </button>
+                <button type="button" class="empty-link ra-reset" (click)="openInvites()">
+                  Invite Ride Angels
+                </button>
+              </div>
+            </div>
           }
         </div>
       </section>
@@ -149,7 +162,20 @@
               </div>
             </div>
           } @empty {
-            <p class="empty">No drives scheduled yet.</p>
+            <div class="empty-coach">
+              <p class="empty">
+                No drives scheduled yet. When a rider in your circle needs a ride,
+                open requests show on Calendar.
+              </p>
+              <div class="empty-actions">
+                <button type="button" class="empty-link ra-reset" (click)="openOpenRequests()">
+                  View open requests
+                </button>
+                <button type="button" class="empty-link ra-reset" (click)="openInvites()">
+                  Ride circle
+                </button>
+              </div>
+            </div>
           }
         </div>
       </section>

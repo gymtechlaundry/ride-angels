@@ -83,19 +83,19 @@ Do **not** ship UI until product asks. Future concepts include:
 
 ## Product / UX ideas discussed
 
-- Invite Ride Angels by **phone** as well as email (parity with auth channels).
+- ~~Invite Ride Angels by **phone** as well as email (parity with auth channels).~~ Shipped in V1 circle UX (`create_circle_invite` + share/SMS link).
 - Richer notification preferences (mute types, quiet hours).
 - Angel availability / “I’m free this week” signals.
 - Ride history / completed trip archive UI.
-- SMS fallback when push isn’t available (Twilio already used for OTP — separate product decision).
+- SMS fallback when push isn’t available (Twilio already used for OTP — separate product decision). Twilio **auto-SMS for circle invites** still optional; phone invites use share/`sms:` with the link today.
 - Android Play Store release — see [`android-testing.md`](./android-testing.md) (FCM + device calendar wired; Firebase project + `FCM_SERVER_KEY` still required per environment).
 - TimeTree: no direct API — keep relying on device calendar bridge unless a partner API appears.
 - Recurring appointments (e.g. weekly dialysis / therapy) with one create flow.
 - Calendar: rider appointments already sync on create; angels still sync on claim (see calendar-integration.md).
-- “On the way” / trip-status check-ins (angel → rider) without full GPS tracking.
-- In-app call / text shortcuts to rider or angel from appointment detail (tel: / sms:).
+- ~~“On the way” / trip-status check-ins (angel → rider) without full GPS tracking.~~ Shipped (`on_my_way_at` + `mark_angel_on_my_way`).
+- ~~In-app call / text shortcuts to rider or angel from appointment detail (tel: / sms:).~~ Shipped.
 - Share appointment summary link (once universal links exist).
-- Empty-state coaching on Home / Circle for first-time riders and angels.
+- ~~Empty-state coaching on Home / Circle for first-time riders and angels.~~ Shipped.
 - Accessibility pass: Dynamic Type, VoiceOver labels, high-contrast review.
 - Multi-language / localization (start with Spanish if rider communities need it).
 - Widget or Lock Screen glance for next ride (iOS).

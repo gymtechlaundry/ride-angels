@@ -229,6 +229,15 @@ export class RideDomainRepository {
     }
   }
 
+  async markAngelOnMyWayRpc(rideRequestId: string): Promise<void> {
+    const { error } = await getSupabaseClient().rpc('mark_angel_on_my_way', {
+      p_ride_request_id: rideRequestId,
+    });
+    if (error) {
+      throw this.mapRpcError(error.message);
+    }
+  }
+
   async listNotifications(recipientId: string): Promise<
     import('../models').AppNotification[]
   > {
@@ -643,6 +652,9 @@ export class RideDomainRepository {
       confirmationStatus: confirmation as RideAssignment['confirmationStatus'],
       pendingChangeSummary: row['pending_change_summary']
         ? String(row['pending_change_summary'])
+        : undefined,
+      onMyWayAt: row['on_my_way_at']
+        ? String(row['on_my_way_at'])
         : undefined,
     };
   }
