@@ -9,7 +9,6 @@ import {
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import {
-  ClaimBoardFilter,
   RideCardView,
 } from '../../core/models';
 import { AuthService } from '../../core/services/auth.service';
@@ -53,7 +52,6 @@ export class CalendarPage implements OnInit, ViewWillEnter {
   readonly selectedDate = signal(toDateKey(new Date()));
   readonly viewMode = signal<ScheduleViewMode>('calendar');
   readonly persona = this.auth.activePersona;
-  readonly boardFilter = this.board.filter;
   readonly openRequests = this.board.openBoardItems;
   readonly dayEvents = this.schedule.dayEvents;
 
@@ -75,7 +73,7 @@ export class CalendarPage implements OnInit, ViewWillEnter {
   readonly subtitle = computed(() => {
     if (this.viewMode() === 'list') {
       return this.persona() === 'angel'
-        ? 'Trusted circle and community rides looking for a driver'
+        ? 'Trusted-circle rides looking for a driver'
         : 'All of your upcoming rides in one list';
     }
     return this.persona() === 'angel'
@@ -113,10 +111,6 @@ export class CalendarPage implements OnInit, ViewWillEnter {
       queryParams: mode === 'list' ? { view: 'list' } : {},
       replaceUrl: true,
     });
-  }
-
-  setBoardFilter(filter: ClaimBoardFilter): void {
-    this.board.setFilter(filter);
   }
 
   onSelectDate(date: string): void {

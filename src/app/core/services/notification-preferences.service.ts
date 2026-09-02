@@ -47,8 +47,8 @@ export const NOTIFICATION_PREF_GROUPS: Array<{
       },
       {
         type: 'public_offer_received',
-        label: 'Public offers',
-        description: 'When angels offer on a community board ride',
+        label: 'Ride offers',
+        description: 'When a Ride Angel offers to drive for your request',
       },
       {
         type: 'offer_accepted',

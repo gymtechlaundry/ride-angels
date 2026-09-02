@@ -55,39 +55,6 @@
         </div>
       </section>
     } @else if (persona() === 'angel') {
-      <div class="filters ra-page-pad" role="tablist" aria-label="Filter open requests">
-        <button
-          type="button"
-          class="seg ra-reset"
-          role="tab"
-          [class.active]="boardFilter() === 'all'"
-          [attr.aria-selected]="boardFilter() === 'all'"
-          (click)="setBoardFilter('all')"
-        >
-          All
-        </button>
-        <button
-          type="button"
-          class="seg ra-reset"
-          role="tab"
-          [class.active]="boardFilter() === 'private'"
-          [attr.aria-selected]="boardFilter() === 'private'"
-          (click)="setBoardFilter('private')"
-        >
-          Trusted
-        </button>
-        <button
-          type="button"
-          class="seg ra-reset"
-          role="tab"
-          [class.active]="boardFilter() === 'public'"
-          [attr.aria-selected]="boardFilter() === 'public'"
-          (click)="setBoardFilter('public')"
-        >
-          Community
-        </button>
-      </div>
-
       <section class="feed ra-page-pad">
         @for (item of openRequests(); track item.rideRequestId) {
           <app-claim-board-card
@@ -96,15 +63,8 @@
           />
         } @empty {
           <p class="empty">
-            No open
-            {{
-              boardFilter() === 'private'
-                ? 'trusted'
-                : boardFilter() === 'public'
-                  ? 'community'
-                  : ''
-            }}
-            requests right now. Confirmed trips stay under Upcoming drives on Home.
+            No open trusted-circle requests right now. Confirmed trips stay under
+            Upcoming drives on Home.
           </p>
         }
       </section>
