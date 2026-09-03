@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Pre-flight checks before App Store / Play uploads (Capacitor).
 # Usage: from repo root → npm run store:preflight
+# Uses grep/sed only (no ripgrep) so it works in a plain macOS shell.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -11,12 +12,14 @@ ok() { printf '  OK  %s\n' "$*"; }
 warn() { printf ' WARN %s\n' "$*"; }
 bad() { printf ' FAIL %s\n' "$*"; FAIL=1; }
 
+has() { grep -Eq "$1" "$2"; }
+
 echo "Ride Angels store preflight"
 echo
 
 # --- Capacitor: no live-reload URL in store binaries ---
 if [[ -f capacitor.config.ts ]]; then
-  if rg -q "url:\s*['\"]https?://" capacitor.config.ts || rg -q "url:\s*['\"]http://" capacitor.config.ts; then
+  if has "url:[[:space:]]*['\"]https?://" capacitor.config.ts || has "url:[[:space:]]*['\"]http://" capacitor.config.ts; then
     bad "capacitor.config.ts appears to set server.url (store builds white-screen)"
   else
     ok "capacitor.config.ts has no server.url"
@@ -28,7 +31,7 @@ for cfg in \
   ios/App/App/capacitor.config.json
 do
   if [[ -f "$cfg" ]]; then
-    if rg -q '"url"\s*:' "$cfg"; then
+    if has '"url"[[:space:]]*:' "$cfg"; then
       bad "$cfg still has server url — run production sync before upload"
     else
       ok "$cfg has no server url"
@@ -40,7 +43,7 @@ done
 
 # --- Production web flag ---
 if [[ -f src/environments/environment.prod.ts ]]; then
-  if rg -q "production:\s*true" src/environments/environment.prod.ts; then
+  if has "production:[[:space:]]*true" src/environments/environment.prod.ts; then
     ok "environment.prod.ts production: true"
   else
     bad "environment.prod.ts should set production: true"
@@ -48,7 +51,7 @@ if [[ -f src/environments/environment.prod.ts ]]; then
 fi
 
 # --- Android release hardening ---
-if rg -q "minifyEnabled\s+true" android/app/build.gradle; then
+if has "minifyEnabled[[:space:]]+true" android/app/build.gradle; then
   ok "Android release minifyEnabled true"
 else
   bad "Android release minifyEnabled is not true (Play obfuscation warning)"
@@ -75,7 +78,7 @@ IOS_BUILD=$(sed -nE 's/.*CURRENT_PROJECT_VERSION = ([0-9]+);/\1/p' ios/App/App.x
 IOS_MKT=$(sed -nE 's/.*MARKETING_VERSION = ([0-9.]+);/\1/p' ios/App/App.xcodeproj/project.pbxproj | head -1)
 ok "iOS marketing=${IOS_MKT:-?} build=${IOS_BUILD:-?} (build must be higher than any uploaded IPA)"
 
-if rg -q "ITSAppUsesNonExemptEncryption" ios/App/App/Info.plist; then
+if has "ITSAppUsesNonExemptEncryption" ios/App/App/Info.plist; then
   ok "Info.plist has ITSAppUsesNonExemptEncryption (confirm false for HTTPS-only)"
 else
   warn "Confirm ITSAppUsesNonExemptEncryption=false for App Store export compliance"
