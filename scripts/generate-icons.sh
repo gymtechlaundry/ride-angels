@@ -46,4 +46,8 @@ if [[ -d "$BACKUP/android-splashes" ]]; then
   done < <(find "$BACKUP/android-splashes" -type f -name 'splash.png' -print0 2>/dev/null)
 fi
 
-echo "Icons generated; portrait splash assets restored."
+# Adaptive launcher foreground: keep the mark inside Android's ~66% safe zone
+# (capacitor-assets alone leaves wing tips too close to the mask edge).
+python3 "$ROOT/scripts/rebuild-android-adaptive-icon.py"
+
+echo "Icons generated; portrait splash assets restored; Android adaptive safe-zone applied."
