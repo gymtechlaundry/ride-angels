@@ -51,7 +51,10 @@
     "//android:release": "Production build + sync, then open Android Studio (optional; CLI AAB uses android:bundle).",
     "android:release": "npm run build:android:release && bash scripts/android-with-jdk.sh npx cap open android",
     "//android:bundle": "Production build + sync, then Gradle bundleRelease → Play upload AAB (bump versionCode first).",
-    "android:bundle": "npm run build:android:release && bash scripts/android-with-jdk.sh ./android/gradlew -p android bundleRelease && node -e \"console.log('AAB: android/app/build/outputs/bundle/release/app-release.aab')\"",
+    "android:bundle": "npm run build:android:release && bash scripts/android-with-jdk.sh ./android/gradlew -p android bundleRelease && node -e \"console.log('AAB: android/app/build/outputs/bundle/release/app-release.aab'); console.log('R8 mapping (upload to Play): android/app/build/outputs/mapping/release/mapping.txt')\"",
+
+    "//store:preflight": "Checks before App Store / Play upload (no server.url, minify, versions, legal URLs).",
+    "store:preflight": "bash scripts/store-preflight.sh",
 
     "//start:lan": "Alias for start:external (Hyperion canonical name).",
     "start:lan": "npm run start:external",

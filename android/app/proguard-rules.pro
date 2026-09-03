@@ -1,21 +1,43 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Ride Angels — release R8 / ProGuard
+# Capacitor + Cordova plugin reflection must survive minify.
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-keepattributes SourceFile,LineNumberTable,*Annotation*,Signature,InnerClasses,EnclosingMethod
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Capacitor v3+ plugins
+-keep @com.getcapacitor.annotation.CapacitorPlugin public class * {
+    @com.getcapacitor.annotation.PermissionCallback <methods>;
+    @com.getcapacitor.annotation.ActivityCallback <methods>;
+    @com.getcapacitor.annotation.Permission <methods>;
+    @com.getcapacitor.PluginMethod public <methods>;
+}
+-keep public class * extends com.getcapacitor.Plugin { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Capacitor v2 (deprecated annotations still present in some plugins)
+-keep @com.getcapacitor.NativePlugin public class * {
+    @com.getcapacitor.PluginMethod public <methods>;
+}
+
+# Cordova bridge plugins
+-keep public class * extends org.apache.cordova.** {
+    public <methods>;
+    public <fields>;
+}
+
+# Keep Capacitor bridge / JS interface surface
+-keep class com.getcapacitor.** { *; }
+-dontwarn com.getcapacitor.**
+
+# Push / FCM (when google-services is applied)
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+
+# Capgo calendar / other Cap plugins use reflection on plugin classes
+-keep class ee.forgr.capacitor_plugins.** { *; }
+-keep class com.capgo.** { *; }
+-keep class io.capawesome.** { *; }
+-dontwarn ee.forgr.**
+-dontwarn com.capgo.**
+-dontwarn io.capawesome.**
