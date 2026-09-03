@@ -1,6 +1,6 @@
 # Product — Ride Angels
 
-Coordinate rides to appointments with people you already trust. Riders request; Ride Angels offer. One account, both roles.
+Plan who’s driving each appointment with family and friends—so rides aren’t a last-minute burden. Riders request; Ride Angels offer. One account, both roles.
 
 **Status:** V1 feature-complete for first store production. Docs packet ready for TestFlight + Play internal/closed while production review runs. Maintain here: `~/Projects/hyperion-studio/Apps/shipped/ride-angels`
 

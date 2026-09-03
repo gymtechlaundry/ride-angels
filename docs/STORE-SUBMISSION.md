@@ -53,8 +53,8 @@ Play tags (optional): transportation, family, productivity
 ## 2. What reviewers must understand
 
 ```
-One-sentence pitch: Coordinate rides to appointments with people you already trust — not random drivers.
-Who it is for: Families, caregivers, and neighbors helping someone get to appointments.
+One-sentence pitch: Plan who’s driving each appointment with family and friends—so it’s not a last-minute burden.
+Who it is for: Riders (or the person organizing for them) and the family/friends who already help with rides.
 What a first-time user does (first-run path):
   1. Create account or Sign in with phone or email OTP
   2. Choose I’m a Rider or I’m a Ride Angel
@@ -98,9 +98,9 @@ See [LISTING.md](./LISTING.md) for paste-ready text and character counts.
 
 ```
 App name: Ride Angels
-Subtitle (iOS, 30): Trusted rides from loved ones
-Short description (Play, 80): Trusted rides to appointments from family, friends, and neighbors.
-Promotional text (iOS, 170): Need a lift to an appointment? Ask the people who already show up for you. Riders request. Ride Angels offer. Your circle stays in the loop.
+Subtitle (iOS, 30): No more last-minute asks
+Short description (Play, 80): Plan appointment rides with family and friends—so it’s not a last-minute ask.
+Promotional text (iOS, 170): Stop the last-minute scramble. Add the appointment, ask your circle, and know who’s driving—before the day arrives.
 ```
 
 ### Full description / What’s New / Keywords
@@ -187,7 +187,7 @@ Open testing?     No (optional)
 
 ```
 Name: Ride Angels
-Subtitle: Trusted rides from loved ones
+Subtitle: No more last-minute asks
 Bundle ID: org.rideangels.app
 SKU: ride-angels-ios
 Primary language: English (U.S.)
@@ -316,7 +316,7 @@ Contact website: https://hyperionappstudio.com/rideangels/
 ### Store listing
 
 ```
-Short description (80): Trusted rides to appointments from family, friends, and neighbors.
+Short description (80): Plan appointment rides with family and friends—so it’s not a last-minute ask.
 Full description (4000): see LISTING.md
 App icon 512×512:
 Feature graphic 1024×500:
