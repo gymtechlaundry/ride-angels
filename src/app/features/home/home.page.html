@@ -82,17 +82,28 @@
   <div class="home-page ra-page-shell">
     @if (showContactNudge()) {
       <section class="alert-strip ra-page-pad">
-        <button type="button" class="strip ra-reset" (click)="openContactNudge()">
-          <strong>{{ contactNudgeTitle() }}</strong>
-          <span>{{ contactNudgeBody() }}</span>
-        </button>
-        <button
-          type="button"
-          class="nudge-dismiss ra-reset"
-          (click)="dismissContactNudge()"
-        >
-          Not now
-        </button>
+        <div class="nudge-card">
+          <button type="button" class="nudge-main ra-reset" (click)="openContactNudge()">
+            <strong>{{ contactNudgeTitle() }}</strong>
+            <span>{{ contactNudgeBody() }}</span>
+          </button>
+          <div class="nudge-footer">
+            <button
+              type="button"
+              class="nudge-action ra-reset"
+              (click)="openContactNudge()"
+            >
+              {{ missingPhone() ? 'Add phone' : missingEmail() ? 'Add email' : 'Add now' }}
+            </button>
+            <button
+              type="button"
+              class="nudge-dismiss ra-reset"
+              (click)="dismissContactNudge()"
+            >
+              Not now
+            </button>
+          </div>
+        </div>
       </section>
     }
 
