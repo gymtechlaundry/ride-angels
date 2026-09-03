@@ -658,9 +658,7 @@ export class AuthService {
     try {
       await this.applySession(data.session);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Profile could not be loaded.';
-      throw new AuthError(message, 'validation');
+      throw mapAuthError(err, 'verify');
     }
     await this.flow.clear();
     const user = this.currentUser();
