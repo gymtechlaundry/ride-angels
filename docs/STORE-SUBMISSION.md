@@ -139,7 +139,7 @@ iPad 13" screenshots: binary supports iPad (`TARGETED_DEVICE_FAMILY = 1,2`). Pro
 
 **Play note:** Ride Angels is **already live in production** on Google Play. The closed-testing 12-tester / 14-day gate does **not** block this resubmit. Still bump `versionCode`, upload a new AAB, and create a **production release update** on the existing Play app (V1 circle features). Use **Internal testing** so family can install that build while the production update is reviewed / rolled out.
 
-1. **Bump builds** (never reuse): next iOS build after `9`; next Android `versionCode` after `5` — see §10.
+1. **Bump builds** (never reuse): next iOS build after `11`; next Android `versionCode` after `9` — see §10.
 2. **iOS:** Archive → Upload → TestFlight **Internal** (and External if needed). Family on TestFlight while App Review / first App Store production waits.
 3. **Android:** Upload AAB to **Internal testing** for family (share the opt-in link). Also create/submit a **Production** release with that (or the same) AAB on the existing listing.
 4. Keep the **same marketing version** on both stores for this wave when ready.
@@ -465,9 +465,9 @@ From [SERVICES.md](./SERVICES.md):
 
 | Store | Marketing | Build / versionCode | What changed |
 | --- | --- | --- | --- |
-| iOS (current in repo) | 1.0 | build **9** | Last uploaded baseline |
-| Android (current in repo) | 1.0 | versionCode **5** | Last AAB baseline |
-| **Next upload (bump first)** | 1.0 | iOS build **10+** / Android **6+** | V1 circle UX: phone invites, Call/Text, On my way, reminders, clearer modes, contact nudge, OTP leave-app fix |
+| iOS (current in repo) | 1.0 | build **11** | Last baseline in Xcode |
+| Android (current in repo) | 1.0 | versionCode **9** | R8 minify + shrink on; mapping.txt for Play |
+| **Next upload** | 1.0 | bump if 11 / 9 already used | Icon safe-zone + release hardening; `npm run store:preflight` first |
 
 Never reuse a build number. iOS build and Android `versionCode` do not need to match.
 

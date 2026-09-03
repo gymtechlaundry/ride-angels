@@ -15,6 +15,7 @@ Studio root: `~/Projects/hyperion-studio`
 | This app’s smoke list | [SMOKE.md](./SMOKE.md) |
 | This app’s listing copy | [LISTING.md](./LISTING.md) |
 | This app’s full submission packet | [STORE-SUBMISSION.md](./STORE-SUBMISSION.md) |
+| Pre-upload checks | `npm run store:preflight` |
 | Legal (repo mirrors) | [legal/](./legal/) → live `https://hyperionappstudio.com/rideangels/` |
 
 ```bash

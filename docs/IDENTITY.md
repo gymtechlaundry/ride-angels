@@ -44,9 +44,9 @@ Update before every Archive / AAB. See `android/app/build.gradle` and Xcode Vers
 
 | Platform | Marketing | Build / versionCode | Notes |
 | --- | --- | --- | --- |
-| iOS (repo now) | 1.0 | 9 | Last baseline in Xcode |
-| Android (repo now) | 1.0 | 5 | Last baseline in `build.gradle` |
-| **Next store upload** | 1.0 | iOS **10+** / Android **6+** | Bump before TestFlight + Play internal + **Play production update** |
+| iOS (repo now) | 1.0 | 11 | Last baseline in Xcode |
+| Android (repo now) | 1.0 | 9 | R8 minify on; must exceed any uploaded AAB |
+| **Next store upload** | 1.0 | bump if 11 / 9 already used | `npm run store:preflight` then `release:ios` / `android:bundle` |
 
 Full packet: [STORE-SUBMISSION.md](./STORE-SUBMISSION.md). Listing paste: [LISTING.md](./LISTING.md).
 
