@@ -150,13 +150,10 @@ iPad 13" screenshots: binary supports iPad (`TARGETED_DEVICE_FAMILY = 1,2`). Pro
 Internal testers (App Store Connect users): Hyperion team + family Apple IDs added as internal/external
 External testers needed?     Yes (family who are not App Store Connect users)
 What to put in TestFlight test details:
-  Sign in with phone OTP. Reviewer / tester phones: see supabase/seed/QA_TRIO.md
-  (Riley +15555550101 / Avery +15555550102 / Blake +15555550103, code 123456).
-  Or use your real number if Twilio Verify is live.
+  See docs/LISTING.md “App Review notes” (same demo OTP flow).
   First run: pick Rider or Ride Angel → Home.
-  Rider: invite a circle member, add appointment, accept an offer.
-  Angel: offer / claim, Call or Text, On my way.
-  Do not use Delete account on shared QA accounts unless resetting.
+  Rider: invite, add appointment, accept offer; Angel: Call/Text, On my way.
+  Do not Delete account on shared QA phones unless resetting.
 Export compliance (encryption):  HTTPS only → ITSAppUsesNonExemptEncryption=false
 ```
 
@@ -260,14 +257,9 @@ Contact name: Devin Cooper
 Contact phone: 904-556-1823
 Contact email: support@hyperionappstudio.com
 Sign-in required: Yes
-Demo username / phone: +15555550101 (Riley Rider) and/or +15555550102 (Avery Angel)
-How reviewer gets OTP / password: Hosted Supabase test OTP 123456 for those numbers (Auth → Phone → Test phone numbers). No password.
-First-run notes:
-  After OTP, choose I’m a Rider or I’m a Ride Angel, then Home.
-  Use Riley as rider and Avery as angel to demo invite → appointment → offer → Call/Text → On my way.
-  Seed: supabase/seed/QA_TRIO.md. Push may need Profile → Enable push on device.
-Anything hidden behind flags: Public/community board UI is hidden. Google Calendar OAuth is off. No Sign in with Apple/Google.
-Attachments (optional): none
+Demo username / phone: +15555550101 (Riley) / +15555550102 (Avery); OTP 123456
+How reviewer gets OTP: Supabase Auth → Phone → Test phone numbers. No password.
+Notes: Paste the full “App Review notes” block from docs/LISTING.md
 ```
 
 ### Export compliance
