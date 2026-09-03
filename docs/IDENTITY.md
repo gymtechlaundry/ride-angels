@@ -34,6 +34,14 @@ QA phones: `supabase/seed/QA_TRIO.md`. Hosted test OTP `123456` must be set in S
 
 Update before every Archive / AAB. See `android/app/build.gradle` and Xcode Version/Build.
 
+| Platform | Marketing | Build / versionCode | Notes |
+| --- | --- | --- | --- |
+| iOS (repo now) | 1.0 | 9 | Last baseline in Xcode |
+| Android (repo now) | 1.0 | 5 | Last baseline in `build.gradle` |
+| **Next store upload** | 1.0 | iOS **10+** / Android **6+** | Bump before TestFlight + Play internal/closed + production |
+
+Full packet: [STORE-SUBMISSION.md](./STORE-SUBMISSION.md). Listing paste: [LISTING.md](./LISTING.md).
+
 ## Signing (paths only)
 
 ```

@@ -1,12 +1,15 @@
 # Ride Angels — SMS opt-in disclosure
 
+**Last updated:** 2026-09-02
+
 This page documents how Ride Angels obtains consent to send SMS one-time
 passcodes (OTP) for account authentication (Twilio Verify / Auth OTP).
+It does **not** cover marketing SMS (none are sent) or invite share links opened in the user’s own Messages app.
 
 ## Product
 
 **Ride Angels** (`org.rideangels.app`) — iOS and Android app for coordinating
-trusted rides to appointments.
+trusted rides to appointments with a private circle.
 
 ## How users opt in
 
