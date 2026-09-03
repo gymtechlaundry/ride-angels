@@ -28,7 +28,15 @@ Support email: support@hyperionappstudio.com
 
 ## Review
 
+```
+Contact name: Devin Cooper
+Contact phone: 904-556-1823
+Contact email: support@hyperionappstudio.com
+```
+
 QA phones: `supabase/seed/QA_TRIO.md`. Hosted test OTP `123456` must be set in Supabase.
+
+**Play:** production listing already live — this resubmit is a **production release update** (bump `versionCode`), not a first unlock. Family can use Internal testing while that update rolls out.
 
 ## Current versions
 
@@ -38,7 +46,7 @@ Update before every Archive / AAB. See `android/app/build.gradle` and Xcode Vers
 | --- | --- | --- | --- |
 | iOS (repo now) | 1.0 | 9 | Last baseline in Xcode |
 | Android (repo now) | 1.0 | 5 | Last baseline in `build.gradle` |
-| **Next store upload** | 1.0 | iOS **10+** / Android **6+** | Bump before TestFlight + Play internal/closed + production |
+| **Next store upload** | 1.0 | iOS **10+** / Android **6+** | Bump before TestFlight + Play internal + **Play production update** |
 
 Full packet: [STORE-SUBMISSION.md](./STORE-SUBMISSION.md). Listing paste: [LISTING.md](./LISTING.md).
 

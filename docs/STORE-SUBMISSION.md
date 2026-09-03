@@ -135,12 +135,14 @@ iPad 13" screenshots: binary supports iPad (`TARGETED_DEVICE_FAMILY = 1,2`). Pro
 
 ## 5. Testing tracks
 
-### Family / friends testing while production is pending
+### Family / friends testing while store review / rollout runs
+
+**Play note:** Ride Angels is **already live in production** on Google Play. The closed-testing 12-tester / 14-day gate does **not** block this resubmit. Still bump `versionCode`, upload a new AAB, and create a **production release update** on the existing Play app (V1 circle features). Use **Internal testing** so family can install that build while the production update is reviewed / rolled out.
 
 1. **Bump builds** (never reuse): next iOS build after `9`; next Android `versionCode` after `5` — see §10.
-2. **iOS:** Archive → Upload → TestFlight **Internal** (and External if needed). Family on TestFlight install while App Review / production waits.
-3. **Android:** Upload AAB to **Internal testing** (and **Closed testing** if your Play account still needs 12 testers / 14 days before production unlocks). Share the **opt-in link**; testers must accept before install.
-4. Submit the **same marketing version** toward production on both stores when ready.
+2. **iOS:** Archive → Upload → TestFlight **Internal** (and External if needed). Family on TestFlight while App Review / first App Store production waits.
+3. **Android:** Upload AAB to **Internal testing** for family (share the opt-in link). Also create/submit a **Production** release with that (or the same) AAB on the existing listing.
+4. Keep the **same marketing version** on both stores for this wave when ready.
 
 ### Apple — TestFlight
 
@@ -163,18 +165,18 @@ Export compliance (encryption):  HTTPS only → ITSAppUsesNonExemptEncryption=fa
 
 ### Google Play — tracks
 
-Personal Play accounts created after 13 Nov 2023 often need **closed testing: 12 opted-in testers for 14 continuous days** before production.
+**This app:** production listing already exists. Closed-testing 12/14 is **not** a gate for publishing a new production version. (That rule mainly blocks *first* production on newer personal accounts.)
 
 ```
 Internal testers (Gmail list): family Gmail addresses on internal track
-Closed testers (12+ if required): UNKNOWN — fill if production is locked
+Closed testers: N/A for unlocking production (already live) — optional if you still use a closed track
 Open testing?     No (optional)
 ```
 
-- [ ] Internal testing AAB uploaded (`versionName (versionCode)`)
+- [ ] Internal testing AAB uploaded (`versionName (versionCode)`) for family
 - [ ] Testers opened the **opt-in link** and installed from Play
 - [ ] Device smoke of that exact AAB
-- [ ] Closed test started if production is still locked
+- [ ] **Production release update** created/submitted on the existing Play app (new `versionCode`)
 - [ ] **AAB only** (no APK for a new upload)
 
 ---
@@ -255,7 +257,7 @@ Privacy Policy URL: https://hyperionappstudio.com/rideangels/privacy/
 
 ```
 Contact name: Devin Cooper
-Contact phone: UNKNOWN
+Contact phone: 904-556-1823
 Contact email: support@hyperionappstudio.com
 Sign-in required: Yes
 Demo username / phone: +15555550101 (Riley Rider) and/or +15555550102 (Avery Angel)
@@ -307,7 +309,7 @@ App or game: App
 Free or paid: Free
 Developer name (public): Hyperion App Studio / BARFLY ENTERPRISE LLC
 Contact email: support@hyperionappstudio.com
-Contact phone: UNKNOWN
+Contact phone: 904-556-1823
 Contact website: https://hyperionappstudio.com/rideangels/
 ```
 
@@ -414,17 +416,17 @@ How to get OTP: 123456 (Supabase Auth test phone numbers)
 | Health Connect | No |
 | COVID contact tracing | No |
 
-### Production
+### Production (update existing listing)
 
 ```
 Countries: All available
 Release notes: see LISTING.md What’s New
-Staged rollout % (first public: often 100): 100
+Staged rollout % (update: often 100; optional staged later): 100
 ```
 
 - [ ] Dashboard / publishing overview is green
-- [ ] Production not greyed out (closed-test 12–14 done if required)
-- [ ] After live, install from the **public listing**, not the internal opt-in link
+- [ ] New production release with bumped `versionCode` (app already live — not a first-publish unlock)
+- [ ] After the update is available, install from the **public listing** (not only the internal opt-in link)
 
 ---
 
@@ -481,10 +483,10 @@ Never reuse a build number. iOS build and Android `versionCode` do not need to m
 - [ ] iOS: TestFlight internal (+ external for family) smoke
 - [ ] Android: Play internal smoke of the AAB testers will get
 
-### First production
+### This production wave
 
-- [ ] Apple: age rating, privacy label, review notes, screenshots, build attached → Submit
-- [ ] Play: listing, IARC, target audience, Data safety, ads, app access, closed test if required → Production
+- [ ] Apple: age rating, privacy label, review notes, screenshots, build attached → Submit (first App Store production if not live yet; otherwise update)
+- [ ] Play: refresh listing / Data safety if needed → **Production release update** on the existing live app (do not skip production)
 - [ ] Same marketing version on both stores
 
 ### After live
@@ -496,5 +498,3 @@ Never reuse a build number. iOS build and Android `versionCode` do not need to m
 
 - App Store Connect numeric Apple ID
 - Play Console numeric app ID
-- Review / Play contact phone number
-- Closed-testing tester list (if production still locked on the Play account)
