@@ -97,6 +97,7 @@ See [docs/partner-integrations.md](../docs/partner-integrations.md).
 
 - RPC: `delete_own_account` — deletes the calling Auth user (cascades profile + domain data) and storage objects under their id
 - `created_by_user_id` / `assigned_by_user_id` FKs now `ON DELETE SET NULL`
+- **Dev reset (re-onboard a test email/phone):** `./scripts/reset-test-user.sh you@example.com` (requires supabase CLI login; uses service_role from `supabase projects api-keys`)
 
 The mobile app expects profile ownership via `auth_user_id` (= Supabase `auth.users.id`). Never key ownership by email or phone.
 

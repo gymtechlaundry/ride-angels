@@ -40,21 +40,8 @@ export class OnboardingPage {
         lastName: this.lastName,
         defaultPersona: this.selected(),
       });
-      const methods = this.auth.getLinkedSignInMethods();
-      const hasVerifiedEmail = methods.some(
-        (m) => m.channel === 'email' && m.status === 'verified',
-      );
-      const hasVerifiedPhone = methods.some(
-        (m) => m.channel === 'phone' && m.status === 'verified',
-      );
-      // Encourage a second sign-in method (email if phone-first, phone if email-first).
-      if (!hasVerifiedEmail || !hasVerifiedPhone) {
-        await this.router.navigate(['/account/security'], {
-          replaceUrl: true,
-          queryParams: { prompt: 'recovery' },
-        });
-        return;
-      }
+      // Land on Home immediately. Missing phone/email is nudged there instead of
+      // bouncing through Account & security right after signup.
       await this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
     } finally {
       this.saving.set(false);

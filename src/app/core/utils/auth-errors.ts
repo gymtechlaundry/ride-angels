@@ -92,6 +92,15 @@ export function mapAuthError(
     );
   }
 
+  // Device clock behind the server → JWT "iat" looks like the future.
+  // Common on simulators; rare on real devices with Automatic Date & Time on.
+  if (isClockSkewAuthFailure(lower)) {
+    return new AuthError(
+      'This device’s clock looks out of sync. Turn on Automatic Date & Time, then try signing in again.',
+      'session_expired',
+    );
+  }
+
   if (isAuthSessionFailure(err)) {
     return new AuthError(
       'Your session expired. Please sign in again.',
@@ -158,6 +167,7 @@ export function isAuthSessionFailure(err: unknown): boolean {
     lower.includes('jwt expired') ||
     lower.includes('invalid jwt') ||
     lower.includes('invalid claim') ||
+    isClockSkewAuthFailure(lower) ||
     lower.includes('refresh_token') ||
     lower.includes('auth session missing') ||
     lower.includes('session from session_id claim in jwt does not exist') ||
@@ -167,5 +177,16 @@ export function isAuthSessionFailure(err: unknown): boolean {
         lower.includes('missing'))) ||
     lower.includes('not authenticated') ||
     lower.includes('not_authenticated')
+  );
+}
+
+/** JWT iat / “issued at future” — almost always device clock skew. */
+function isClockSkewAuthFailure(lowerMessage: string): boolean {
+  return (
+    lowerMessage.includes('issued at future') ||
+    lowerMessage.includes('iat is in the future') ||
+    (lowerMessage.includes('jwt') &&
+      lowerMessage.includes('future') &&
+      (lowerMessage.includes('issued') || lowerMessage.includes('iat')))
   );
 }

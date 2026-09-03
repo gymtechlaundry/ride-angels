@@ -32,73 +32,6 @@
   color: var(--ra-text-secondary);
 }
 
-.mode-switch {
-  display: inline-flex;
-  margin-top: 10px;
-  padding: 3px;
-  border-radius: 999px;
-  background: var(--ra-surface);
-  border: 1px solid var(--ra-border);
-  gap: 2px;
-}
-
-.mode-chip {
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ra-text-secondary);
-}
-
-.mode-chip.active {
-  background: var(--ra-primary);
-  color: #fff;
-}
-
-.mode-chip:disabled {
-  opacity: 0.7;
-}
-
-.contact-nudge {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-bottom: 8px;
-}
-
-.nudge-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  text-align: left;
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--ra-primary-soft);
-  border: 1px solid color-mix(in srgb, var(--ra-primary) 25%, transparent);
-}
-
-.nudge-card strong {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ra-ink);
-}
-
-.nudge-card span {
-  font-size: 13px;
-  line-height: 1.35;
-  color: var(--ra-text-secondary);
-}
-
-.nudge-dismiss {
-  align-self: flex-start;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ra-text-muted);
-  padding: 2px 4px;
-}
-
 .welcome-actions {
   display: flex;
   align-items: center;
@@ -162,6 +95,58 @@
 .strip span {
   font-size: 12px;
   color: var(--ra-text-secondary);
+}
+
+.nudge-card {
+  width: 100%;
+  border-radius: var(--ra-card-radius);
+  background: var(--ra-primary-soft);
+  border: 1px solid color-mix(in srgb, var(--ra-primary) 25%, transparent);
+  overflow: hidden;
+}
+
+.nudge-main {
+  width: 100%;
+  text-align: left;
+  padding: var(--ra-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nudge-main strong {
+  font-size: 14px;
+  color: var(--ra-ink);
+}
+
+.nudge-main span {
+  font-size: 12px;
+  color: var(--ra-text-secondary);
+}
+
+.nudge-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 var(--ra-card-padding) 12px;
+  border-top: 1px solid color-mix(in srgb, var(--ra-primary) 18%, transparent);
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+.nudge-action {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ra-primary);
+  padding: 4px 0;
+}
+
+.nudge-dismiss {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ra-text-muted);
+  padding: 4px 0;
 }
 
 .offer-chips {
