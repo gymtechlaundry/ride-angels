@@ -145,17 +145,16 @@
           } @empty {
             <div class="empty-coach">
               <p class="empty">
-                No rides yet. Add an appointment, then invite people you trust so
-                someone can offer to drive.
+                No rides scheduled yet. Use Add an appointment above when you
+                need a lift.
               </p>
-              <div class="empty-actions">
-                <button type="button" class="empty-link ra-reset" (click)="addAppointment()">
-                  Add appointment
-                </button>
-                <button type="button" class="empty-link ra-reset" (click)="openInvites()">
-                  Invite Ride Angels
-                </button>
-              </div>
+              @if (myAngels().length === 0) {
+                <div class="empty-actions">
+                  <button type="button" class="empty-link ra-reset" (click)="openInvites()">
+                    Invite Ride Angels
+                  </button>
+                </div>
+              }
             </div>
           }
         </div>

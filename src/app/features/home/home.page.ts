@@ -53,6 +53,7 @@ export class HomePage implements ViewWillEnter {
   readonly upcomingDrives = this.appointments.upcomingDrives;
   readonly pendingOffers = this.offers.pendingOffersForCurrentRider;
   readonly pendingInvites = this.angels.pendingIncoming;
+  readonly myAngels = this.angels.myAngels;
   readonly unread = this.notifications.unreadForCurrentUser;
   readonly contactNudgeDismissed = signal(false);
 
