@@ -2,7 +2,7 @@
 
 Plan who’s driving each appointment with family and friends—so rides aren’t a last-minute burden. Riders request; Ride Angels offer. One account, both roles.
 
-**Status:** V1 feature-complete for first store production. Docs packet ready for TestFlight + Play internal/closed while production review runs. Maintain here: `~/Projects/hyperion-studio/Apps/shipped/ride-angels`
+**Status:** **Google Play production** is live (listing updated 2026-09-02). iOS is TestFlight only — not on the public App Store (iTunes lookup by `org.rideangels.app` is empty as of 2026-09-04). Maintain here: `~/Projects/hyperion-studio/Apps/shipped/ride-angels`
 
 **In this binary (safe to claim):** phone/email OTP; Rider / Ride Angel modes; private-circle appointments and offers; email + phone invites; Call / Text; On my way; push + reminders; device calendar; Feedback & ideas; in-app account delete.
 
