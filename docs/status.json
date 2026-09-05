@@ -63,9 +63,9 @@
     },
     "android": {
       "marketing": "1.0",
-      "versionCode": 12,
+      "versionCode": 13,
       "track": "production",
-      "note": "Play production is live at versionCode 9. Next AAB is 1.0 (12)."
+      "note": "Play production is live at versionCode 9. versionCode 12 was discarded in Console; next AAB is 1.0 (13)."
     }
   },
   "next": [
