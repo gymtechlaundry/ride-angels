@@ -57,19 +57,19 @@
   "platforms": {
     "ios": {
       "marketing": "1.0",
-      "build": 11,
+      "build": 12,
       "track": "testflight",
-      "note": "TestFlight only. Not on the public App Store as of 2026-09-04. Bump iOS build if 11 was already uploaded."
+      "note": "Repo binary is 1.0 (12). Build 11 was the last TestFlight upload. Public App Store is still empty."
     },
     "android": {
       "marketing": "1.0",
-      "versionCode": 9,
+      "versionCode": 12,
       "track": "production",
-      "note": "Live on Play (public listing 2026-09-05). https://play.google.com/store/apps/details?id=org.rideangels.app"
+      "note": "Play production is live at versionCode 9. Next AAB is 1.0 (12)."
     }
   },
   "next": [
-    "Submit iOS to App Review so Ride Angels matches Play and is publicly installable on iPhone.",
+    "Upload 1.0 (12) to TestFlight and Play, then submit iOS for App Review.",
     "Ship push notifications (P0 in docs/future-features.md).",
     "Angular 22 / Ionic 9 in a dedicated PR after the iOS listing exists."
   ],
