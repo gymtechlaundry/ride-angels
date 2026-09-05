@@ -1,0 +1,78 @@
+{
+  "slug": "ride-angels",
+  "name": "Ride Angels",
+  "stage": "shipped",
+  "kind": "capacitor",
+  "updated": "2026-09-05",
+  "focus": "active",
+  "bundleId": "org.rideangels.app",
+  "verified": {
+    "checked": "2026-09-05",
+    "play": {
+      "url": "https://play.google.com/store/apps/details?id=org.rideangels.app",
+      "live": true,
+      "status": 200,
+      "error": null
+    },
+    "appStore": {
+      "live": false,
+      "version": null,
+      "trackId": null,
+      "url": null,
+      "error": null
+    },
+    "legal": [
+      {
+        "url": "https://hyperionappstudio.com/rideangels/",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://hyperionappstudio.com/rideangels/privacy/",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://hyperionappstudio.com/rideangels/support/",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://hyperionappstudio.com/rideangels/terms/",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://hyperionappstudio.com/rideangels/sms-opt-in/",
+        "status": 200,
+        "ok": true
+      }
+    ]
+  },
+  "revenue": {
+    "model": "free",
+    "path": "orgs-later",
+    "note": "No IAP in v1. Play production is live. Organizations and billing stay flagged off."
+  },
+  "platforms": {
+    "ios": {
+      "marketing": "1.0",
+      "build": 11,
+      "track": "testflight",
+      "note": "TestFlight only. Not on the public App Store as of 2026-09-04. Bump iOS build if 11 was already uploaded."
+    },
+    "android": {
+      "marketing": "1.0",
+      "versionCode": 9,
+      "track": "production",
+      "note": "Live on Play (public listing 2026-09-05). https://play.google.com/store/apps/details?id=org.rideangels.app"
+    }
+  },
+  "next": [
+    "Submit iOS to App Review so Ride Angels matches Play and is publicly installable on iPhone.",
+    "Ship push notifications (P0 in docs/future-features.md).",
+    "Angular 22 / Ionic 9 in a dedicated PR after the iOS listing exists."
+  ],
+  "blockers": [],
+  "backlog": "docs/future-features.md"
+}
