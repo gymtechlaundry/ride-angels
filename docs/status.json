@@ -57,9 +57,9 @@
   "platforms": {
     "ios": {
       "marketing": "1.0",
-      "build": 13,
-      "track": "testflight",
-      "note": "Archived and uploading as 1.0 (13). Build 11 was the previous TestFlight binary. Public App Store is still empty."
+      "build": 12,
+      "track": "review",
+      "note": "1.0 (12) is Waiting for Review. Xcode auto-bumped the project to 13 after archive; 13 is the next unused build, not the one in review."
     },
     "android": {
       "marketing": "1.0",
@@ -69,7 +69,7 @@
     }
   },
   "next": [
-    "Upload 1.0 (13) iOS to TestFlight / App Review, and 1.0 (12) AAB to Play.",
+    "Wait for App Review on iOS 1.0 (12). Do not submit 13 unless Apple rejects 12.",
     "Ship push notifications (P0 in docs/future-features.md).",
     "Angular 22 / Ionic 9 in a dedicated PR after the iOS listing exists."
   ],

@@ -29,7 +29,7 @@ Console limits: `~/Projects/hyperion-studio/Playbooks/store/README.md`.
 - [ ] Subtitle, promotional text, description, keywords, What’s New (below)  
 - [ ] Support URL / Privacy URL / Marketing URL (below)  
 - [ ] Screenshots (shot list) · App icon 1024: `ride-angels-final-exact-brand-kit/app-icons/app-icon-ios-1024.png`  
-- [ ] This version: **1.0 (13)**  
+- [ ] This version: **1.0 (12)** (Waiting for Review). Xcode is at 13 for the next archive.  
 - [ ] App Review Information notes (full block at bottom)  
 - [ ] Contact: Devin Cooper · 904-556-1823 · support@hyperionappstudio.com  
 
