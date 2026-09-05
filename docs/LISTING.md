@@ -20,9 +20,9 @@ Console limits: `~/Projects/hyperion-studio/Playbooks/store/README.md`.
 - [ ] Category: Lifestyle  
 
 ### Google Play — This production release
-- [ ] Release name: `1.0 (13)` (or current `versionCode`)  
-- [ ] Release notes — use the `<en-US>` block under What’s New  
-- [ ] Upload AAB + `android/app/build/outputs/mapping/release/mapping.txt`  
+- [x] Release name: `1.0 (13)` (or current `versionCode`)  
+- [x] Release notes — use the `<en-US>` block under What’s New  
+- [x] Upload AAB + `android/app/build/outputs/mapping/release/mapping.txt`  
 
 ### App Store Connect — Version / listing
 - [ ] Name: Ride Angels  

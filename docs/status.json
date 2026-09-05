@@ -65,11 +65,11 @@
       "marketing": "1.0",
       "versionCode": 13,
       "track": "production",
-      "note": "Play production is live at versionCode 9. versionCode 12 was discarded in Console; next AAB is 1.0 (13)."
+      "note": "Play production 1.0 (13) published 2026-09-05. Next AAB must be versionCode 14+."
     }
   },
   "next": [
-    "Wait for App Review on iOS 1.0 (12). Do not submit 13 unless Apple rejects 12.",
+    "Wait for App Review on iOS 1.0 (12). Play 1.0 (13) is published. Do not submit iOS 13 unless Apple rejects 12.",
     "Ship push notifications (P0 in docs/future-features.md).",
     "Angular 22 / Ionic 9 in a dedicated PR after the iOS listing exists."
   ],
