@@ -57,19 +57,19 @@
   "platforms": {
     "ios": {
       "marketing": "1.0",
-      "build": 11,
-      "track": "testflight",
-      "note": "TestFlight only. Not on the public App Store as of 2026-09-04. Bump iOS build if 11 was already uploaded."
+      "build": 12,
+      "track": "review",
+      "note": "1.0 (12) is Waiting for Review. Xcode auto-bumped the project to 13 after archive; 13 is the next unused build, not the one in review."
     },
     "android": {
       "marketing": "1.0",
-      "versionCode": 9,
+      "versionCode": 13,
       "track": "production",
-      "note": "Live on Play (public listing 2026-09-05). https://play.google.com/store/apps/details?id=org.rideangels.app"
+      "note": "Play production 1.0 (13) published 2026-09-05. Next AAB must be versionCode 14+."
     }
   },
   "next": [
-    "Submit iOS to App Review so Ride Angels matches Play and is publicly installable on iPhone.",
+    "Wait for App Review on iOS 1.0 (12). Play 1.0 (13) is published. Do not submit iOS 13 unless Apple rejects 12.",
     "Ship push notifications (P0 in docs/future-features.md).",
     "Angular 22 / Ionic 9 in a dedicated PR after the iOS listing exists."
   ],
