@@ -3,11 +3,11 @@
   "name": "Ride Angels",
   "stage": "shipped",
   "kind": "capacitor",
-  "updated": "2026-09-05",
+  "updated": "2026-09-06",
   "focus": "active",
   "bundleId": "org.rideangels.app",
   "verified": {
-    "checked": "2026-09-05",
+    "checked": "2026-09-06",
     "play": {
       "url": "https://play.google.com/store/apps/details?id=org.rideangels.app",
       "live": true,
@@ -15,10 +15,10 @@
       "error": null
     },
     "appStore": {
-      "live": false,
-      "version": null,
-      "trackId": null,
-      "url": null,
+      "live": true,
+      "version": "1.0",
+      "trackId": 6800446555,
+      "url": "https://apps.apple.com/us/app/ride-angels/id6800446555?uo=4",
       "error": null
     },
     "legal": [
@@ -52,26 +52,26 @@
   "revenue": {
     "model": "free",
     "path": "orgs-later",
-    "note": "No IAP in v1. Play production is live. Organizations and billing stay flagged off."
+    "note": "No IAP in v1. Play and App Store production are live. Organizations and billing stay flagged off."
   },
   "platforms": {
     "ios": {
       "marketing": "1.0",
       "build": 12,
-      "track": "review",
-      "note": "1.0 (12) is Waiting for Review. Xcode auto-bumped the project to 13 after archive; 13 is the next unused build, not the one in review."
+      "track": "production",
+      "note": "Live on App Store 1.0 (2026-09-06). https://apps.apple.com/us/app/ride-angels/id6800446555 — Apple ID 6800446555. Next unused Xcode build is 13."
     },
     "android": {
       "marketing": "1.0",
       "versionCode": 13,
       "track": "production",
-      "note": "Play production 1.0 (13) published 2026-09-05. Next AAB must be versionCode 14+."
+      "note": "Live on Play (public listing 2026-09-06). https://play.google.com/store/apps/details?id=org.rideangels.app Next AAB must be versionCode 14+."
     }
   },
   "next": [
-    "Wait for App Review on iOS 1.0 (12). Play 1.0 (13) is published. Do not submit iOS 13 unless Apple rejects 12.",
-    "Ship push notifications (P0 in docs/future-features.md).",
-    "Angular 22 / Ionic 9 in a dedicated PR after the iOS listing exists."
+    "Ship push notifications (P0 in docs/future-features.md). Next iOS binary is 13; next Play AAB is versionCode 14+.",
+    "Declare regulated medical device = No in App Store Connect by early 2027.",
+    "Angular 22 / Ionic 9 in a dedicated PR."
   ],
   "blockers": [],
   "backlog": "docs/future-features.md"
