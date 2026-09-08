@@ -190,9 +190,12 @@ data” state until the access token expires.
 | Sign out all devices | `global` — every session | Account & Security → Devices |
 | Dead / revoked JWT | Clear local session → `/auth` | `handleExpiredSession()` + domain sync |
 
-On cold start the app validates the stored session with `auth.getUser()`. If
-refresh or domain loads fail with an auth/JWT error, the client clears local
-state and sends the user to sign-in instead of showing empty profile/rides.
+On cold start the app restores the session from Capacitor Preferences (not
+WKWebView localStorage) and validates with `auth.getUser()`. A **dead JWT**
+(401 / refresh_token / expired) still clears local state and sends the user to
+sign-in. A **network error** does not — the stored session stays so returning to
+the app does not demand a new OTP. Sign-out (Profile) is the only intentional
+way to leave the account on this device.
 
 ---
 
@@ -214,6 +217,7 @@ This is immediate. The same phone or email can register again afterward.
 - `src/app/core/services/user-profile.repository.ts`  
 - `src/app/core/services/auth-flow.service.ts`  
 - `src/app/core/supabase/supabase-client.ts`  
+- `src/app/core/supabase/auth-storage.ts`  
 - `src/app/features/auth/**`  
 - `src/app/features/account/account-security.*`  
 - `src/environments/environment*.ts`  
