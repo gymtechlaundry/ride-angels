@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
+import { capacitorAuthStorage } from './auth-storage';
 
 let client: SupabaseClient | null = null;
 
@@ -18,6 +19,7 @@ export function getSupabaseClient(): SupabaseClient {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: false,
+        storage: capacitorAuthStorage,
       },
     });
   }

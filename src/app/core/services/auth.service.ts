@@ -57,6 +57,7 @@ export class AuthService {
   private signingOut = false;
   /** Prevents re-entrant expired-session handling. */
   private handlingExpiredSession = false;
+  private initPromise: Promise<void> | null = null;
 
   private readonly session = signal<Session | null>(null);
   private readonly persona = signal<AppPersona>('rider');
@@ -80,6 +81,22 @@ export class AuthService {
   readonly usingMockAuth = computed(() => !isSupabaseConfigured());
 
   async initialize(): Promise<void> {
+    if (this.ready()) {
+      return;
+    }
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+    this.initPromise = this.initializeOnce();
+    try {
+      await this.initPromise;
+    } catch (err) {
+      this.initPromise = null;
+      throw err;
+    }
+  }
+
+  private async initializeOnce(): Promise<void> {
     await this.profiles.ensureReady();
     await this.flow.hydrate();
     const { value: persona } = await Preferences.get({ key: KEYS.activePersona });
@@ -90,15 +107,25 @@ export class AuthService {
       const supabase = getSupabaseClient();
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        // Validate against the server so revoked/zombie sessions don't paint an empty shell.
-        const { error: userError } = await supabase.auth.getUser();
-        if (userError) {
+        // Only drop a stored session when the server says the JWT is dead.
+        // Network failures must not force another OTP — keep the local session.
+        let userError: unknown = null;
+        try {
+          const result = await supabase.auth.getUser();
+          userError = result.error;
+        } catch (err) {
+          userError = err;
+        }
+        if (userError && isAuthSessionFailure(userError)) {
           await this.handleExpiredSession();
         } else {
           await this.applySession(data.session);
         }
       }
       supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'INITIAL_SESSION' && !session && this.session()) {
+          return;
+        }
         // Avoid redundant profile writes on token refresh.
         if (event === 'TOKEN_REFRESHED' && session?.user.id === this.session()?.user.id) {
           this.session.set(session);

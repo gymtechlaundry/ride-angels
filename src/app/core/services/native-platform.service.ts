@@ -5,6 +5,10 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { Keyboard, KeyboardResize } from '@capacitor/keyboard';
 import { App } from '@capacitor/app';
 import { NotificationService } from './notification.service';
+import {
+  getSupabaseClient,
+  isSupabaseConfigured,
+} from '../supabase/supabase-client';
 
 /**
  * Native shell bootstrap for iOS/Android.
@@ -60,6 +64,9 @@ export class NativePlatformService {
     void App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
         void this.notifications.refreshForCurrentUser();
+        this.setAuthAutoRefresh(true);
+      } else {
+        this.setAuthAutoRefresh(false);
       }
     });
 
@@ -74,6 +81,23 @@ export class NativePlatformService {
       }
     } catch {
       // getLaunchUrl unavailable on some platforms
+    }
+  }
+
+  /** Keep refresh tokens alive across background/foreground like a native social app. */
+  private setAuthAutoRefresh(active: boolean): void {
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+    try {
+      const auth = getSupabaseClient().auth;
+      if (active) {
+        void auth.startAutoRefresh();
+      } else {
+        void auth.stopAutoRefresh();
+      }
+    } catch {
+      // Auth client not ready yet.
     }
   }
 
