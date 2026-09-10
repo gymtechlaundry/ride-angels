@@ -3,7 +3,7 @@
   "name": "Ride Angels",
   "stage": "shipped",
   "kind": "capacitor",
-  "updated": "2026-09-06",
+  "updated": "2026-09-10",
   "focus": "active",
   "bundleId": "org.rideangels.app",
   "verified": {
@@ -59,17 +59,17 @@
       "marketing": "1.0",
       "build": 12,
       "track": "production",
-      "note": "Live on App Store 1.0 (2026-09-06). https://apps.apple.com/us/app/ride-angels/id6800446555 — Apple ID 6800446555. Next unused Xcode build is 13."
+      "note": "Live on App Store 1.0 (12). Apple closed the 1.0 train — next upload is 1.0.1 (14). https://apps.apple.com/us/app/ride-angels/id6800446555"
     },
     "android": {
       "marketing": "1.0",
       "versionCode": 13,
       "track": "production",
-      "note": "Live on Play (public listing 2026-09-06). https://play.google.com/store/apps/details?id=org.rideangels.app Next AAB must be versionCode 14+."
+      "note": "Live on Play 1.0 (13). Next AAB is 1.0.1 versionCode 14. https://play.google.com/store/apps/details?id=org.rideangels.app"
     }
   },
   "next": [
-    "Ship push notifications (P0 in docs/future-features.md). Next iOS binary is 13; next Play AAB is versionCode 14+.",
+    "Upload 1.0.1 (14): persist-session. In App Store Connect create a new iOS version 1.0.1 — do not attach a build to 1.0.",
     "Declare regulated medical device = No in App Store Connect by early 2027.",
     "Angular 22 / Ionic 9 in a dedicated PR."
   ],

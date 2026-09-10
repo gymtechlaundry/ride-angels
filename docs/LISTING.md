@@ -20,16 +20,17 @@ Console limits: `~/Projects/hyperion-studio/Playbooks/store/README.md`.
 - [ ] Category: Lifestyle  
 
 ### Google Play — This production release
-- [x] Release name: `1.0 (13)` (or current `versionCode`)  
-- [x] Release notes — use the `<en-US>` block under What’s New  
-- [x] Upload AAB + `android/app/build/outputs/mapping/release/mapping.txt`  
+- [ ] Release name: `1.0.1 (14)` (or current `versionCode`)  
+- [ ] Release notes — use the `<en-US>` block under What’s New  
+- [ ] Upload AAB + `android/app/build/outputs/mapping/release/mapping.txt`  
 
 ### App Store Connect — Version / listing
 - [ ] Name: Ride Angels  
 - [ ] Subtitle, promotional text, description, keywords, What’s New (below)  
 - [ ] Support URL / Privacy URL / Marketing URL (below)  
 - [ ] Screenshots (shot list) · App icon 1024: `ride-angels-final-exact-brand-kit/app-icons/app-icon-ios-1024.png`  
-- [x] This version: **1.0 (12)** live on the App Store (Apple ID 6800446555). Xcode is at 13 for the next archive.  
+- [x] Live: **1.0 (12)** (Apple ID 6800446555).  
+- [ ] This upload: **1.0.1 (14)**. In App Store Connect create a **new** iOS version `1.0.1` — the 1.0 train is closed. Do not archive as 1.0.  
 - [ ] App Review Information notes (full block at bottom)  
 - [ ] Contact: Devin Cooper · 904-556-1823 · support@hyperionappstudio.com  
 
@@ -110,14 +111,14 @@ ride,driver,appointment,caregiver,family,senior,volunteer,transport,carpool,trus
 **Plain text** (App Store “What’s New” and TestFlight):
 
 ```
-Plan rides ahead with your circle so appointments aren’t a last-minute scramble. Invite by phone or email, Call and Text from ride cards, On my way, and reminders. Clearer Rider / Ride Angel setup, a sharper Android app icon, and sign-in fixes so your one-time code still works if you leave for Messages or Mail.
+Stay signed in when you come back to the app. You only need a new code if you sign out.
 ```
 
 **Play Console** (keep the language tags):
 
 ```
 <en-US>
-Plan rides ahead with your circle so appointments aren’t a last-minute scramble. Invite by phone or email, Call and Text from ride cards, On my way, and reminders. Clearer Rider / Ride Angel setup, a sharper Android app icon, and sign-in fixes so your one-time code still works if you leave for Messages or Mail.
+Stay signed in when you come back to the app. You only need a new code if you sign out.
 </en-US>
 ```
 
