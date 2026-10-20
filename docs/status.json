@@ -3,11 +3,11 @@
   "name": "Ride Angels",
   "stage": "shipped",
   "kind": "capacitor",
-  "updated": "2026-09-10",
+  "updated": "2026-10-20",
   "focus": "active",
   "bundleId": "org.rideangels.app",
   "verified": {
-    "checked": "2026-09-06",
+    "checked": "2026-10-20",
     "play": {
       "url": "https://play.google.com/store/apps/details?id=org.rideangels.app",
       "live": true,
@@ -16,7 +16,7 @@
     },
     "appStore": {
       "live": true,
-      "version": "1.0",
+      "version": "1.0.1",
       "trackId": 6800446555,
       "url": "https://apps.apple.com/us/app/ride-angels/id6800446555?uo=4",
       "error": null
@@ -59,17 +59,17 @@
       "marketing": "1.0",
       "build": 12,
       "track": "production",
-      "note": "Live on App Store 1.0 (12). Apple closed the 1.0 train — next upload is 1.0.1 (14). https://apps.apple.com/us/app/ride-angels/id6800446555"
+      "note": "Live on App Store 1.0.1 (2026-10-20)."
     },
     "android": {
       "marketing": "1.0",
       "versionCode": 13,
       "track": "production",
-      "note": "Live on Play 1.0 (13). Next AAB is 1.0.1 versionCode 14. https://play.google.com/store/apps/details?id=org.rideangels.app"
+      "note": "Live on Play (public listing 2026-10-20). https://play.google.com/store/apps/details?id=org.rideangels.app"
     }
   },
   "next": [
-    "Upload 1.0.1 (14): persist-session. In App Store Connect create a new iOS version 1.0.1 — do not attach a build to 1.0.",
+    "Upload persist-session native 14. Public App Store is already 1.0.1 — attach iOS build 14 to 1.0.1 (not 1.0). Play native 14 is ahead of 13.",
     "Declare regulated medical device = No in App Store Connect by early 2027.",
     "Angular 22 / Ionic 9 in a dedicated PR."
   ],
