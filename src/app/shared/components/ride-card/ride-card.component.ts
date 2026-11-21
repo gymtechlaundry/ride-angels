@@ -26,7 +26,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
           <span class="ra-icon-box" style="width:12px;height:12px">
             <img class="ra-icon" src="assets/icons/clock.svg" alt="" />
           </span>
-          {{ ride.timeLabel }}
+          Pickup at {{ ride.timeLabel }}
         </span>
         @if (!hideDate) {
           <span class="date">{{ ride.dateLabel }}</span>
