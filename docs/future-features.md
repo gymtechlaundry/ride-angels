@@ -41,9 +41,9 @@ Suggested priority tags: `P0` next release · `P1` soon · `P2` later · `P3` ex
 
 ### Address / maps UX — `P1`
 
-- Places autocomplete or geocoding for pickup / destination (today: free-text labels only).
+- ~~Places autocomplete for pickup / destination~~ — shipped via Edge `places-autocomplete` + schedule form typeahead (needs `GOOGLE_PLACES_API_KEY`).
 - Optional map preview on appointment detail / claim cards.
-- Store lat/lng when available (schema + RLS later).
+- Persist place id / lat/lng on `ride_requests` (schema + RLS) — today formatted address is stored in label/line1.
 
 ### Auth & account polish — `P1`
 

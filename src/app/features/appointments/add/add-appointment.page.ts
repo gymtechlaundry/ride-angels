@@ -20,6 +20,8 @@ import {
   defaultAppointmentDateTime,
   toDateKey,
 } from '../../../core/utils/date-time';
+import { ResolvedPlace } from '../../../core/services/places.service';
+import { AddressAutocompleteComponent } from '../../../shared/components/address-autocomplete/address-autocomplete.component';
 import { DateTimeFieldComponent } from '../../../shared/components/date-time-field/date-time-field.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
@@ -36,6 +38,7 @@ import { PrimaryButtonComponent } from '../../../shared/components/primary-butto
     PageHeaderComponent,
     PrimaryButtonComponent,
     DateTimeFieldComponent,
+    AddressAutocompleteComponent,
   ],
   templateUrl: './add-appointment.page.html',
   styleUrl: './add-appointment.page.scss',
@@ -54,6 +57,10 @@ export class AddAppointmentPage implements OnInit {
   readonly returnNeeded = signal(true);
   readonly editingId = signal<string | null>(null);
   readonly minDate = toDateKey(new Date());
+
+  /** Prefer Places-resolved street line when available; fall back to typed label. */
+  private pickupLine1 = '';
+  private destinationLine1 = '';
 
   private readonly defaults = defaultAppointmentDateTime();
 
@@ -79,6 +86,9 @@ export class AddAppointmentPage implements OnInit {
     }
     this.editingId.set(id);
     this.returnNeeded.set(detail.ride.returnNeeded);
+    this.pickupLine1 = detail.ride.pickup.line1 || detail.ride.pickup.label;
+    this.destinationLine1 =
+      detail.ride.destination.line1 || detail.ride.destination.label;
     this.form.patchValue({
       title: detail.appointment.title,
       date: detail.appointment.date,
@@ -90,6 +100,28 @@ export class AddAppointmentPage implements OnInit {
         addHoursToTimeKey(detail.appointment.time, 2),
       notes: detail.appointment.notes ?? '',
     });
+  }
+
+  onPickupText(value: string): void {
+    this.form.patchValue({ pickupLabel: value });
+    this.pickupLine1 = value;
+  }
+
+  onPickupPlace(place: ResolvedPlace): void {
+    const label = place.formattedAddress || place.line1;
+    this.form.patchValue({ pickupLabel: label });
+    this.pickupLine1 = place.line1 || label;
+  }
+
+  onDestinationText(value: string): void {
+    this.form.patchValue({ destinationLabel: value });
+    this.destinationLine1 = value;
+  }
+
+  onDestinationPlace(place: ResolvedPlace): void {
+    const label = place.formattedAddress || place.line1;
+    this.form.patchValue({ destinationLabel: label });
+    this.destinationLine1 = place.line1 || label;
   }
 
   async onRefresh(event: RefresherCustomEvent): Promise<void> {
@@ -142,9 +174,9 @@ export class AddAppointmentPage implements OnInit {
         date: value.date,
         time: value.time,
         pickupLabel: value.pickupLabel,
-        pickupLine1: value.pickupLabel,
+        pickupLine1: this.pickupLine1 || value.pickupLabel,
         destinationLabel: value.destinationLabel,
-        destinationLine1: value.destinationLabel,
+        destinationLine1: this.destinationLine1 || value.destinationLabel,
         returnNeeded: this.returnNeeded(),
         returnPickupTime: this.returnNeeded() ? value.returnPickupTime : undefined,
         publicBoard: false,
@@ -196,9 +228,9 @@ export class AddAppointmentPage implements OnInit {
         date: value.date,
         time: value.time,
         pickupLabel: value.pickupLabel,
-        pickupLine1: value.pickupLabel,
+        pickupLine1: this.pickupLine1 || value.pickupLabel,
         destinationLabel: value.destinationLabel,
-        destinationLine1: value.destinationLabel,
+        destinationLine1: this.destinationLine1 || value.destinationLabel,
         returnNeeded: this.returnNeeded(),
         returnPickupTime: this.returnNeeded() ? value.returnPickupTime : undefined,
         publicBoard: false,

@@ -1,0 +1,42 @@
+<label class="field address-ac">
+  <span class="label">{{ label }}</span>
+  <div class="input-wrap" [class.busy]="loading() || resolving()">
+    <span class="ra-icon-box" style="width:16px;height:16px">
+      <img class="ra-icon" [src]="iconSrc" alt="" />
+    </span>
+    <input
+      #inputEl
+      type="text"
+      [placeholder]="placeholder"
+      [attr.autocomplete]="autocompleteAttr"
+      [ngModel]="query()"
+      (ngModelChange)="onInput($event)"
+      (focus)="onFocus()"
+      (keydown)="onKeydown($event)"
+      role="combobox"
+      [attr.aria-expanded]="open()"
+      aria-autocomplete="list"
+      [attr.aria-controls]="'address-ac-list'"
+    />
+  </div>
+
+  @if (open() && suggestions().length) {
+    <ul
+      id="address-ac-list"
+      class="suggestions"
+      role="listbox"
+      aria-label="Address suggestions"
+    >
+      @for (s of suggestions(); track s.placeId) {
+        <li role="option">
+          <button type="button" class="suggestion" (mousedown)="onSelect(s)">
+            <span class="suggestion__primary">{{ s.primaryText }}</span>
+            @if (s.secondaryText) {
+              <span class="suggestion__secondary">{{ s.secondaryText }}</span>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</label>
