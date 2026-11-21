@@ -147,11 +147,45 @@ function patchLiveReloadConfig(host, port) {
   return original;
 }
 
+function refreshDevice(udid) {
+  const phones = listPairedPhones();
+  return phones.find((p) => p.udid === udid) ?? null;
+}
+
+/** Wait until CoreDevice reports the phone online (USB or wireless). */
+function waitForDeviceOnline(udid, timeoutMs = 90_000) {
+  const started = Date.now();
+  let lastState = 'unknown';
+  console.log(
+    'Waiting for iPhone to come online (USB data cable or wireless debugging)…',
+  );
+  while (Date.now() - started < timeoutMs) {
+    const current = refreshDevice(udid);
+    lastState = current?.state ?? 'missing';
+    if (current?.ready) {
+      console.log(`Device online: ${current.name} (${udid})`);
+      return current;
+    }
+    spawnSync('sleep', ['2']);
+  }
+  throw new Error(
+    `iPhone still ${lastState} after ${Math.round(timeoutMs / 1000)}s.\n` +
+      'Xcode cannot see it — unlock alone is not enough.\n' +
+      'Fix connection, then retry:\n' +
+      '  1. Use a USB data cable (not charge-only); unplug/replug\n' +
+      '  2. Trust This Computer on the phone\n' +
+      '  3. Open Device Hub and confirm the phone is Connected\n' +
+      '  4. Or enable wireless debugging while on the same Wi‑Fi\n' +
+      'Check: xcrun xctrace list devices   (must NOT say Devices Offline)',
+  );
+}
+
 function buildForDevice(udid) {
+  // Build for generic iOS device — does not require the phone to be online.
+  // Install still needs a live CoreDevice connection afterward.
   const derivedDataPath = join(root, 'ios', 'DerivedData', udid);
-  // Ride Angels uses CapApp-SPM (no CocoaPods App.xcworkspace).
   const project = 'App.xcodeproj';
-  console.log('Running xcodebuild for device…');
+  console.log('Running xcodebuild (generic iOS device)…');
   run(
     'xcrun',
     [
@@ -163,7 +197,7 @@ function buildForDevice(udid) {
       '-configuration',
       'Debug',
       '-destination',
-      `id=${udid}`,
+      'generic/platform=iOS',
       '-derivedDataPath',
       derivedDataPath,
       '-allowProvisioningUpdates',
@@ -232,11 +266,6 @@ if (!['200', '304'].includes(code)) {
 }
 
 const device = resolveDevice();
-if (!device.ready && device.state !== 'forced') {
-  console.warn(
-    `Device is ${device.state}. Unlock and keep it awake — install may still work.`,
-  );
-}
 
 let originalConfig = null;
 const restore = () => {
@@ -260,7 +289,10 @@ try {
   originalConfig = patchLiveReloadConfig(host, port);
   console.log(`Live reload → http://${host}:${port}`);
   const appPath = buildForDevice(device.udid);
-  installAndLaunch(device.udid, appPath);
+  const online = device.ready
+    ? device
+    : waitForDeviceOnline(device.udid);
+  installAndLaunch(online.udid, appPath);
   console.log(
     '\nApp launched with live reload. Keep this terminal open.\n' +
       'Edit/save Angular → phone updates. Ctrl+C when done.',
