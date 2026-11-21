@@ -1,184 +1,228 @@
 #!/usr/bin/env node
 /**
- * Physical-device live reload.
- * Requires `npm run start:external` already serving on :4200.
+ * Physical-device live reload (Xcode 27+).
+ *
+ * Capacitor/`native-run` only lists simulators on Xcode 27, so `cap run ios
+ * --target <phone-udid>` fails with "Invalid target ID". This script:
+ *   1. Requires `npm run start:external` on :4200
+ *   2. Patches ios/.../capacitor.config.json with server.url
+ *   3. Builds with xcodebuild for the paired phone
+ *   4. Installs + launches via `xcrun devicectl`
  *
  * Optional: IOS_DEVICE_UDID=... to force a device.
- *
- * On Xcode 27+, `npx cap run ios --list` often omits physical devices
- * (native-run still looks for Simulator.app / Device Hub listing). We fall
- * back to `xcrun devicectl` so a plugged-in iPhone still auto-targets.
+ * Ctrl+C restores capacitor.config.json.
  */
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir, networkInterfaces } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { networkInterfaces } from 'node:os';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = resolve(__dirname, '..');
+const iosAppDir = join(root, 'ios', 'App');
+const capConfigPath = join(iosAppDir, 'App', 'capacitor.config.json');
+const bundleId = 'org.rideangels.app';
+const scheme = 'App';
 
 function lanIPv4() {
   const preferred = spawnSync('ipconfig', ['getifaddr', 'en0'], {
     encoding: 'utf8',
   }).stdout?.trim();
-  if (preferred) {
-    return preferred;
-  }
+  if (preferred) return preferred;
   const nets = networkInterfaces();
   for (const entries of Object.values(nets)) {
     for (const entry of entries ?? []) {
-      if (entry.family === 'IPv4' && !entry.internal) {
-        return entry.address;
-      }
+      if (entry.family === 'IPv4' && !entry.internal) return entry.address;
     }
   }
   return null;
 }
 
-function pickUniquePhysical(devices) {
-  if (devices.length === 1) {
-    console.log(`Using device: ${devices[0].name} (${devices[0].udid})`);
-    return devices[0].udid;
-  }
-  if (devices.length > 1) {
-    console.log('Multiple devices online — pick one with IOS_DEVICE_UDID=...');
-    for (const d of devices) {
-      console.log(`  ${d.name} → ${d.udid}`);
-    }
-  }
-  return null;
-}
-
-/** Capacitor / native-run listing (often empty for physical devices on Xcode 27). */
-function listFromCapacitor() {
-  const listed = spawnSync('npx', ['cap', 'run', 'ios', '--list'], {
+function run(cmd, args, opts = {}) {
+  const result = spawnSync(cmd, args, {
     encoding: 'utf8',
-    shell: process.platform === 'win32',
+    stdio: opts.stdio ?? 'pipe',
+    cwd: opts.cwd,
   });
-  const text = `${listed.stdout || ''}\n${listed.stderr || ''}`;
-  const physical = [];
-  for (const line of text.split('\n')) {
-    if (!/\(simulator\)/i.test(line) && /iPhone|iPad/i.test(line)) {
-      const parts = line.trim().split(/\s{2,}/);
-      const id = parts[parts.length - 1];
-      if (/^[0-9A-Fa-f-]{20,}$/.test(id)) {
-        physical.push({ name: parts[0], udid: id });
-      }
-    }
+  if (result.status !== 0 && !opts.allowFail) {
+    const err = (result.stderr || result.stdout || '').trim();
+    throw new Error(
+      `${cmd} ${args.join(' ')} failed (exit ${result.status})${err ? `\n${err}` : ''}`,
+    );
   }
-  return physical;
+  return result;
 }
 
-/** Xcode 27 Device Hub / CoreDevice — reliable for a USB/network paired phone. */
-function listFromDevicectl() {
+function listPairedPhones() {
   const dir = mkdtempSync(join(tmpdir(), 'ra-ios-devices-'));
   const out = join(dir, 'devices.json');
   try {
-    const listed = spawnSync(
-      'xcrun',
-      [
-        'devicectl',
-        'list',
-        'devices',
-        '--filter',
-        'properties.hardware.reality == "physical"',
-        '--json-output',
-        out,
-      ],
-      { encoding: 'utf8' },
-    );
-    if (listed.status !== 0) {
-      return [];
-    }
+    run('xcrun', [
+      'devicectl',
+      'list',
+      'devices',
+      '--filter',
+      'properties.hardware.reality == "physical"',
+      '--json-output',
+      out,
+    ]);
     const raw = JSON.parse(readFileSync(out, 'utf8'));
     const devices = raw?.result?.devices ?? [];
     const paired = [];
     for (const dev of devices) {
       const props = dev.properties ?? {};
-      const hw = props.hardware ?? dev.hardwareProperties ?? {};
-      const conn = props.connection ?? dev.connectionProperties ?? {};
-      const deviceMeta = props.device ?? dev.deviceProperties ?? {};
+      const hw = props.hardware ?? {};
+      const conn = props.connection ?? {};
+      const meta = props.device ?? dev.deviceProperties ?? {};
       const udid = String(hw.udid ?? '').trim();
       if (!udid) continue;
       const pairing = String(
-        conn.pairingState ??
-          dev.connectionProperties?.pairingState ??
-          '',
+        conn.pairingState ?? dev.connectionProperties?.pairingState ?? '',
       ).toLowerCase();
       if (pairing && pairing !== 'paired') continue;
-
-      const tunnel = String(
-        conn.tunnelState ??
-          conn.state ??
+      const state = String(
+        conn.state ??
+          conn.tunnelState ??
           dev.connectionProperties?.tunnelState ??
           '',
       ).toLowerCase();
-      const ready =
-        tunnel === 'connected' ||
-        tunnel === 'available' ||
-        !!conn.tunnelIPAddressString ||
-        !!dev.connectionProperties?.tunnelIPAddressString;
-      const name =
-        deviceMeta.name ||
-        hw.marketingName ||
-        'iPhone';
-      paired.push({ name, udid, ready });
+      paired.push({
+        name: meta.name || hw.marketingName || 'iPhone',
+        udid,
+        ready: state === 'connected' || state === 'available',
+        state: state || 'unknown',
+      });
     }
-    // Prefer a tunnel-ready phone; otherwise still return paired ones
-    // (unlock / wake the device if deploy then fails).
     const ready = paired.filter((d) => d.ready);
     return ready.length ? ready : paired;
-  } catch {
-    return [];
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 }
 
-/** Prefer an available paired iPhone/iPad. */
-function resolvePhysicalDeviceTarget() {
-  if (process.env.IOS_DEVICE_UDID?.trim()) {
-    return process.env.IOS_DEVICE_UDID.trim();
-  }
+function resolveDevice() {
+  const forced = process.env.IOS_DEVICE_UDID?.trim();
+  if (forced) return { name: 'iPhone', udid: forced, ready: true, state: 'forced' };
 
-  const fromCap = listFromCapacitor();
-  const pickedCap = pickUniquePhysical(fromCap);
-  if (pickedCap) return pickedCap;
-
-  const fromDevice = listFromDevicectl();
-  if (fromDevice.length) {
+  const phones = listPairedPhones();
+  if (phones.length === 1) {
     console.log(
-      'Capacitor did not list a physical device; using xcrun devicectl.',
+      `Using device: ${phones[0].name} (${phones[0].udid}) [${phones[0].state}]`,
     );
+    return phones[0];
   }
-  return pickUniquePhysical(fromDevice);
+  if (phones.length > 1) {
+    console.error('Multiple phones paired — set IOS_DEVICE_UDID=...');
+    for (const p of phones) {
+      console.error(`  ${p.name} → ${p.udid} (${p.state})`);
+    }
+    process.exit(1);
+  }
+  console.error(
+    'No paired physical iPhone found.\n' +
+      'Unlock the phone, plug in USB, trust this Mac, open Device Hub once, then retry.',
+  );
+  process.exit(1);
+}
+
+function patchLiveReloadConfig(host, port) {
+  if (!existsSync(capConfigPath)) {
+    throw new Error(`Missing ${capConfigPath} — run npx cap sync ios first.`);
+  }
+  const original = readFileSync(capConfigPath, 'utf8');
+  const json = JSON.parse(original);
+  json.server = {
+    ...(json.server ?? {}),
+    url: `http://${host}:${port}`,
+    cleartext: true,
+  };
+  writeFileSync(capConfigPath, `${JSON.stringify(json, null, '\t')}\n`);
+  return original;
+}
+
+function buildForDevice(udid) {
+  const derivedDataPath = join(root, 'ios', 'DerivedData', udid);
+  const workspace = 'App.xcworkspace';
+  console.log('Running xcodebuild for device…');
+  run(
+    'xcrun',
+    [
+      'xcodebuild',
+      '-workspace',
+      workspace,
+      '-scheme',
+      scheme,
+      '-configuration',
+      'Debug',
+      '-destination',
+      `id=${udid}`,
+      '-derivedDataPath',
+      derivedDataPath,
+      '-allowProvisioningUpdates',
+    ],
+    { cwd: iosAppDir, stdio: 'inherit' },
+  );
+  const appPath = join(
+    derivedDataPath,
+    'Build',
+    'Products',
+    'Debug-iphoneos',
+    `${scheme}.app`,
+  );
+  if (!existsSync(appPath)) {
+    throw new Error(`Build succeeded but App.app not found at ${appPath}`);
+  }
+  return appPath;
+}
+
+function installAndLaunch(udid, appPath) {
+  console.log('Installing on device…');
+  run(
+    'xcrun',
+    ['devicectl', 'device', 'install', 'app', '--device', udid, appPath],
+    { stdio: 'inherit' },
+  );
+  console.log('Launching…');
+  run(
+    'xcrun',
+    [
+      'devicectl',
+      'device',
+      'process',
+      'launch',
+      '--device',
+      udid,
+      bundleId,
+    ],
+    { stdio: 'inherit' },
+  );
 }
 
 const host = lanIPv4();
 if (!host) {
   console.error(
-    'Could not resolve a LAN IP (en0). Connect Wi‑Fi, then retry.\n' +
-      'Or run: npx cap run ios -l --host=YOUR_MAC_IP --port=4200',
+    'Could not resolve a LAN IP (en0). Connect Wi‑Fi, then retry.',
   );
   process.exit(1);
 }
 
-const probe = spawnSync(
+const port = 4200;
+const probe = run(
   'curl',
-  [
-    '-sS',
-    '-m',
-    '2',
-    '-o',
-    '/dev/null',
-    '-w',
-    '%{http_code}',
-    `http://${host}:4200/`,
-  ],
-  { encoding: 'utf8' },
+  ['-sS', '-m', '2', '-o', '/dev/null', '-w', '%{http_code}', `http://${host}:${port}/`],
+  { allowFail: true },
 );
 const code = (probe.stdout || '').trim();
 if (!['200', '304'].includes(code)) {
   console.error(
-    `Angular is not reachable at http://${host}:4200 (HTTP ${code || 'down'}).\n` +
+    `Angular is not reachable at http://${host}:${port} (HTTP ${code || 'down'}).\n` +
       'In another terminal run:\n' +
       '  npm run start:external\n' +
       'Wait until it says Local/Network, then retry npm run ios:live:device',
@@ -186,21 +230,44 @@ if (!['200', '304'].includes(code)) {
   process.exit(1);
 }
 
-const target = resolvePhysicalDeviceTarget();
-const args = ['cap', 'run', 'ios', '-l', `--host=${host}`, '--port=4200'];
-if (target) {
-  args.push(`--target=${target}`);
-} else {
+const device = resolveDevice();
+if (!device.ready && device.state !== 'forced') {
   console.warn(
-    'No online physical device auto-detected.\n' +
-      'Unlock/plug in the iPhone, trust this Mac, open Device Hub once, then retry.\n' +
-      'Or force: IOS_DEVICE_UDID=00008140-0018781C0C91401C npm run ios:live:device',
+    `Device is ${device.state}. Unlock and keep it awake — install may still work.`,
   );
 }
 
-console.log(`Live reload → http://${host}:4200`);
-const result = spawnSync('npx', args, {
-  stdio: 'inherit',
-  shell: process.platform === 'win32',
+let originalConfig = null;
+const restore = () => {
+  if (originalConfig != null) {
+    writeFileSync(capConfigPath, originalConfig);
+    originalConfig = null;
+    console.log('Restored capacitor.config.json (live-reload URL removed).');
+  }
+};
+
+process.on('SIGINT', () => {
+  restore();
+  process.exit(0);
 });
-process.exit(result.status ?? 1);
+process.on('SIGTERM', () => {
+  restore();
+  process.exit(0);
+});
+
+try {
+  originalConfig = patchLiveReloadConfig(host, port);
+  console.log(`Live reload → http://${host}:${port}`);
+  const appPath = buildForDevice(device.udid);
+  installAndLaunch(device.udid, appPath);
+  console.log(
+    '\nApp launched with live reload. Keep this terminal open.\n' +
+      'Edit/save Angular → phone updates. Ctrl+C when done.',
+  );
+  // Stay alive so Ctrl+C can restore config; ng serve is the actual reload engine.
+  setInterval(() => {}, 1 << 30);
+} catch (err) {
+  restore();
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+}
