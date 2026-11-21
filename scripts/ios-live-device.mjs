@@ -149,14 +149,15 @@ function patchLiveReloadConfig(host, port) {
 
 function buildForDevice(udid) {
   const derivedDataPath = join(root, 'ios', 'DerivedData', udid);
-  const workspace = 'App.xcworkspace';
+  // Ride Angels uses CapApp-SPM (no CocoaPods App.xcworkspace).
+  const project = 'App.xcodeproj';
   console.log('Running xcodebuild for device…');
   run(
     'xcrun',
     [
       'xcodebuild',
-      '-workspace',
-      workspace,
+      '-project',
+      project,
       '-scheme',
       scheme,
       '-configuration',
