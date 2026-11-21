@@ -6,6 +6,7 @@ import {
   MOCK_RIDE_REQUESTS,
   buildRideCards,
   buildUpcomingDrivesForAngel,
+  formatDateLabel,
   formatTimeLabel,
   formatWhenLong,
 } from '../mock/mock-data';
@@ -24,7 +25,10 @@ import { newUuid } from '../utils/uuid';
 export interface CreateAppointmentInput {
   title: string;
   date: string;
+  /** Pickup time HH:mm */
   time: string;
+  /** Optional destination appointment start HH:mm */
+  appointmentStartTime?: string;
   pickupLabel: string;
   pickupLine1: string;
   destinationLabel: string;
@@ -247,6 +251,7 @@ export class AppointmentService {
       title: input.title,
       date: input.date,
       time: input.time,
+      appointmentStartTime: input.appointmentStartTime,
       notes: input.notes,
       status: 'active',
       createdAt: now,
@@ -321,6 +326,7 @@ export class AppointmentService {
       title: input.title,
       date: input.date,
       time: input.time,
+      appointmentStartTime: input.appointmentStartTime,
       notes: input.notes,
       updatedAt: now,
     };
@@ -618,7 +624,16 @@ export class AppointmentService {
   ): string {
     const parts: string[] = [];
     if (previous.date !== input.date || previous.time !== input.time) {
-      parts.push(`When → ${formatWhenLong(input.date, input.time)}`);
+      parts.push(`Pickup → ${formatWhenLong(input.date, input.time)}`);
+    }
+    if (
+      (previous.appointmentStartTime ?? '') !== (input.appointmentStartTime ?? '')
+    ) {
+      parts.push(
+        input.appointmentStartTime
+          ? `Appointment starts → ${formatTimeLabel(input.appointmentStartTime)}`
+          : 'Appointment start time removed',
+      );
     }
     if (previousRide.pickup.label !== input.pickupLabel) {
       parts.push(`Pickup → ${input.pickupLabel}`);
@@ -808,13 +823,22 @@ export class AppointmentService {
       ? this.auth.getUserById(assignment.angelId)
       : undefined;
 
+    const pickupTimeLabel = formatTimeLabel(appointment.time);
+    const appointmentStartLabel = appointment.appointmentStartTime
+      ? formatTimeLabel(appointment.appointmentStartTime)
+      : undefined;
+
     return {
       appointment,
       ride,
       assignment,
       angel,
+      /** Claim-board / compact: date + pickup (reminders stay on pickup). */
       whenLabel: formatWhenLong(appointment.date, appointment.time),
-      timeLabel: formatTimeLabel(appointment.time),
+      dateLabel: formatDateLabel(appointment.date),
+      timeLabel: pickupTimeLabel,
+      pickupTimeLabel,
+      appointmentStartLabel,
     };
   }
 

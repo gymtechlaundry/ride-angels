@@ -13,7 +13,7 @@ Scheduled push/inbox reminders for confirmed drives and unclaimed rides.
 
 Deduped in `ride_reminder_sends` (one send per ride + recipient + kind).
 
-Wall-clock times use **`America/New_York`** for V1 (appointments store local date/time without a per-user timezone).
+Wall-clock times use **`America/New_York`** for V1 (appointments store local date/time without a per-user timezone). Reminders always key off **`appointments.ride_time`** (pickup), not optional `appointment_start_time`.
 
 ## How it runs
 

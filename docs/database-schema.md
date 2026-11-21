@@ -50,6 +50,7 @@ erDiagram
     text title
     date ride_date
     time ride_time
+    time appointment_start_time
     text notes
     timestamptz created_at
     timestamptz updated_at
@@ -168,7 +169,8 @@ Scheduled appointment owned by a rider.
 | `created_by_user_id` | `uuid` | FK → `profiles(id)` | Who created the row |
 | `title` | `text` | NOT NULL | |
 | `ride_date` | `date` | NOT NULL | |
-| `ride_time` | `time` | NOT NULL | |
+| `ride_time` | `time` | NOT NULL | Pickup time (when the Ride Angel should arrive) |
+| `appointment_start_time` | `time` | nullable | Optional destination / clinic start |
 | `notes` | `text` | nullable | |
 | `created_at` | `timestamptz` | NOT NULL, default `now()` | |
 | `updated_at` | `timestamptz` | NOT NULL, default `now()` | |

@@ -127,8 +127,12 @@ export function defaultAppointmentDateTime(): { date: string; time: string } {
 }
 
 export function addHoursToTimeKey(timeKey: string, hours: number): string {
+  return addMinutesToTimeKey(timeKey, Math.round(hours * 60));
+}
+
+export function addMinutesToTimeKey(timeKey: string, minutes: number): string {
   const [h, m] = timeKey.split(':').map(Number);
-  const total = ((h + hours) * 60 + m + 24 * 60) % (24 * 60);
+  const total = (h * 60 + m + minutes + 24 * 60) % (24 * 60);
   const nh = Math.floor(total / 60);
   const nm = total % 60;
   return `${String(nh).padStart(2, '0')}:${String(nm).padStart(2, '0')}`;

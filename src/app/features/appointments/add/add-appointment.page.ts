@@ -17,6 +17,7 @@ import { RideAngelService } from '../../../core/services/ride-angel.service';
 import { isSupabaseConfigured } from '../../../core/supabase/supabase-client';
 import {
   addHoursToTimeKey,
+  addMinutesToTimeKey,
   defaultAppointmentDateTime,
   toDateKey,
 } from '../../../core/utils/date-time';
@@ -55,6 +56,7 @@ export class AddAppointmentPage implements OnInit {
   private readonly toast = inject(ToastController);
 
   readonly returnNeeded = signal(true);
+  readonly hasAppointmentStart = signal(false);
   readonly editingId = signal<string | null>(null);
   readonly minDate = toDateKey(new Date());
 
@@ -68,6 +70,7 @@ export class AddAppointmentPage implements OnInit {
     title: ['', Validators.required],
     date: [this.defaults.date, Validators.required],
     time: [this.defaults.time, Validators.required],
+    appointmentStartTime: [addMinutesToTimeKey(this.defaults.time, 40)],
     pickupLabel: ['', Validators.required],
     destinationLabel: ['', Validators.required],
     returnPickupTime: [addHoursToTimeKey(this.defaults.time, 2)],
@@ -86,6 +89,8 @@ export class AddAppointmentPage implements OnInit {
     }
     this.editingId.set(id);
     this.returnNeeded.set(detail.ride.returnNeeded);
+    const start = detail.appointment.appointmentStartTime;
+    this.hasAppointmentStart.set(!!start);
     this.pickupLine1 = detail.ride.pickup.line1 || detail.ride.pickup.label;
     this.destinationLine1 =
       detail.ride.destination.line1 || detail.ride.destination.label;
@@ -93,6 +98,8 @@ export class AddAppointmentPage implements OnInit {
       title: detail.appointment.title,
       date: detail.appointment.date,
       time: detail.appointment.time,
+      appointmentStartTime:
+        start || addMinutesToTimeKey(detail.appointment.time, 40),
       pickupLabel: detail.ride.pickup.label,
       destinationLabel: detail.ride.destination.label,
       returnPickupTime:
@@ -136,6 +143,18 @@ export class AddAppointmentPage implements OnInit {
     this.returnNeeded.set(checked);
   }
 
+  onAppointmentStartToggle(checked: boolean): void {
+    this.hasAppointmentStart.set(checked);
+    if (checked && !this.form.controls.appointmentStartTime.dirty) {
+      this.form.patchValue({
+        appointmentStartTime: addMinutesToTimeKey(
+          this.form.controls.time.value,
+          40,
+        ),
+      });
+    }
+  }
+
   onAppointmentDateChange(date: string): void {
     this.form.patchValue({ date });
   }
@@ -145,6 +164,19 @@ export class AddAppointmentPage implements OnInit {
     if (!this.form.controls.returnPickupTime.dirty) {
       this.form.patchValue({ returnPickupTime: addHoursToTimeKey(time, 2) });
     }
+    if (
+      this.hasAppointmentStart() &&
+      !this.form.controls.appointmentStartTime.dirty
+    ) {
+      this.form.patchValue({
+        appointmentStartTime: addMinutesToTimeKey(time, 40),
+      });
+    }
+  }
+
+  onAppointmentStartTimeChange(time: string): void {
+    this.form.patchValue({ appointmentStartTime: time });
+    this.form.controls.appointmentStartTime.markAsDirty();
   }
 
   onReturnTimeChange(time: string): void {
@@ -166,22 +198,31 @@ export class AddAppointmentPage implements OnInit {
     await this.saveCreate();
   }
 
+  private buildInput() {
+    const value = this.form.getRawValue();
+    return {
+      title: value.title,
+      date: value.date,
+      time: value.time,
+      appointmentStartTime: this.hasAppointmentStart()
+        ? value.appointmentStartTime
+        : undefined,
+      pickupLabel: value.pickupLabel,
+      pickupLine1: this.pickupLine1 || value.pickupLabel,
+      destinationLabel: value.destinationLabel,
+      destinationLine1: this.destinationLine1 || value.destinationLabel,
+      returnNeeded: this.returnNeeded(),
+      returnPickupTime: this.returnNeeded() ? value.returnPickupTime : undefined,
+      publicBoard: false,
+      notes: value.notes.trim() || undefined,
+    };
+  }
+
   private async saveCreate(): Promise<void> {
     try {
-      const value = this.form.getRawValue();
-      const appointment = await this.appointments.createAppointment({
-        title: value.title,
-        date: value.date,
-        time: value.time,
-        pickupLabel: value.pickupLabel,
-        pickupLine1: this.pickupLine1 || value.pickupLabel,
-        destinationLabel: value.destinationLabel,
-        destinationLine1: this.destinationLine1 || value.destinationLabel,
-        returnNeeded: this.returnNeeded(),
-        returnPickupTime: this.returnNeeded() ? value.returnPickupTime : undefined,
-        publicBoard: false,
-        notes: value.notes.trim() || undefined,
-      });
+      const appointment = await this.appointments.createAppointment(
+        this.buildInput(),
+      );
 
       const rider = this.auth.getCurrentUser();
 
@@ -222,20 +263,10 @@ export class AddAppointmentPage implements OnInit {
 
   private async saveEdit(appointmentId: string): Promise<void> {
     try {
-      const value = this.form.getRawValue();
-      const result = await this.appointments.updateAppointment(appointmentId, {
-        title: value.title,
-        date: value.date,
-        time: value.time,
-        pickupLabel: value.pickupLabel,
-        pickupLine1: this.pickupLine1 || value.pickupLabel,
-        destinationLabel: value.destinationLabel,
-        destinationLine1: this.destinationLine1 || value.destinationLabel,
-        returnNeeded: this.returnNeeded(),
-        returnPickupTime: this.returnNeeded() ? value.returnPickupTime : undefined,
-        publicBoard: false,
-        notes: value.notes.trim() || undefined,
-      });
+      const result = await this.appointments.updateAppointment(
+        appointmentId,
+        this.buildInput(),
+      );
 
       const toast = await this.toast.create({
         message: result.needsReconfirm
