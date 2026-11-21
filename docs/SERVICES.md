@@ -2,7 +2,7 @@
 
 Map of vendors. **IDs and dashboard URLs only — never paste API keys, tokens, `.p8` bodies, or `service_role`.**
 
-Playbook: `~/Projects/hyperion-studio/Playbooks/secrets.md`. How-tos: [phone-otp.md](./phone-otp.md), [push-notifications.md](./push-notifications.md), [circle-invites.md](./circle-invites.md), [ride-reminders.md](./ride-reminders.md), [partner-integrations.md](./partner-integrations.md).
+Playbook: `~/Projects/hyperion-studio/Playbooks/secrets.md`. How-tos: [phone-otp.md](./phone-otp.md), [push-notifications.md](./push-notifications.md), [circle-invites.md](./circle-invites.md), [ride-reminders.md](./ride-reminders.md), [places-autocomplete.md](./places-autocomplete.md), [partner-integrations.md](./partner-integrations.md).
 
 ## Status
 
@@ -23,6 +23,7 @@ Bundle ID:                     org.rideangels.app   (grandfathered)
 | Resend | Circle invite email | Domain `hyperionappstudio.com` | `RESEND_API_KEY`, `RESEND_FROM` | `Hyperion / ride-angels / Resend API key` | Edge secrets on `send-circle-invite`. From: `Ride Angels <noreply@hyperionappstudio.com>` |
 | APNs | iOS push | Team `R5D743J5S2`; bundle `org.rideangels.app` | `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_P8_KEY`, `APNS_BUNDLE_ID`, `APNS_PRODUCTION`, `RIDE_ANGELS_PUSH_SECRET` | `Hyperion / studio / APNs .p8` (shared with ColorPing) | Edge secrets. `APNS_BUNDLE_ID=org.rideangels.app`. `APNS_PRODUCTION=true` for TestFlight / store |
 | Firebase / FCM | Android push | Package `org.rideangels.app` | `FCM_SERVICE_ACCOUNT_JSON` | `Hyperion / ride-angels / Firebase admin` | Edge secrets. `android/app/google-services.json` gitignored. Admin JSON currently also under studio `Admin/` (gitignored) — move to 1Password when convenient |
+| Google Places | Address autocomplete on schedule form | Google Cloud project with Places API (New) enabled | `GOOGLE_PLACES_API_KEY` | `Hyperion / ride-angels / Google Places API key` | Edge secret on `places-autocomplete` only (never in the Ionic binary). Restrict key to Places API |
 | ColorPing partner | Ingest appointments | ColorPing project `sglkzrstfbhzsjcxtkpd` | `COLORPING_INGEST_API_KEY` (and `set_partner_api_key` in DB) | `Hyperion / colorping / Ride Angels ingest key` | Must match ColorPing `RIDE_ANGELS_API_KEY` |
 
 ## Shared with another Hyperion app

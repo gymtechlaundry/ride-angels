@@ -42,35 +42,23 @@
         (timeChange)="onAppointmentTimeChange($event)"
       />
 
-      <label class="field">
-        <span class="label">Pickup Address (From)</span>
-        <div class="input-wrap">
-          <span class="ra-icon-box" style="width:16px;height:16px">
-            <img class="ra-icon" src="assets/icons/map-pin.svg" alt="" />
-          </span>
-          <input
-            formControlName="pickupLabel"
-            type="text"
-            placeholder="Home address"
-            autocomplete="street-address"
-          />
-        </div>
-      </label>
+      <app-address-autocomplete
+        label="Pickup Address (From)"
+        placeholder="Start typing a pickup address"
+        autocompleteAttr="street-address"
+        [value]="form.controls.pickupLabel.value"
+        (valueChange)="onPickupText($event)"
+        (placeSelected)="onPickupPlace($event)"
+      />
 
-      <label class="field">
-        <span class="label">Destination Address (To)</span>
-        <div class="input-wrap">
-          <span class="ra-icon-box" style="width:16px;height:16px">
-            <img class="ra-icon" src="assets/icons/map-pin.svg" alt="" />
-          </span>
-          <input
-            formControlName="destinationLabel"
-            type="text"
-            placeholder="Where are you going?"
-            autocomplete="off"
-          />
-        </div>
-      </label>
+      <app-address-autocomplete
+        label="Destination Address (To)"
+        placeholder="Start typing a destination"
+        autocompleteAttr="off"
+        [value]="form.controls.destinationLabel.value"
+        (valueChange)="onDestinationText($event)"
+        (placeSelected)="onDestinationPlace($event)"
+      />
 
       <label class="field">
         <span class="label">Notes for your Ride Angel (optional)</span>
