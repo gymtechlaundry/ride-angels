@@ -4,7 +4,14 @@
  * Requires `npm run start:external` already serving on :4200.
  *
  * Optional: IOS_DEVICE_UDID=... to force a device.
+ *
+ * On Xcode 27+, `npx cap run ios --list` often omits physical devices
+ * (native-run still looks for Simulator.app / Device Hub listing). We fall
+ * back to `xcrun devicectl` so a plugged-in iPhone still auto-targets.
  */
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { networkInterfaces } from 'node:os';
 
@@ -26,12 +33,22 @@ function lanIPv4() {
   return null;
 }
 
-/** Prefer an available paired iPhone/iPad visible to Capacitor (`cap run ios --list`). */
-function resolvePhysicalDeviceTarget() {
-  if (process.env.IOS_DEVICE_UDID?.trim()) {
-    return process.env.IOS_DEVICE_UDID.trim();
+function pickUniquePhysical(devices) {
+  if (devices.length === 1) {
+    console.log(`Using device: ${devices[0].name} (${devices[0].udid})`);
+    return devices[0].udid;
   }
+  if (devices.length > 1) {
+    console.log('Multiple devices online — pick one with IOS_DEVICE_UDID=...');
+    for (const d of devices) {
+      console.log(`  ${d.name} → ${d.udid}`);
+    }
+  }
+  return null;
+}
 
+/** Capacitor / native-run listing (often empty for physical devices on Xcode 27). */
+function listFromCapacitor() {
   const listed = spawnSync('npx', ['cap', 'run', 'ios', '--list'], {
     encoding: 'utf8',
     shell: process.platform === 'win32',
@@ -47,18 +64,92 @@ function resolvePhysicalDeviceTarget() {
       }
     }
   }
+  return physical;
+}
 
-  if (physical.length === 1) {
-    console.log(`Using device: ${physical[0].name} (${physical[0].udid})`);
-    return physical[0].udid;
-  }
-  if (physical.length > 1) {
-    console.log('Multiple devices online — pick one with IOS_DEVICE_UDID=...');
-    for (const d of physical) {
-      console.log(`  ${d.name} → ${d.udid}`);
+/** Xcode 27 Device Hub / CoreDevice — reliable for a USB/network paired phone. */
+function listFromDevicectl() {
+  const dir = mkdtempSync(join(tmpdir(), 'ra-ios-devices-'));
+  const out = join(dir, 'devices.json');
+  try {
+    const listed = spawnSync(
+      'xcrun',
+      [
+        'devicectl',
+        'list',
+        'devices',
+        '--filter',
+        'properties.hardware.reality == "physical"',
+        '--json-output',
+        out,
+      ],
+      { encoding: 'utf8' },
+    );
+    if (listed.status !== 0) {
+      return [];
     }
+    const raw = JSON.parse(readFileSync(out, 'utf8'));
+    const devices = raw?.result?.devices ?? [];
+    const paired = [];
+    for (const dev of devices) {
+      const props = dev.properties ?? {};
+      const hw = props.hardware ?? dev.hardwareProperties ?? {};
+      const conn = props.connection ?? dev.connectionProperties ?? {};
+      const deviceMeta = props.device ?? dev.deviceProperties ?? {};
+      const udid = String(hw.udid ?? '').trim();
+      if (!udid) continue;
+      const pairing = String(
+        conn.pairingState ??
+          dev.connectionProperties?.pairingState ??
+          '',
+      ).toLowerCase();
+      if (pairing && pairing !== 'paired') continue;
+
+      const tunnel = String(
+        conn.tunnelState ??
+          conn.state ??
+          dev.connectionProperties?.tunnelState ??
+          '',
+      ).toLowerCase();
+      const ready =
+        tunnel === 'connected' ||
+        tunnel === 'available' ||
+        !!conn.tunnelIPAddressString ||
+        !!dev.connectionProperties?.tunnelIPAddressString;
+      const name =
+        deviceMeta.name ||
+        hw.marketingName ||
+        'iPhone';
+      paired.push({ name, udid, ready });
+    }
+    // Prefer a tunnel-ready phone; otherwise still return paired ones
+    // (unlock / wake the device if deploy then fails).
+    const ready = paired.filter((d) => d.ready);
+    return ready.length ? ready : paired;
+  } catch {
+    return [];
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
-  return null;
+}
+
+/** Prefer an available paired iPhone/iPad. */
+function resolvePhysicalDeviceTarget() {
+  if (process.env.IOS_DEVICE_UDID?.trim()) {
+    return process.env.IOS_DEVICE_UDID.trim();
+  }
+
+  const fromCap = listFromCapacitor();
+  const pickedCap = pickUniquePhysical(fromCap);
+  if (pickedCap) return pickedCap;
+
+  const fromDevice = listFromDevicectl();
+  if (fromDevice.length) {
+    console.log(
+      'Capacitor did not list a physical device; using xcrun devicectl.',
+    );
+  }
+  return pickUniquePhysical(fromDevice);
 }
 
 const host = lanIPv4();
@@ -101,8 +192,9 @@ if (target) {
   args.push(`--target=${target}`);
 } else {
   console.warn(
-    'No online physical device auto-detected. Capacitor will prompt (needs a real terminal).\n' +
-      'Unlock/plug in the iPhone, trust this Mac, then retry — or set IOS_DEVICE_UDID.',
+    'No online physical device auto-detected.\n' +
+      'Unlock/plug in the iPhone, trust this Mac, open Device Hub once, then retry.\n' +
+      'Or force: IOS_DEVICE_UDID=00008140-0018781C0C91401C npm run ios:live:device',
   );
 }
 
