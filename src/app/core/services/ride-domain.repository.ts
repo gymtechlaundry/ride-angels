@@ -129,6 +129,7 @@ export class RideDomainRepository {
           title: input.appointment.title,
           ride_date: input.appointment.date,
           ride_time: input.appointment.time,
+          appointment_start_time: input.appointment.appointmentStartTime ?? '',
           notes: input.appointment.notes ?? '',
           pickup_label: input.ride.pickup.label,
           pickup_line1: input.ride.pickup.line1,
@@ -329,6 +330,7 @@ export class RideDomainRepository {
           title: input.appointment.title,
           ride_date: input.appointment.date,
           ride_time: input.appointment.time,
+          appointment_start_time: input.appointment.appointmentStartTime ?? '',
           notes: input.appointment.notes ?? null,
           pickup_label: input.ride.pickup.label,
           pickup_line1: input.ride.pickup.line1,
@@ -592,6 +594,9 @@ export class RideDomainRepository {
       title: String(row['title']),
       date: String(row['ride_date']),
       time: String(row['ride_time']).slice(0, 5),
+      appointmentStartTime: row['appointment_start_time']
+        ? String(row['appointment_start_time']).slice(0, 5)
+        : undefined,
       notes: row['notes'] ? String(row['notes']) : undefined,
       status: row['status'] === 'cancelled' ? 'cancelled' : 'active',
       cancellationReason: row['cancellation_reason']

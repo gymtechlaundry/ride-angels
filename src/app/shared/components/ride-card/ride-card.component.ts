@@ -26,19 +26,33 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
           <span class="ra-icon-box" style="width:12px;height:12px">
             <img class="ra-icon" src="assets/icons/clock.svg" alt="" />
           </span>
-          {{ ride.timeLabel }}
+          Pickup at {{ ride.timeLabel }}
         </span>
         @if (!hideDate) {
           <span class="date">{{ ride.dateLabel }}</span>
         }
       </div>
 
-      <div class="route">
-        <span class="from">{{ ride.fromLabel }}</span>
-        <span class="ra-icon-box" style="width:12px;height:12px" aria-hidden="true">
-          <img class="ra-icon" src="assets/icons/arrow-right.svg" alt="" />
-        </span>
-        <span class="to">{{ ride.toLabel }}</span>
+      <div class="route" aria-label="Route from {{ ride.fromLabel }} to {{ ride.toLabel }}">
+        <div class="stop">
+          <span class="pin" aria-hidden="true">
+            <img class="ra-icon" src="assets/icons/map-pin-pickup.svg" alt="" />
+          </span>
+          <div class="stop-text">
+            <span class="stop-label">From</span>
+            <span class="stop-value">{{ ride.fromLabel }}</span>
+          </div>
+        </div>
+        <div class="route-rail" aria-hidden="true"></div>
+        <div class="stop">
+          <span class="pin" aria-hidden="true">
+            <img class="ra-icon" src="assets/icons/map-pin-destination.svg" alt="" />
+          </span>
+          <div class="stop-text">
+            <span class="stop-label">To</span>
+            <span class="stop-value">{{ ride.toLabel }}</span>
+          </div>
+        </div>
       </div>
 
       @if (ride.viewAs === 'angel' && ride.riderName) {
@@ -133,17 +147,59 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
       }
       .route {
         display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 10px 12px;
+        background: var(--ra-primary-soft);
+        border-radius: 12px;
+      }
+      .stop {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        min-width: 0;
+      }
+      .pin {
+        flex: 0 0 auto;
+        width: 14px;
+        height: 14px;
+        margin-top: 2px;
+        display: inline-flex;
         align-items: center;
-        gap: var(--ra-card-meta-gap);
-        font-size: var(--ra-card-body-size);
+        justify-content: center;
       }
-      .from {
-        color: var(--ra-text-secondary);
-        font-weight: 500;
+      .pin .ra-icon {
+        width: 14px;
+        height: 14px;
       }
-      .to {
-        color: var(--ra-ink);
+      .stop-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+      .stop-label {
+        font-size: 10px;
         font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--ra-text-muted);
+        line-height: 1.2;
+      }
+      .stop-value {
+        font-family: var(--ra-font-body);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ra-ink);
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+      .route-rail {
+        width: 2px;
+        height: 12px;
+        margin: 4px 0 4px 6px;
+        border-radius: 1px;
+        background: color-mix(in srgb, var(--ra-primary) 28%, transparent);
       }
       .driver {
         display: flex;

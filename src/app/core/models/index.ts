@@ -224,8 +224,10 @@ export interface Appointment {
   title: string;
   /** ISO date YYYY-MM-DD */
   date: string;
-  /** Local time HH:mm */
+  /** Pickup time HH:mm — when the Ride Angel should arrive. */
   time: string;
+  /** Optional clinic/appointment start HH:mm at the destination. */
+  appointmentStartTime?: string;
   notes?: string;
   status?: AppointmentStatus;
   cancellationReason?: string;

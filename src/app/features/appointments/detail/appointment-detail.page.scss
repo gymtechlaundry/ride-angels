@@ -45,6 +45,18 @@
   color: var(--ra-ink);
 }
 
+.when-line {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ra-ink);
+}
+
+.when-line--secondary {
+  font-weight: 500;
+  color: var(--ra-text-secondary);
+}
+
 .return {
   margin: 4px 0 0;
   font-size: 14px;

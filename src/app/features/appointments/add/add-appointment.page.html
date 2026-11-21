@@ -31,10 +31,10 @@
       </label>
 
       <app-date-time-field
-        label="Date & Time"
+        label="Pickup"
         mode="date-time"
         iconSrc="assets/icons/clock.svg"
-        placeholder="Choose date and time"
+        placeholder="When should your Ride Angel arrive?"
         [date]="form.controls.date.value"
         [time]="form.controls.time.value"
         [min]="minDate"
@@ -42,10 +42,42 @@
         (timeChange)="onAppointmentTimeChange($event)"
       />
 
+      <section class="optional-module">
+        <div class="toggle-header">
+          <div class="toggle-label">
+            <span class="ra-icon-box" style="width:16px;height:16px">
+              <img class="ra-icon" src="assets/icons/clock.svg" alt="" />
+            </span>
+            <span>Appointment starts at</span>
+          </div>
+          <ion-toggle
+            [checked]="hasAppointmentStart()"
+            (ionChange)="onAppointmentStartToggle($any($event).detail.checked)"
+            aria-label="Add appointment start time"
+          ></ion-toggle>
+        </div>
+        <p class="help">
+          Optional — when you need to be at the clinic or destination.
+        </p>
+
+        @if (hasAppointmentStart()) {
+          <app-date-time-field
+            class="nested"
+            label="Appointment start"
+            mode="time"
+            iconSrc="assets/icons/clock.svg"
+            placeholder="Choose start time"
+            [date]="form.controls.date.value"
+            [time]="form.controls.appointmentStartTime.value"
+            (timeChange)="onAppointmentStartTimeChange($event)"
+          />
+        }
+      </section>
+
       <app-address-autocomplete
         label="Pickup Address (From)"
         placeholder="Start typing a pickup address"
-        autocompleteAttr="street-address"
+        autocompleteAttr="off"
         [value]="form.controls.pickupLabel.value"
         (valueChange)="onPickupText($event)"
         (placeSelected)="onPickupPlace($event)"

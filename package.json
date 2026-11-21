@@ -38,7 +38,7 @@
     "ios:live": "npx cap run ios -l --host=localhost --port=4200",
     "//android:live": "Live-reload the Android app against ng serve on localhost:4200 (dev only).",
     "android:live": "bash scripts/android-with-jdk.sh npx cap run android -l --host=localhost --port=4200 --forwardPorts=4200:4200",
-    "//ios:live:device": "Live-reload on a physical iPhone (see scripts/ios-live-device.mjs).",
+    "//ios:live:device": "Live-reload on a physical iPhone via xcodebuild+devicectl (Xcode 27; cap run cannot see phones).",
     "ios:live:device": "node scripts/ios-live-device.mjs",
 
     "//build:ios:release": "Production www/ + Cap sync iOS. Run before Archive / TestFlight.",

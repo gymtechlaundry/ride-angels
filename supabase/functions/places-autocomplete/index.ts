@@ -101,7 +101,14 @@ Deno.serve(async (req) => {
       if (!res.ok) {
         const text = await res.text().catch(() => '');
         console.error('[places] autocomplete error', res.status, text);
-        return json({ error: 'places_upstream_error' }, 502);
+        return json(
+          {
+            error: 'places_upstream_error',
+            status: res.status,
+            message: text.slice(0, 400),
+          },
+          502,
+        );
       }
 
       const data = (await res.json()) as {

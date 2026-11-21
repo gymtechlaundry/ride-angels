@@ -1,28 +1,19 @@
 import { Injectable } from '@angular/core';
 import { getSupabaseClient, isSupabaseConfigured } from '../supabase/supabase-client';
+import { PlaceSuggestion, ResolvedPlace } from './places.models';
 
-export interface PlaceSuggestion {
-  placeId: string;
-  primaryText: string;
-  secondaryText: string;
-  fullText: string;
-}
-
-export interface ResolvedPlace {
-  placeId: string;
-  formattedAddress: string;
-  displayName: string;
-  line1: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  latitude?: number;
-  longitude?: number;
-}
+export type { PlaceSuggestion, ResolvedPlace } from './places.models';
 
 @Injectable({ providedIn: 'root' })
 export class PlacesService {
-  private sessionToken = crypto.randomUUID();
+  private sessionToken: string | null = null;
+
+  private ensureSession(): string {
+    if (!this.sessionToken) {
+      this.sessionToken = crypto.randomUUID();
+    }
+    return this.sessionToken;
+  }
 
   /** Start a new Places billing session (call when opening a field). */
   refreshSession(): void {
@@ -43,18 +34,24 @@ export class PlacesService {
           body: {
             action: 'suggest',
             input: q,
-            sessionToken: this.sessionToken,
+            sessionToken: this.ensureSession(),
           },
         },
       );
       if (error) {
-        console.warn('[places] suggest failed', error.message);
+        console.warn(
+          '[places] suggest failed',
+          error.message,
+          await readFunctionsErrorBody(error),
+        );
         return [];
       }
-      if (data?.error === 'places_not_configured') {
+      const payload = asRecord(data);
+      if (payload?.['error']) {
+        console.warn('[places] suggest rejected', payload['error'], payload['message']);
         return [];
       }
-      return (data?.suggestions ?? []) as PlaceSuggestion[];
+      return (payload?.['suggestions'] as PlaceSuggestion[] | undefined) ?? [];
     } catch (err) {
       console.warn('[places] suggest error', err);
       return [];
@@ -79,15 +76,24 @@ export class PlacesService {
           body: {
             action: 'details',
             placeId,
-            sessionToken: this.sessionToken,
+            sessionToken: this.ensureSession(),
           },
         },
       );
       if (error) {
-        console.warn('[places] details failed', error.message);
+        console.warn(
+          '[places] details failed',
+          error.message,
+          await readFunctionsErrorBody(error),
+        );
         return null;
       }
-      const place = data?.place as ResolvedPlace | undefined;
+      const payload = asRecord(data);
+      if (payload?.['error']) {
+        console.warn('[places] details rejected', payload['error']);
+        return null;
+      }
+      const place = payload?.['place'] as ResolvedPlace | undefined;
       if (!place?.formattedAddress) return null;
       // End session after a successful selection (Places session billing).
       this.refreshSession();
@@ -124,5 +130,27 @@ export class PlacesService {
           fullText,
         };
       });
+  }
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object'
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+async function readFunctionsErrorBody(error: unknown): Promise<unknown> {
+  const ctx = (error as { context?: Response } | null)?.context;
+  if (!ctx || typeof ctx.json !== 'function') {
+    return undefined;
+  }
+  try {
+    return await ctx.clone().json();
+  } catch {
+    try {
+      return await ctx.text();
+    } catch {
+      return undefined;
+    }
   }
 }

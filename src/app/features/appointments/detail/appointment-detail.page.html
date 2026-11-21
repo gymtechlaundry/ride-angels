@@ -20,7 +20,13 @@
 
           <div class="info-block">
             <p class="eyebrow">When</p>
-            <p class="when">{{ d.whenLabel }}</p>
+            <p class="when">{{ d.dateLabel }}</p>
+            <p class="when-line">Pickup {{ d.pickupTimeLabel }}</p>
+            @if (d.appointmentStartLabel) {
+              <p class="when-line when-line--secondary">
+                Appointment starts {{ d.appointmentStartLabel }}
+              </p>
+            }
           </div>
 
           <div class="route-box">

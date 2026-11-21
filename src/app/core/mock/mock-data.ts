@@ -204,6 +204,7 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
     title: 'Dr. Henderson (Dentist)',
     date: '2026-10-21',
     time: '09:15',
+    appointmentStartTime: '09:45',
     createdAt: '2026-10-03T12:00:00.000Z',
     updatedAt: '2026-10-03T12:00:00.000Z',
   },
