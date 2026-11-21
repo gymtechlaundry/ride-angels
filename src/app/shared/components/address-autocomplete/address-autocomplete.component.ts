@@ -11,16 +11,18 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
+import type {
   PlaceSuggestion,
-  PlacesService,
   ResolvedPlace,
-} from '../../../core/services/places.service';
+} from '../../../core/services/places.models';
+import { PlacesService } from '../../../core/services/places.service';
 
 @Component({
   selector: 'app-address-autocomplete',
   standalone: true,
   imports: [FormsModule],
+  // One Places session per field (also avoids root-injector timing issues on live reload).
+  providers: [PlacesService],
   templateUrl: './address-autocomplete.component.html',
   styleUrl: './address-autocomplete.component.scss',
 })

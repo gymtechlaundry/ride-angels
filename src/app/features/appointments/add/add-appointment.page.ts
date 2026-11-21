@@ -21,7 +21,7 @@ import {
   defaultAppointmentDateTime,
   toDateKey,
 } from '../../../core/utils/date-time';
-import { ResolvedPlace } from '../../../core/services/places.service';
+import type { ResolvedPlace } from '../../../core/services/places.models';
 import { AddressAutocompleteComponent } from '../../../shared/components/address-autocomplete/address-autocomplete.component';
 import { DateTimeFieldComponent } from '../../../shared/components/date-time-field/date-time-field.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';

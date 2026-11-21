@@ -1,28 +1,19 @@
 import { Injectable } from '@angular/core';
 import { getSupabaseClient, isSupabaseConfigured } from '../supabase/supabase-client';
+import { PlaceSuggestion, ResolvedPlace } from './places.models';
 
-export interface PlaceSuggestion {
-  placeId: string;
-  primaryText: string;
-  secondaryText: string;
-  fullText: string;
-}
-
-export interface ResolvedPlace {
-  placeId: string;
-  formattedAddress: string;
-  displayName: string;
-  line1: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  latitude?: number;
-  longitude?: number;
-}
+export type { PlaceSuggestion, ResolvedPlace } from './places.models';
 
 @Injectable({ providedIn: 'root' })
 export class PlacesService {
-  private sessionToken = crypto.randomUUID();
+  private sessionToken: string | null = null;
+
+  private ensureSession(): string {
+    if (!this.sessionToken) {
+      this.sessionToken = crypto.randomUUID();
+    }
+    return this.sessionToken;
+  }
 
   /** Start a new Places billing session (call when opening a field). */
   refreshSession(): void {
@@ -43,7 +34,7 @@ export class PlacesService {
           body: {
             action: 'suggest',
             input: q,
-            sessionToken: this.sessionToken,
+            sessionToken: this.ensureSession(),
           },
         },
       );
@@ -79,7 +70,7 @@ export class PlacesService {
           body: {
             action: 'details',
             placeId,
-            sessionToken: this.sessionToken,
+            sessionToken: this.ensureSession(),
           },
         },
       );
