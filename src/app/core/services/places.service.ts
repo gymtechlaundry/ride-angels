@@ -39,13 +39,19 @@ export class PlacesService {
         },
       );
       if (error) {
-        console.warn('[places] suggest failed', error.message);
+        console.warn(
+          '[places] suggest failed',
+          error.message,
+          await readFunctionsErrorBody(error),
+        );
         return [];
       }
-      if (data?.error === 'places_not_configured') {
+      const payload = asRecord(data);
+      if (payload?.['error']) {
+        console.warn('[places] suggest rejected', payload['error'], payload['message']);
         return [];
       }
-      return (data?.suggestions ?? []) as PlaceSuggestion[];
+      return (payload?.['suggestions'] as PlaceSuggestion[] | undefined) ?? [];
     } catch (err) {
       console.warn('[places] suggest error', err);
       return [];
@@ -75,10 +81,19 @@ export class PlacesService {
         },
       );
       if (error) {
-        console.warn('[places] details failed', error.message);
+        console.warn(
+          '[places] details failed',
+          error.message,
+          await readFunctionsErrorBody(error),
+        );
         return null;
       }
-      const place = data?.place as ResolvedPlace | undefined;
+      const payload = asRecord(data);
+      if (payload?.['error']) {
+        console.warn('[places] details rejected', payload['error']);
+        return null;
+      }
+      const place = payload?.['place'] as ResolvedPlace | undefined;
       if (!place?.formattedAddress) return null;
       // End session after a successful selection (Places session billing).
       this.refreshSession();
@@ -115,5 +130,27 @@ export class PlacesService {
           fullText,
         };
       });
+  }
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object'
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+async function readFunctionsErrorBody(error: unknown): Promise<unknown> {
+  const ctx = (error as { context?: Response } | null)?.context;
+  if (!ctx || typeof ctx.json !== 'function') {
+    return undefined;
+  }
+  try {
+    return await ctx.clone().json();
+  } catch {
+    try {
+      return await ctx.text();
+    } catch {
+      return undefined;
+    }
   }
 }
