@@ -129,6 +129,14 @@
   color: var(--ra-ink);
 }
 
+.stop-address {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ra-text-secondary);
+  line-height: 1.35;
+}
+
 .route-line {
   width: 1px;
   height: 24px;

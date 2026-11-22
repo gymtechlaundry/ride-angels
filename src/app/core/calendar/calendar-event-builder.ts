@@ -1,4 +1,9 @@
 import { RideCalendarEventPayload } from '../models/calendar';
+import {
+  addressCardLabel,
+  addressHasNickname,
+  addressStreetLine,
+} from '../utils/address-display';
 import { addHoursToTimeKey } from '../utils/date-time';
 
 /** Build a professional calendar event body (minimal PII). */
@@ -9,12 +14,15 @@ export function buildCalendarEventContent(payload: RideCalendarEventPayload): {
   startMs: number;
   endMs: number;
 } {
+  const destinationDisplay = addressCardLabel(
+    payload.destinationLabel,
+    payload.destinationLine1,
+  );
   const title = payload.title?.trim()
     ? `Ride Angels — ${payload.title.trim()}`
-    : `Ride Angels — Ride to ${payload.destinationLabel}`;
+    : `Ride Angels — Ride to ${destinationDisplay}`;
   const location =
-    payload.destinationLine1?.trim() ||
-    payload.destinationLabel ||
+    addressStreetLine(payload.destinationLabel, payload.destinationLine1) ||
     'Destination';
 
   const lines = [
@@ -24,8 +32,8 @@ export function buildCalendarEventContent(payload: RideCalendarEventPayload): {
     payload.riderName ? `Rider: ${payload.riderName}` : null,
     payload.angelName ? `Angel: ${payload.angelName}` : null,
     '',
-    `Pickup: ${payload.pickupLine1?.trim() || payload.pickupLabel}`,
-    `Destination: ${payload.destinationLine1?.trim() || payload.destinationLabel}`,
+    `Pickup: ${formatCalendarAddress(payload.pickupLabel, payload.pickupLine1)}`,
+    `Destination: ${formatCalendarAddress(payload.destinationLabel, payload.destinationLine1)}`,
     payload.notes ? `Notes: ${payload.notes}` : null,
     '',
     `Open in Ride Angels: ${payload.deepLink}`,
@@ -43,6 +51,14 @@ export function buildCalendarEventContent(payload: RideCalendarEventPayload): {
     startMs: toLocalMs(payload.date, payload.startTime),
     endMs: toLocalMs(payload.date, endTime),
   };
+}
+
+function formatCalendarAddress(label: string, line1?: string): string {
+  const street = addressStreetLine(label, line1);
+  if (addressHasNickname(label, line1 ?? '')) {
+    return `${addressCardLabel(label, line1)} — ${street}`;
+  }
+  return street;
 }
 
 function toLocalMs(date: string, time: string): number {

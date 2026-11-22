@@ -120,6 +120,33 @@
   line-height: 1.4;
 }
 
+.nickname-field {
+  margin-top: -6px;
+}
+
+.nickname-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nickname-chip {
+  padding: 6px 12px;
+  border: 1px solid var(--ra-border);
+  border-radius: 999px;
+  background: var(--ra-surface);
+  font-family: var(--ra-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ra-text-secondary);
+}
+
+.nickname-chip.active {
+  border-color: var(--ra-primary);
+  background: var(--ra-primary-soft);
+  color: var(--ra-primary);
+}
+
 .actions {
   padding-top: 8px;
 }

@@ -29,4 +29,7 @@ Without the secret, typing still works as free text; suggestions stay empty (fun
 
 ## Persistence
 
-Selected place’s `formattedAddress` is saved to `pickup_label` / `destination_label` (and street line to `*_line1`). Lat/lng / place id schema is a follow-up.
+- Address text (Places `formattedAddress` or typed value) → `pickup_line1` / `destination_line1`
+- Optional nickname (“Home”, “Clinic”) → `pickup_label` / `destination_label` when set; otherwise label matches line1
+- Cards prefer the nickname; detail shows nickname + full address when they differ
+- Lat/lng / place id / saved-places table are follow-ups

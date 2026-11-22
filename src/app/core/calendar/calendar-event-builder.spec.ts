@@ -28,6 +28,8 @@ describe('buildCalendarEventContent', () => {
     const content = buildCalendarEventContent(base);
     expect(content.notes).toContain('Rider: Alex Rider');
     expect(content.notes).toContain('Angel: Jordan Angel');
+    expect(content.notes).toContain('Pickup: Home — 12 Oak St');
+    expect(content.notes).toContain('Destination: Memorial Clinic — 100 Health Ave');
     expect(content.notes).toContain('Notes: Wheelchair assist');
     expect(content.notes).toContain(base.deepLink);
   });
