@@ -5,6 +5,7 @@ import {
   formatDateLabel,
   formatTimeLabel,
 } from '../mock/mock-data';
+import { addressCardLabel } from '../utils/address-display';
 import {
   RIDE_ASSIGNMENT_REPOSITORY,
   RIDE_OFFER_REPOSITORY,
@@ -101,9 +102,11 @@ export class RideOfferService {
         title: appt.title,
         timeLabel: formatTimeLabel(appt.time),
         dateLabel: formatDateLabel(appt.date),
-        fromLabel: ride.pickup.label.split('(')[0].trim() || ride.pickup.label,
-        toLabel:
-          ride.destination.label.split('(')[0].trim() || ride.destination.label,
+        fromLabel: addressCardLabel(ride.pickup.label, ride.pickup.line1),
+        toLabel: addressCardLabel(
+          ride.destination.label,
+          ride.destination.line1,
+        ),
         statusLabel: 'Awaiting confirm',
         date: appt.date,
         time: appt.time,

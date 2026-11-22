@@ -82,7 +82,12 @@ export type NotificationType =
 
 export interface Address {
   id: string;
+  /**
+   * Display name — optional nickname (“Home”, “Clinic”) when set;
+   * otherwise the same as `line1` / formatted address.
+   */
   label: string;
+  /** Street or full formatted address (always the navigable location). */
   line1: string;
   line2?: string;
   city?: string;

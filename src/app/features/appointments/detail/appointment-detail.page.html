@@ -36,7 +36,10 @@
               </span>
               <div>
                 <p class="stop-label">Pickup From</p>
-                <p class="stop-value">{{ d.ride.pickup.label }}</p>
+                <p class="stop-value">{{ pickupTitle() }}</p>
+                @if (pickupSubtitle(); as street) {
+                  <p class="stop-address">{{ street }}</p>
+                }
               </div>
             </div>
             <div class="route-line" aria-hidden="true"></div>
@@ -46,7 +49,10 @@
               </span>
               <div>
                 <p class="stop-label">Destination</p>
-                <p class="stop-value">{{ d.ride.destination.label }}</p>
+                <p class="stop-value">{{ destinationTitle() }}</p>
+                @if (destinationSubtitle(); as street) {
+                  <p class="stop-address">{{ street }}</p>
+                }
               </div>
             </div>
           </div>

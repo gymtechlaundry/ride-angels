@@ -21,6 +21,7 @@ import { ClaimBoardService } from '../../../core/services/claim-board.service';
 import { DomainSyncService } from '../../../core/services/domain-sync.service';
 import { RideAngelService } from '../../../core/services/ride-angel.service';
 import { RideOfferService } from '../../../core/services/ride-offer.service';
+import { addressCardLabel } from '../../../core/utils/address-display';
 import { promptOfferNote, promptWithdrawOfferReason } from '../../../core/utils/offer-prompt';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
@@ -156,7 +157,7 @@ export class CircleRiderDetailPage {
               riderRelationship: relationship,
               title: appointment.title,
               whenLabel: formatWhenLong(appointment.date, appointment.time),
-              routeLabel: `${ride.pickup.label} → ${ride.destination.label}`,
+              routeLabel: `${addressCardLabel(ride.pickup.label, ride.pickup.line1)} → ${addressCardLabel(ride.destination.label, ride.destination.line1)}`,
               visibility,
               claimedByCurrentUser: false,
               offerPendingByCurrentUser: offerPending,
@@ -170,7 +171,7 @@ export class CircleRiderDetailPage {
           rideRequestId: ride.id,
           title: appointment.title,
           whenLabel: formatWhenLong(appointment.date, appointment.time),
-          routeLabel: `${ride.pickup.label} → ${ride.destination.label}`,
+          routeLabel: `${addressCardLabel(ride.pickup.label, ride.pickup.line1)} → ${addressCardLabel(ride.destination.label, ride.destination.line1)}`,
           statusLabel: toStatusLabel(
             ride.status,
             assignment?.confirmationStatus,

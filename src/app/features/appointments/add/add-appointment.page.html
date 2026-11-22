@@ -78,19 +78,73 @@
         label="Pickup Address (From)"
         placeholder="Start typing a pickup address"
         autocompleteAttr="off"
-        [value]="form.controls.pickupLabel.value"
+        [value]="form.controls.pickupAddress.value"
         (valueChange)="onPickupText($event)"
         (placeSelected)="onPickupPlace($event)"
       />
+
+      <label class="field nickname-field">
+        <span class="label">Pickup nickname (optional)</span>
+        <div class="input-wrap">
+          <input
+            formControlName="pickupNickname"
+            type="text"
+            placeholder="e.g. Home"
+            maxlength="40"
+            autocomplete="off"
+          />
+        </div>
+        <div class="nickname-chips" role="group" aria-label="Pickup nickname suggestions">
+          @for (chip of nicknameSuggestions; track chip) {
+            <button
+              type="button"
+              class="nickname-chip ra-reset"
+              [class.active]="form.controls.pickupNickname.value === chip"
+              (click)="applyPickupNickname(chip)"
+            >
+              {{ chip }}
+            </button>
+          }
+        </div>
+      </label>
 
       <app-address-autocomplete
         label="Destination Address (To)"
         placeholder="Start typing a destination"
         autocompleteAttr="off"
-        [value]="form.controls.destinationLabel.value"
+        [value]="form.controls.destinationAddress.value"
         (valueChange)="onDestinationText($event)"
         (placeSelected)="onDestinationPlace($event)"
       />
+
+      <label class="field nickname-field">
+        <span class="label">Destination nickname (optional)</span>
+        <div class="input-wrap">
+          <input
+            formControlName="destinationNickname"
+            type="text"
+            placeholder="e.g. Clinic"
+            maxlength="40"
+            autocomplete="off"
+          />
+        </div>
+        <div
+          class="nickname-chips"
+          role="group"
+          aria-label="Destination nickname suggestions"
+        >
+          @for (chip of nicknameSuggestions; track chip) {
+            <button
+              type="button"
+              class="nickname-chip ra-reset"
+              [class.active]="form.controls.destinationNickname.value === chip"
+              (click)="applyDestinationNickname(chip)"
+            >
+              {{ chip }}
+            </button>
+          }
+        </div>
+      </label>
 
       <label class="field">
         <span class="label">Notes for your Ride Angel (optional)</span>

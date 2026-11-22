@@ -12,6 +12,7 @@ import {
   RideStatusLabel,
   User,
 } from '../models';
+import { addressCardLabel } from '../utils/address-display';
 import { isPastAppointmentListWindow, isPastLocalDateTime } from '../utils/date-time';
 
 /** Offline-demo avatars — large PNGs are not packaged in Cap builds. */
@@ -427,8 +428,8 @@ export function buildRideCards(
       title: appt.title,
       timeLabel: formatTimeLabel(appt.time),
       dateLabel: formatDateLabel(appt.date),
-      fromLabel: ride.pickup.label.split('(')[0].trim() || ride.pickup.label,
-      toLabel: ride.destination.label.split('(')[0].trim() || ride.destination.label,
+      fromLabel: addressCardLabel(ride.pickup.label, ride.pickup.line1),
+      toLabel: addressCardLabel(ride.destination.label, ride.destination.line1),
       statusLabel: toStatusLabel(ride.status, assignment?.confirmationStatus),
       claimedByName: angel?.displayName,
       claimedByAvatarUrl: angel?.avatarUrl,
@@ -492,8 +493,8 @@ export function buildUpcomingDrivesForAngel(
       title: appt.title,
       timeLabel: formatTimeLabel(appt.time),
       dateLabel: formatDateLabel(appt.date),
-      fromLabel: ride.pickup.label.split('(')[0].trim() || ride.pickup.label,
-      toLabel: ride.destination.label.split('(')[0].trim() || ride.destination.label,
+      fromLabel: addressCardLabel(ride.pickup.label, ride.pickup.line1),
+      toLabel: addressCardLabel(ride.destination.label, ride.destination.line1),
       statusLabel: toStatusLabel(ride.status, assignment.confirmationStatus),
       date: appt.date,
       time: appt.time,
@@ -603,7 +604,7 @@ export function buildClaimBoard(
       riderRelationship: relationship,
       title: appt.title,
       whenLabel: `${formatDateLabel(appt.date)} at ${formatTimeLabel(appt.time)}`,
-      routeLabel: `${ride.pickup.label.split('(')[0].trim()} to ${ride.destination.label.split('(')[0].trim()}`,
+      routeLabel: `${addressCardLabel(ride.pickup.label, ride.pickup.line1)} to ${addressCardLabel(ride.destination.label, ride.destination.line1)}`,
       visibility: ride.visibility === 'public' ? 'public' : 'private',
       claimedByCurrentUser: claimedByMe,
       date: appt.date,

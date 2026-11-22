@@ -20,6 +20,11 @@ import { ClaimBoardService } from '../../../core/services/claim-board.service';
 import { DomainSyncService } from '../../../core/services/domain-sync.service';
 import { RideOfferService } from '../../../core/services/ride-offer.service';
 import { toStatusLabel, formatTimeLabel } from '../../../core/mock/mock-data';
+import {
+  addressCardLabel,
+  addressHasNickname,
+  addressStreetLine,
+} from '../../../core/utils/address-display';
 import { promptOfferNote, promptWithdrawOfferReason } from '../../../core/utils/offer-prompt';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { ProfileAvatarComponent } from '../../../shared/components/profile-avatar/profile-avatar.component';
@@ -86,6 +91,37 @@ export class AppointmentDetailPage {
       return 'Unclaimed';
     }
     return toStatusLabel(d.ride.status, d.assignment?.confirmationStatus);
+  });
+
+  readonly pickupTitle = computed(() => {
+    const pickup = this.detail()?.ride.pickup;
+    if (!pickup) return '';
+    return addressCardLabel(pickup.label, pickup.line1);
+  });
+
+  readonly pickupSubtitle = computed(() => {
+    const pickup = this.detail()?.ride.pickup;
+    if (!pickup || !addressHasNickname(pickup.label, pickup.line1)) {
+      return null;
+    }
+    return addressStreetLine(pickup.label, pickup.line1);
+  });
+
+  readonly destinationTitle = computed(() => {
+    const destination = this.detail()?.ride.destination;
+    if (!destination) return '';
+    return addressCardLabel(destination.label, destination.line1);
+  });
+
+  readonly destinationSubtitle = computed(() => {
+    const destination = this.detail()?.ride.destination;
+    if (
+      !destination ||
+      !addressHasNickname(destination.label, destination.line1)
+    ) {
+      return null;
+    }
+    return addressStreetLine(destination.label, destination.line1);
   });
 
   readonly isRider = computed(() => {

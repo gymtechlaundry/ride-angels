@@ -84,7 +84,9 @@ export class AddressAutocompleteComponent implements OnDestroy {
     }, 280);
   }
 
-  async onSelect(suggestion: PlaceSuggestion): Promise<void> {
+  async onSelect(event: Event, suggestion: PlaceSuggestion): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
     this.open.set(false);
     this.resolving.set(true);
     try {
