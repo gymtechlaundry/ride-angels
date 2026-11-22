@@ -3,6 +3,13 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* Keep closed fields from trapping sibling paint order. */
+  z-index: 0;
+}
+
+/* Open dropdown must stack above the next form fields (e.g. nickname chips). */
+.address-ac.is-open {
+  z-index: 30;
 }
 
 .label {

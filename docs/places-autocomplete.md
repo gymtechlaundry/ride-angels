@@ -22,8 +22,11 @@ supabase secrets set \
   --project-ref zuvfzmpdmjwewcuyxtac
 
 supabase functions deploy places-autocomplete \
-  --project-ref zuvfzmpdmjwewcuyxtac
+  --project-ref zuvfzmpdmjwewcuyxtac \
+  --no-verify-jwt
 ```
+
+(`verify_jwt = false` is also set in `supabase/config.toml` for this function — the handler still requires a signed-in user via `auth.getUser()`.)
 
 Without the secret, typing still works as free text; suggestions stay empty (function returns `places_not_configured`).
 

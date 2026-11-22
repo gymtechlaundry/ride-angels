@@ -1,4 +1,4 @@
-<label class="field address-ac">
+<label class="field address-ac" [class.is-open]="open()">
   <span class="label">{{ label }}</span>
   <div class="input-wrap" [class.busy]="loading() || resolving()">
     <span class="ra-icon-box" style="width:16px;height:16px">
