@@ -1,4 +1,4 @@
-<label class="field address-ac" [class.is-open]="open()">
+<label class="field address-ac">
   <span class="label">{{ label }}</span>
   <div class="input-wrap" [class.busy]="loading() || resolving()">
     <span class="ra-icon-box" style="width:16px;height:16px">
@@ -29,7 +29,11 @@
     >
       @for (s of suggestions(); track s.placeId) {
         <li role="option">
-          <button type="button" class="suggestion" (mousedown)="onSelect(s)">
+          <button
+            type="button"
+            class="suggestion"
+            (pointerdown)="onSelect($event, s)"
+          >
             <span class="suggestion__primary">{{ s.primaryText }}</span>
             @if (s.secondaryText) {
               <span class="suggestion__secondary">{{ s.secondaryText }}</span>

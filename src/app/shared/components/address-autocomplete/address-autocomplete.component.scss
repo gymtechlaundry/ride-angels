@@ -1,15 +1,7 @@
 .address-ac {
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  /* Keep closed fields from trapping sibling paint order. */
-  z-index: 0;
-}
-
-/* Open dropdown must stack above the next form fields (e.g. nickname chips). */
-.address-ac.is-open {
-  z-index: 30;
 }
 
 .label {
@@ -39,7 +31,8 @@
   outline: none;
   background: transparent;
   font-family: var(--ra-font-body);
-  font-size: 14px;
+  /* 16px avoids iOS focus-zoom; keeps suggestions usable while typing. */
+  font-size: 16px;
   color: var(--ra-ink);
   min-width: 0;
 }
@@ -48,12 +41,11 @@
   color: var(--ra-text-secondary);
 }
 
+/*
+ * In-flow list (not absolute). Absolute menus get clipped by ion-content /
+ * WKWebView scrollers on iOS even when z-index is raised.
+ */
 .suggestions {
-  position: absolute;
-  z-index: 1000;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
   margin: 0;
   padding: 6px;
   list-style: none;
@@ -63,6 +55,7 @@
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
   max-height: 240px;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .suggestion {
